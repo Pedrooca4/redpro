@@ -24,18 +24,13 @@ pnpm start
 
 Não execute os servidores de desenvolvimento e produção simultaneamente na mesma porta.
 
-## Configuração do Supabase
+## Ambiente RED-004
 
-Copie `.env.example` para `.env.local` e preencha apenas quando for configurar o projeto Supabase:
+A base funciona sem credenciais externas. O [.env.example](.env.example) documenta as duas variáveis públicas Supabase preparadas e o alvo opcional do smoke HTTP, sempre com valores vazios.
 
-```dotenv
-NEXT_PUBLIC_SUPABASE_URL=
-NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
-```
+Consulte [docs/ENVIRONMENT.md](docs/ENVIRONMENT.md) para configurar o desenvolvimento e a Vercel, entender a exposição de cada variável e distinguir configurações atuais das futuras. Não envie credenciais pelo chat ou pelo GitHub.
 
-Essas variáveis são públicas por definição e podem chegar ao navegador. Use a chave **publishable**, nunca uma chave secreta ou `service_role`. Segredos de provedores de IA deverão permanecer exclusivamente no servidor quando essa integração for implementada. Não versione `.env.local` nem cole credenciais em logs, issues ou documentação.
-
-Configurar as variáveis não implementa login, autorização ou acesso seguro aos dados. Essas entregas dependem das próximas tarefas de banco, políticas de acesso e autenticação. Não há migração a aplicar nesta etapa.
+Execute pnpm check:env na raiz do checkout para verificar o exemplo vazio e a proteção do Git. O comando exige Git instalado, não lê arquivos privados e não substitui a revisão do diff. O .gitignore existente foi preservado. Configurar variáveis não comprova conexão Supabase, autenticação ou persistência.
 
 ## Comandos
 
@@ -104,4 +99,4 @@ Antes de enviar alterações: pnpm format:check, pnpm lint, pnpm typecheck, pnpm
 
 Site publicado: https://redpro-pp-0c16.vercel.app. Repositório: https://github.com/Pedrooca4/redpro. Deploys automáticos estão vinculados ao projeto Vercel existente.
 
-A RED-003 configura lint e formatação; evidências em [docs/RED-003.md](docs/RED-003.md). A próxima tarefa é RED-004, criar variáveis de ambiente e .env.example. Enviar novas alterações continua sujeito à autorização do usuário.
+A RED-004 documenta variáveis e protege seu versionamento; evidências em [docs/RED-004.md](docs/RED-004.md). A próxima tarefa é RED-005, configurar testes unitários. Enviar alterações continua sujeito à autorização do usuário.
