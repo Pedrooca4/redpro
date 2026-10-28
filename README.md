@@ -72,6 +72,23 @@ Next.js 16.4.3 com App Router, TypeScript, React, Tailwind CSS 4 e ícones Lucid
 
 Os cinco documentos oficiais orientam o projeto. A relação das referências, as decisões desta entrega e o critério de aceite da RED-001 estão em [docs/RED-001.md](docs/RED-001.md). O preparo para Vercel está em [docs/DEPLOY.md](docs/DEPLOY.md).
 
-## Próxima etapa
+## TypeScript e imports RED-002
 
-Reutilizar o repositório GitHub `redpro` existente em https://github.com/Pedrooca4/redpro, após obter a autorização necessária para enviar alterações. Não criar um repositório remoto substituto nem enviar diretamente à branch de produção. Depois da RED-001, seguir os itens de fundação do backlog e suas evidências de aceite.
+O projeto usa strict: true, que inclui noImplicitAny e strictNullChecks, e verifica os tipos sem emitir JavaScript com pnpm typecheck. Os arquivos da aplicação usam .ts/.tsx; allowJs: false evita incluir fontes JavaScript não verificadas. Arquivos de ferramenta .mjs continuam sendo executados pelo Node e verificados pelo lint. forceConsistentCasingInFileNames exige consistência nos nomes importados.
+
+O alias único @/* resolve ./src/* no TypeScript e no Next.js. Exemplos:
+
+```ts
+import type { SupabaseConfig } from "@/config/supabase";
+import { SiteHeader } from "@/components/site-header";
+```
+
+Use imports relativos dentro do mesmo módulo quando forem mais claros. O executor nativo do Node dos testes de runtime não interpreta paths do tsconfig: nesses testes, use caminhos relativos com extensão .ts. A fixture tests/typescript-contract.ts usa o alias apenas na verificação do compilador; ela não é executada pelo comando test.
+
+Prefira inferência ou tipos de domínio. Para valores externos sem tipo, use unknown e faça validação antes do uso. Não contorne erros com any ou supressões sem justificativa. O comando typecheck valida também as expectativas negativas da fixture.
+
+## Estado e próxima etapa
+
+RED-001 publicada: https://redpro-pp-0c16.vercel.app. O repositório existente é https://github.com/Pedrooca4/redpro.
+
+A RED-002 complementa a configuração de tipos, documenta aliases e registra seu aceite em [docs/RED-002.md](docs/RED-002.md). A próxima tarefa é RED-003, configurar lint e formatação. O envio de novas alterações continua sujeito à autorização do usuário.
