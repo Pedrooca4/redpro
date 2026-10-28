@@ -17,14 +17,23 @@
     "lint:fix": "eslint . --fix --max-warnings=0",
     "format": "prettier . --write",
     "format:check": "prettier . --check",
-    "check:env": "node scripts/check-env.mjs"
+    "check:env": "node scripts/check-env.mjs",
+    "db:new": "node scripts/db-new.mjs",
+    "db:target": "node --env-file-if-exists=.env.development.local --experimental-strip-types scripts/db.ts target",
+    "db:check": "node --env-file-if-exists=.env.development.local --experimental-strip-types scripts/db.ts check",
+    "db:status": "node --env-file-if-exists=.env.development.local --experimental-strip-types scripts/db.ts status",
+    "db:up": "node --env-file-if-exists=.env.development.local --experimental-strip-types scripts/db.ts up",
+    "db:down": "node --env-file-if-exists=.env.development.local --experimental-strip-types scripts/db.ts down",
+    "test:db": "node --experimental-strip-types --test tests/integration/database.test.ts"
   },
   "dependencies": {
     "@supabase/ssr": "0.12.7",
     "@supabase/supabase-js": "2.118.0",
     "client-only": "0.0.1",
+    "kysely": "0.29.7",
     "lucide-react": "1.62.0",
     "next": "16.4.3",
+    "pg": "8.23.1",
     "react": "19.3.1",
     "react-dom": "19.3.1",
     "server-only": "0.0.1"
@@ -32,6 +41,7 @@
   "devDependencies": {
     "@tailwindcss/postcss": "4.3.3",
     "@types/node": "24.19.2",
+    "@types/pg": "8.23.1",
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
     "eslint": "9.39.5",

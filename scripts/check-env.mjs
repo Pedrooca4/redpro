@@ -13,6 +13,11 @@ const expected = [
   "NEXT_PUBLIC_SUPABASE_URL",
   "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY",
   "SMOKE_BASE_URL",
+  "DATABASE_URL",
+  "REDPRO_DB_PASSWORD",
+  "REDPRO_DB_ENV",
+  "REDPRO_DB_TARGET_REF",
+  "REDPRO_DB_SSL_CA_FILE",
 ];
 const names = [];
 for (const line of readFileSync(".env.example", "utf8").split(/\r?\n/)) {
