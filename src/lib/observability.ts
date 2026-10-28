@@ -1,3 +1,5 @@
+import { unstable_rethrow } from "./next-control-flow.ts";
+import { PUBLIC_ERROR } from "./error-presentation.ts";
 import { randomUUID } from "node:crypto";
 
 export const REQUEST_ID_HEADER = "x-request-id";
@@ -8,7 +10,13 @@ type Route = (typeof routes)[number] | "unmatched";
 type Method = "GET" | "HEAD" | "POST" | "PUT" | "PATCH" | "DELETE" | "OPTIONS" | "OTHER";
 export type RequestContext = { requestId: string; route: Route; method: Method };
 type Event = "request.received" | "request.completed" | "request.failed";
-type Details = RequestContext & { status?: number; durationMs?: number };
+type Details = {
+  requestId: string;
+  route: string;
+  method: string;
+  status?: number;
+  durationMs?: number;
+};
 export type LogWriter = (line: string) => void;
 
 function safeRoute(value: string): Route {
@@ -95,8 +103,15 @@ export function withRequestLogging(
       });
       return result;
     } catch (error: unknown) {
-      log("request.failed", { ...context, durationMs: performance.now() - started });
-      throw error; // Preserve existing behavior; global error handling belongs to RED-009.
+      unstable_rethrow(error);
+      log("request.failed", { ...context, status: 500, durationMs: performance.now() - started });
+      return Response.json(
+        { error: { ...PUBLIC_ERROR, requestId: context.requestId } },
+        {
+          status: 500,
+          headers: { "Cache-Control": "no-store", [REQUEST_ID_HEADER]: context.requestId },
+        },
+      );
     }
   };
 }
