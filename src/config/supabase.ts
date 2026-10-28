@@ -15,9 +15,7 @@ const loopbackHosts = new Set(["localhost", "127.0.0.1", "[::1]"]);
  * network requests. Missing configuration is supported during RED-001.
  * Error messages deliberately exclude configuration values.
  */
-export function getSupabaseConfig(
-  environment: SupabaseEnvironment,
-): SupabaseConfig | null {
+export function getSupabaseConfig(environment: SupabaseEnvironment): SupabaseConfig | null {
   const url = environment.url?.trim();
   const publishableKey = environment.publishableKey?.trim();
 
@@ -37,8 +35,7 @@ export function getSupabaseConfig(
   }
 
   const secureProtocol = parsedUrl.protocol === "https:";
-  const localHttp =
-    parsedUrl.protocol === "http:" && loopbackHosts.has(parsedUrl.hostname);
+  const localHttp = parsedUrl.protocol === "http:" && loopbackHosts.has(parsedUrl.hostname);
 
   if (
     (!secureProtocol && !localHttp) ||
@@ -64,9 +61,7 @@ export function getSupabaseConfig(
   return { url: parsedUrl.origin, publishableKey };
 }
 
-export function requireSupabaseConfig(
-  environment: SupabaseEnvironment,
-): SupabaseConfig {
+export function requireSupabaseConfig(environment: SupabaseEnvironment): SupabaseConfig {
   const config = getSupabaseConfig(environment);
   if (!config) {
     throw new Error(

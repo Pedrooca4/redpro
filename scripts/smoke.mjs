@@ -13,5 +13,10 @@ for (const [path, expectedStatus, text] of [
 const response = await fetch(new URL("/api/health", base), { signal: AbortSignal.timeout(15000) });
 assert.equal(response.status, 200);
 assert.equal(response.headers.get("cache-control"), "no-store");
-assert.deepEqual(await response.json(), { status: "ok", service: "redpro", version: "0.1.0", scope: "application-only" });
+assert.deepEqual(await response.json(), {
+  status: "ok",
+  service: "redpro",
+  version: "0.1.0",
+  scope: "application-only",
+});
 console.log("PASS /api/health — processo responde; sem alegar conexão externa");

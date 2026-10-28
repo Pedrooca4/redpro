@@ -12,9 +12,7 @@ import { requireSupabaseConfig } from "@/config/supabase";
  * RED-001 does not provide auth routes, session validation, or a refresh proxy.
  * Cookie errors are propagated instead of hiding a lost session refresh.
  */
-export async function createSupabaseServerClient(context: {
-  cookieAccess: "read-write";
-}) {
+export async function createSupabaseServerClient(context: { cookieAccess: "read-write" }) {
   if (context.cookieAccess !== "read-write") {
     throw new Error("Este cliente exige um contexto com escrita de cookies.");
   }

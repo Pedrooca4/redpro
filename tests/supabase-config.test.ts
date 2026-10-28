@@ -1,10 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import {
-  getSupabaseConfig,
-  requireSupabaseConfig,
-} from "../src/config/supabase.ts";
+import { getSupabaseConfig, requireSupabaseConfig } from "../src/config/supabase.ts";
 
 // Synthetic values, never credentials for a real Supabase project.
 const publishableKey = "sb_publishable_test-only-not-a-real-key-00000000";

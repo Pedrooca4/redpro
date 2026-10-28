@@ -33,15 +33,15 @@ Verifique também `/` e `/status` em desktop e mobile. Registre os resultados em
 
 Usar o projeto existente, caso já esteja vinculado ao repositório, ou importar o repositório autorizado. Não criar projetos duplicados sem antes conferir essa vinculação.
 
-| Configuração | Valor esperado |
-| --- | --- |
-| Framework Preset | Next.js |
-| Root Directory | `.` — raiz do repositório após integração dos arquivos. |
-| Node.js | 24.x, conforme a configuração suportada na conta. |
-| Install Command | `pnpm install --frozen-lockfile` |
-| Build Command | `pnpm build` |
-| Output Directory | Padrão do framework; não definir exportação estática. |
-| Package manager | pnpm, na versão fixada no `package.json`. |
+| Configuração     | Valor esperado                                          |
+| ---------------- | ------------------------------------------------------- |
+| Framework Preset | Next.js                                                 |
+| Root Directory   | `.` — raiz do repositório após integração dos arquivos. |
+| Node.js          | 24.x, conforme a configuração suportada na conta.       |
+| Install Command  | `pnpm install --frozen-lockfile`                        |
+| Build Command    | `pnpm build`                                            |
+| Output Directory | Padrão do framework; não definir exportação estática.   |
+| Package manager  | pnpm, na versão fixada no `package.json`.               |
 
 Se o repositório existente tiver uma organização diferente, revisar o diretório raiz antes do deploy. A pasta de entrega local não deve virar uma camada extra de diretórios no repositório por acidente.
 

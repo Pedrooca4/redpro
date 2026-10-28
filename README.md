@@ -39,15 +39,15 @@ Configurar as variáveis não implementa login, autorização ou acesso seguro a
 
 ## Comandos
 
-| Comando | Finalidade |
-| --- | --- |
-| `pnpm dev` | Iniciar o servidor de desenvolvimento. |
-| `pnpm build` | Compilar a aplicação para produção. |
-| `pnpm start` | Servir a compilação de produção já criada. |
-| `pnpm lint` | Verificar o código com o linter configurado. |
-| `pnpm typecheck` | Verificar os tipos TypeScript. |
-| `pnpm test` | Executar os testes da base. |
-| `pnpm smoke` | Executar a verificação HTTP contra a aplicação em execução. |
+| Comando          | Finalidade                                                  |
+| ---------------- | ----------------------------------------------------------- |
+| `pnpm dev`       | Iniciar o servidor de desenvolvimento.                      |
+| `pnpm build`     | Compilar a aplicação para produção.                         |
+| `pnpm start`     | Servir a compilação de produção já criada.                  |
+| `pnpm lint`      | Verificar o código com o linter configurado.                |
+| `pnpm typecheck` | Verificar os tipos TypeScript.                              |
+| `pnpm test`      | Executar os testes da base.                                 |
+| `pnpm smoke`     | Executar a verificação HTTP contra a aplicação em execução. |
 
 Execute `pnpm smoke` com o servidor local iniciado. Resultados e limitações da verificação desta entrega estão em [docs/RED-001.md](docs/RED-001.md).
 
@@ -60,10 +60,10 @@ Execute `pnpm smoke` com o servidor local iniciado. Resultados e limitações da
 - `src/components`: componentes visuais compartilhados.
 - `docs`: escopo da entrega e preparação para publicação.
 
-| Rota | Função atual |
-| --- | --- |
-| `/` | Apresentação inicial e escopo da plataforma. |
-| `/status` | Estado atual da implementação. |
+| Rota          | Função atual                                                           |
+| ------------- | ---------------------------------------------------------------------- |
+| `/`           | Apresentação inicial e escopo da plataforma.                           |
+| `/status`     | Estado atual da implementação.                                         |
 | `/api/health` | Resposta de saúde do processo web. Não verifica Supabase, banco ou IA. |
 
 ## Stack e decisões
@@ -87,8 +87,21 @@ Use imports relativos dentro do mesmo módulo quando forem mais claros. O execut
 
 Prefira inferência ou tipos de domínio. Para valores externos sem tipo, use unknown e faça validação antes do uso. Não contorne erros com any ou supressões sem justificativa. O comando typecheck valida também as expectativas negativas da fixture.
 
+## Lint e formatação RED-003
+
+```sh
+pnpm lint          # Verifica regras Next.js/TypeScript; avisos também falham
+pnpm lint:fix      # Aplica correções automáticas do ESLint
+pnpm format       # Aplica o padrão Prettier
+pnpm format:check # Verifica formatação sem alterar arquivos
+```
+
+As regras estão em eslint.config.mjs e .prettierrc.json. O Prettier trata apresentação; o ESLint verifica qualidade do código. Dois espaços, aspas duplas, ponto e vírgula, vírgulas finais e finais de linha LF são padronizados. O EditorConfig orienta os editores e .gitattributes padroniza o Git. A verificação de formatação ignora dependências, builds, arquivos gerados, lockfile e arquivos de ambiente.
+
+Antes de enviar alterações: pnpm format:check, pnpm lint, pnpm typecheck, pnpm test e pnpm build. A configuração de CI permanece na RED-006.
+
 ## Estado e próxima etapa
 
-RED-001 publicada: https://redpro-pp-0c16.vercel.app. O repositório existente é https://github.com/Pedrooca4/redpro.
+Site publicado: https://redpro-pp-0c16.vercel.app. Repositório: https://github.com/Pedrooca4/redpro. Deploys automáticos estão vinculados ao projeto Vercel existente.
 
-A RED-002 complementa a configuração de tipos, documenta aliases e registra seu aceite em [docs/RED-002.md](docs/RED-002.md). A próxima tarefa é RED-003, configurar lint e formatação. O envio de novas alterações continua sujeito à autorização do usuário.
+A RED-003 configura lint e formatação; evidências em [docs/RED-003.md](docs/RED-003.md). A próxima tarefa é RED-004, criar variáveis de ambiente e .env.example. Enviar novas alterações continua sujeito à autorização do usuário.

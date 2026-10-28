@@ -5,8 +5,7 @@ const project = (x: number, y: number, elevation = 0): Point => [
   114 + (x + y) * 23 - elevation,
 ];
 
-const points = (...vertices: Point[]) =>
-  vertices.map(([x, y]) => `${x},${y}`).join(" ");
+const points = (...vertices: Point[]) => vertices.map(([x, y]) => `${x},${y}`).join(" ");
 
 function Block({
   x,
@@ -42,13 +41,7 @@ function Block({
   );
 }
 
-function Trace({
-  route,
-  color = "#E45D48",
-}: {
-  route: readonly Point[];
-  color?: string;
-}) {
+function Trace({ route, color = "#E45D48" }: { route: readonly Point[]; color?: string }) {
   const line = route.map(([x, y]) => project(x, y, 2));
 
   return (
@@ -124,40 +117,143 @@ export function CircuitScene() {
       {Array.from({ length: 25 }, (_, index) => {
         const x = index % 5;
         const y = Math.floor(index / 5);
-        return (
-          <Block
-            key={index}
-            x={x}
-            y={y}
-            top={(x + y) % 3 === 0 ? "#26382A" : "#202E23"}
-          />
-        );
+        return <Block key={index} x={x} y={y} top={(x + y) % 3 === 0 ? "#26382A" : "#202E23"} />;
       })}
 
-      <Trace route={[[0.5, 1.5], [1.5, 1.5], [1.5, 3.5], [3.5, 3.5]]} />
-      <Trace route={[[2.5, 0.5], [3.5, 0.5], [3.5, 1.5], [4.5, 1.5]]} />
-      <Trace route={[[2.5, 2.5], [3.5, 2.5], [3.5, 3.5]]} color="#55F56B" />
-      <Trace route={[[0.5, 3.5], [0.5, 4.5], [2.5, 4.5], [2.5, 3.5]]} />
+      <Trace
+        route={[
+          [0.5, 1.5],
+          [1.5, 1.5],
+          [1.5, 3.5],
+          [3.5, 3.5],
+        ]}
+      />
+      <Trace
+        route={[
+          [2.5, 0.5],
+          [3.5, 0.5],
+          [3.5, 1.5],
+          [4.5, 1.5],
+        ]}
+      />
+      <Trace
+        route={[
+          [2.5, 2.5],
+          [3.5, 2.5],
+          [3.5, 3.5],
+        ]}
+        color="#55F56B"
+      />
+      <Trace
+        route={[
+          [0.5, 3.5],
+          [0.5, 4.5],
+          [2.5, 4.5],
+          [2.5, 3.5],
+        ]}
+      />
 
-      <Block x={0.1} y={1.08} height={46} elevation={46} size={0.78} top="#3D5B3E" left="#263D2A" right="#304D33" />
-      <Block x={0.19} y={1.17} height={7} elevation={53} size={0.6} top="#77D882" left="#3A7043" right="#4B8F54" />
+      <Block
+        x={0.1}
+        y={1.08}
+        height={46}
+        elevation={46}
+        size={0.78}
+        top="#3D5B3E"
+        left="#263D2A"
+        right="#304D33"
+      />
+      <Block
+        x={0.19}
+        y={1.17}
+        height={7}
+        elevation={53}
+        size={0.6}
+        top="#77D882"
+        left="#3A7043"
+        right="#4B8F54"
+      />
       <path d="M275 104 288 111 288 122 275 115Z" fill="#55F56B" opacity=".28" />
 
       <Torch x={2.5} y={0.5} />
 
-      <Block x={3.9} y={1.08} height={44} elevation={44} size={0.78} top="#53614A" left="#293C2D" right="#394C36" />
-      <Block x={3.98} y={1.16} height={10} elevation={54} size={0.62} top="#839474" left="#3F5140" right="#52644A" />
+      <Block
+        x={3.9}
+        y={1.08}
+        height={44}
+        elevation={44}
+        size={0.78}
+        top="#53614A"
+        left="#293C2D"
+        right="#394C36"
+      />
+      <Block
+        x={3.98}
+        y={1.16}
+        height={10}
+        elevation={54}
+        size={0.62}
+        top="#839474"
+        left="#3F5140"
+        right="#52644A"
+      />
       <path d="m460 181 18 10v8l-18-10Z" fill="#BDCA9E" opacity=".35" />
 
-      <Block x={2.06} y={2.06} height={42} elevation={42} size={0.82} top="url(#redpro-core-top)" left="#24743A" right="#319745" />
-      <polygon points={points(project(2.25, 2.25, 43), project(2.69, 2.25, 43), project(2.69, 2.69, 43), project(2.25, 2.69, 43))} fill="#C1FFB8" opacity=".55" />
-      <path d="M289 209v13l12 7v-13M307 219v13l8 5v-13" stroke="#70EB7D" strokeOpacity=".4" strokeWidth="2" />
-      <path d="M329 225v10l12-6v-10M347 215v10l7-4v-10" stroke="#91FF9D" strokeOpacity=".4" strokeWidth="2" />
+      <Block
+        x={2.06}
+        y={2.06}
+        height={42}
+        elevation={42}
+        size={0.82}
+        top="url(#redpro-core-top)"
+        left="#24743A"
+        right="#319745"
+      />
+      <polygon
+        points={points(
+          project(2.25, 2.25, 43),
+          project(2.69, 2.25, 43),
+          project(2.69, 2.69, 43),
+          project(2.25, 2.69, 43),
+        )}
+        fill="#C1FFB8"
+        opacity=".55"
+      />
+      <path
+        d="M289 209v13l12 7v-13M307 219v13l8 5v-13"
+        stroke="#70EB7D"
+        strokeOpacity=".4"
+        strokeWidth="2"
+      />
+      <path
+        d="M329 225v10l12-6v-10M347 215v10l7-4v-10"
+        stroke="#91FF9D"
+        strokeOpacity=".4"
+        strokeWidth="2"
+      />
 
       <Torch x={0.5} y={3.5} />
 
-      <Block x={3.12} y={3.12} height={27} elevation={27} size={0.7} top="#4B6947" left="#27452C" right="#355A37" />
-      <Block x={3.22} y={3.22} height={5} elevation={32} size={0.5} top="#8AE88B" left="#467F4C" right="#539459" />
+      <Block
+        x={3.12}
+        y={3.12}
+        height={27}
+        elevation={27}
+        size={0.7}
+        top="#4B6947"
+        left="#27452C"
+        right="#355A37"
+      />
+      <Block
+        x={3.22}
+        y={3.22}
+        height={5}
+        elevation={32}
+        size={0.5}
+        top="#8AE88B"
+        left="#467F4C"
+        right="#539459"
+      />
 
       <g stroke="#55F56B" strokeWidth="2" opacity=".5">
         <path d="m169 299 31 17m7 4 10 5M438 329l30-16m7-4 10-5" />
