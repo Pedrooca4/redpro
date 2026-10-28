@@ -99,4 +99,6 @@ Antes de enviar alterações: pnpm format:check, pnpm lint, pnpm typecheck, pnpm
 
 Site publicado: https://redpro-pp-0c16.vercel.app. Repositório: https://github.com/Pedrooca4/redpro. Deploys automáticos estão vinculados ao projeto Vercel existente.
 
-A RED-004 documenta variáveis e protege seu versionamento; evidências em [docs/RED-004.md](docs/RED-004.md). A próxima tarefa é RED-005, configurar testes unitários. Enviar alterações continua sujeito à autorização do usuário.
+O lote RED-005/RED-006 reaproveita os testes e adiciona CI no GitHub Actions. Consulte [docs/TESTING.md](docs/TESTING.md), [docs/RED-005.md](docs/RED-005.md) e [docs/RED-006.md](docs/RED-006.md). O workflow executa qualidade, build e smoke em branches e PRs sem segredos. Deploys permanecem sob responsabilidade da integração Git/Vercel. A CI não bloqueia automaticamente merge ou deploy.
+
+Próximo lote recomendado: RED-007 e RED-008 (convenções e logging base), dependentes da RED-001. Enviar alterações continua sujeito à autorização do usuário.
