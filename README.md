@@ -99,6 +99,6 @@ Antes de enviar alterações: pnpm format:check, pnpm lint, pnpm typecheck, pnpm
 
 Site publicado: https://redpro-pp-0c16.vercel.app. Repositório: https://github.com/Pedrooca4/redpro. Deploys automáticos estão vinculados ao projeto Vercel existente.
 
-O lote RED-007/RED-008 documenta o fluxo em [CONTRIBUTING.md](CONTRIBUTING.md) e acrescenta logging com IDs de requisição, detalhado em [docs/LOGGING.md](docs/LOGGING.md). A base de testes e CI anterior foi preservada e o smoke passou a verificar x-request-id.
+O lote RED-009/RED-010 adiciona tratamento de erros descrito em [docs/ERRORS.md](docs/ERRORS.md) e registra [ADRs iniciais](docs/adr/README.md). Decisões aceitas não significam integrações implementadas.
 
-Próximo lote recomendado: RED-009 e RED-010, tratamento global de erros e ADRs iniciais. Envio e integração continuam sujeitos à autorização do usuário.
+Próximo lote: RED-011 e RED-012, conexão de banco de desenvolvimento antes da camada de acesso e migrações. Envio e integração continuam sujeitos a autorização separada do usuário.

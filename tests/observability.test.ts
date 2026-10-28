@@ -111,7 +111,7 @@ test("handler completion keeps body, status, cache and correlated ID", async () 
   assert.ok(record.durationMs >= 0);
 });
 
-test("failed handler logs only a safe category and rethrows the original error", async () => {
+test("failed handler logs only a safe category and returns a safe response", async () => {
   const lines: string[] = [];
   const error = new Error("private-marker");
   const handler = withRequestLogging(
@@ -121,13 +121,12 @@ test("failed handler logs only a safe category and rethrows the original error",
     },
     createRequestLogger((line) => lines.push(line)),
   );
-  await assert.rejects(
-    handler(new Request("https://example.test/api/health")),
-    (value) => value === error,
-  );
+  const response = await handler(new Request("https://example.test/api/health"));
+  assert.equal(response.status, 500);
+  assert.ok(!(await response.text()).includes("private-marker"));
   assert.equal(JSON.parse(lines[0]!).event, "request.failed");
   assert.ok(!lines[0]!.includes("private-marker"));
-  assert.equal(JSON.parse(lines[0]!).status, undefined);
+  assert.equal(JSON.parse(lines[0]!).status, 500);
 });
 
 test("concurrent requests do not share correlation state", async () => {

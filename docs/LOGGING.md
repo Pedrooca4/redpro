@@ -10,7 +10,7 @@ O logger permite apenas rotas estáticas /, /status e /api/health; outras são r
 
 - request.received: entrada no proxy. Não afirma status ou duração final de resposta.
 - request.completed: término do handler instrumentado, com status real e duração em milissegundos.
-- request.failed: falha do handler, com duração e categoria fixa unhandled. Não registra a mensagem bruta nem supõe uma resposta entregue.
+- request.failed: falha do handler, com duração e categoria fixa unhandled. Não registra a mensagem bruta. Na API, a RED-009 devolve resposta 500 segura.
 
 O endpoint /api/health usa withRequestLogging e mantém seu contrato e cache. Novos handlers devem adotar o mesmo wrapper. Para as páginas, esta etapa registra a entrada e o ID; status/duração finais de renderização exigem instrumentação posterior. O header público permite correlacionar os eventos do proxy e do handler, mesmo em processos separados.
 
@@ -18,6 +18,6 @@ Falhas do destino do log não alteram a resposta do handler. O logger padrão es
 
 ## Limites
 
-A proteção é por lista de campos/valores permitidos, sem tentar limpar mensagens arbitrárias. Não passe conteúdo privado ao console diretamente. Logs internos do framework/plataforma ficam fora deste logger. O wrapper relança erros preservando o comportamento existente; tratamento global de erros é a RED-009.
+A proteção é por lista de campos/valores permitidos, sem tentar limpar mensagens arbitrárias. Não passe conteúdo privado ao console diretamente. Logs internos do framework/plataforma ficam fora deste logger. O wrapper preserva o controle de fluxo Next.js e converte falhas inesperadas em resposta segura conforme a RED-009.
 
 Os testes usam dados sintéticos, verificam descarte de campos, IDs concorrentes, propagação, erros e falha do destino de logs. O smoke HTTP verifica os headers em páginas, 404 e API.
