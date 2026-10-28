@@ -54,3 +54,45 @@ jobs:
           trap 'kill "$server_pid" 2>/dev/null || true' EXIT
           curl --fail --silent --show-error --retry 20 --retry-delay 1 --retry-connrefused http://127.0.0.1:3000/api/health > /dev/null
           pnpm smoke
+
+  database:
+    name: Disposable PostgreSQL migrations
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    services:
+      postgres:
+        image: postgres:17.11
+        env:
+          POSTGRES_DB: redpro_test
+          POSTGRES_USER: redpro_ci
+          # Public fixture password, valid only in this disposable service.
+          POSTGRES_PASSWORD: redpro_ci_disposable
+        ports:
+          - 5432/tcp
+        options: >-
+          --health-cmd "pg_isready -U redpro_ci -d redpro_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      NODE_ENV: test
+      REDPRO_DB_ENV: test
+      REDPRO_DB_TARGET_REF: local-test
+    steps:
+      - name: Checkout
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - name: Node.js
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version-file: .nvmrc
+          package-manager-cache: false
+      - name: Install pinned pnpm
+        run: npm install --global pnpm@10.28.1 --ignore-scripts
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Real PostgreSQL migration cycle
+        env:
+          DATABASE_URL: postgresql://redpro_ci:redpro_ci_disposable@127.0.0.1:${{ job.services.postgres.ports[5432] }}/redpro_test
+        run: pnpm test:db

@@ -2,7 +2,7 @@
 
 Base do RedPro, uma plataforma em desenvolvimento para inteligência artificial especializada em redstone e farms de Minecraft. Esta entrega inicia a **RED-001 — Criar repositório e projeto base**.
 
-A aplicação contém uma página inicial com identidade verde e preta, uma página de status e um endpoint de saúde do processo. Chat com IA, biblioteca, comunidade, autenticação e persistência ainda não estão implementados. Os clientes Supabase estão preparados para configuração; isso não comprova conexão com o projeto existente.
+A aplicação contém uma página inicial com identidade verde e preta, uma página de status e um endpoint de saúde do processo. Chat com IA, biblioteca, comunidade, autenticação e persistência de dados do produto ainda não estão implementados. A RED-011/012 comprovou conexão PostgreSQL e aplicação/reversão de uma migração técnica no Supabase de desenvolvimento; o site público continua sem consumir banco.
 
 ## Executar localmente
 
@@ -26,7 +26,7 @@ Não execute os servidores de desenvolvimento e produção simultaneamente na me
 
 ## Ambiente RED-004
 
-A base funciona sem credenciais externas. O [.env.example](.env.example) documenta as duas variáveis públicas Supabase preparadas e o alvo opcional do smoke HTTP, sempre com valores vazios.
+A base funciona sem credenciais externas. O [.env.example](.env.example) documenta as variáveis públicas Supabase, o alvo opcional do smoke HTTP e as variáveis privadas das ferramentas de banco RED-011/012, sempre com valores vazios.
 
 Consulte [docs/ENVIRONMENT.md](docs/ENVIRONMENT.md) para configurar o desenvolvimento e a Vercel, entender a exposição de cada variável e distinguir configurações atuais das futuras. Não envie credenciais pelo chat ou pelo GitHub.
 
@@ -99,6 +99,10 @@ Antes de enviar alterações: pnpm format:check, pnpm lint, pnpm typecheck, pnpm
 
 Site publicado: https://redpro-pp-0c16.vercel.app. Repositório: https://github.com/Pedrooca4/redpro. Deploys automáticos estão vinculados ao projeto Vercel existente.
 
-O lote RED-009/RED-010 adiciona tratamento de erros descrito em [docs/ERRORS.md](docs/ERRORS.md) e registra [ADRs iniciais](docs/adr/README.md). Decisões aceitas não significam integrações implementadas.
+O lote RED-009/RED-010 adiciona tratamento de erros descrito em [docs/ERRORS.md](docs/ERRORS.md) e registra [ADRs iniciais](docs/adr/README.md). O lote RED-011/RED-012 configura conexão privada de desenvolvimento, Kysely/pg e migrações reversíveis. Consulte [docs/DATABASE.md](docs/DATABASE.md), [RED-011](docs/RED-011.md) e [RED-012](docs/RED-012.md) para evidências, limites e reprodução.
 
-Próximo lote: RED-011 e RED-012, conexão de banco de desenvolvimento antes da camada de acesso e migrações. Envio e integração continuam sujeitos a autorização separada do usuário.
+Próximo lote recomendado: RED-013 e RED-014 (schemas de perfis e conversas), considerando RED-023 para a política de IDs/datas antes de criar os schemas. As permissões existentes e as credenciais de desenvolvimento precisam ser revisadas conforme a documentação. Envio e integração continuam sujeitos a autorização separada do usuário.
+
+## Comandos de banco
+
+`pnpm db:check` comprova conexão real de somente leitura. `pnpm db:status` consulta o estado das migrações. `pnpm db:new nome_descritivo` cria um arquivo local. `pnpm db:up` e `pnpm db:down` exigem confirmação de destino/nome e autorização antes de modificar o banco; veja o procedimento completo em [DATABASE.md](docs/DATABASE.md). `pnpm test:db` usa somente PostgreSQL descartável em loopback, provisionado pelo novo job da CI, sem acessar o Supabase.
