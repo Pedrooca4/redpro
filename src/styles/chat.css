@@ -34,6 +34,7 @@ summary:focus-visible {
   display: grid;
   grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
   height: 100dvh;
+  /* Short viewports may scroll the document; never collapse the message region. */
   min-height: 480px;
   background: var(--color-background);
 }
@@ -854,9 +855,6 @@ summary:focus-visible {
   }
 }
 @media (max-height: 600px) {
-  .chat-app {
-    min-height: 0;
-  }
   .chat-topbar {
     padding-block: 8px;
   }

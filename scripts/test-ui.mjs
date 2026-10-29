@@ -194,6 +194,54 @@ try {
     await context.close();
     await browser?.close();
   }
+  // Regression: a short viewport must not let the composer cover the tool buttons.
+  browser = await chromium.launch(launchOptions);
+  const compact = await browser.newContext({
+    viewport: { width: 320, height: 360 },
+    reducedMotion: "reduce",
+  });
+  const page = await compact.newPage();
+  const compactErrors = [];
+  page.on("pageerror", (error) => compactErrors.push(error.message));
+  await page.goto(new URL("/chat", base).href);
+  const draft = page.getByLabel(/^Sua mensagem/);
+  await draft.fill("Rascunho em uma janela baixa");
+  await page.getByRole("button", { name: "BedMine", exact: true }).click();
+  await page.getByLabel("Versão do Minecraft", { exact: true }).selectOption("1.21.0");
+  assert.equal(await draft.inputValue(), "Rascunho em uma janela baixa");
+  const geometry = await page.evaluate(() => {
+    const scroll = document.querySelector(".chat-scroll").getBoundingClientRect();
+    const composer = document.querySelector(".composer-area").getBoundingClientRect();
+    return {
+      messageRegionHeight: scroll.height,
+      composerOverlaps: composer.top < scroll.bottom - 1,
+      horizontalOverflow: document.documentElement.scrollWidth > innerWidth,
+    };
+  });
+  assert.ok(geometry.messageRegionHeight >= 44, "Message region must retain a usable height");
+  assert.equal(geometry.composerOverlaps, false);
+  assert.equal(geometry.horizontalOverflow, false);
+  await page.getByRole("button", { name: "Guia de mineração Y-Level", exact: true }).click();
+  await page.getByRole("dialog", { name: "Guia de mineração Y-Level", exact: true }).waitFor();
+  await page.keyboard.press("Escape");
+  await page.getByRole("button", { name: "Enviar mensagem de demonstração" }).click();
+  await page.locator(".local-message").waitFor();
+  await page.getByRole("button", { name: "Abrir navegação" }).click();
+  await page.getByRole("dialog", { name: "Navegação MinePRO" }).waitFor();
+  await page.keyboard.press("Escape");
+  assert.deepEqual(compactErrors, []);
+  await page.screenshot({ path: `${artifactDir}/chat-320x360.png`, fullPage: true });
+  results.push({
+    width: 320,
+    height: 360,
+    scenario: "short-viewport",
+    result: "PASS",
+    ...geometry,
+  });
+  console.log(
+    "PASS UI 320x360px: composer does not cover tools; draft, send and mobile menu remain usable",
+  );
+  await compact.close();
 } finally {
   await browser?.close();
 }

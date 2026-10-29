@@ -61,3 +61,11 @@ Branch preparada localmente. PR remoto e GitHub Actions deste lote ainda não ex
 MINE-001..006 estão implementadas localmente e registradas como parciais pelos gates de revisão, CI, merge e publicação. RED-035 tem tokens implementados no mesmo lote, sem alterar sua dependência. Integração PostgreSQL deste PR, aparelho físico, teclado virtual, zoom real e auditoria assistiva continuam pendentes. Credenciais compartilhadas e grants citados nos documentos não foram alterados nem considerados resolvidos.
 
 Após autorização para envio: publicar a branch e abrir o PR com a descrição preparada, conferir ambos os jobs da CI e o preview pelo SHA. Solicitar nova autorização para merge. Depois do merge autorizado: identificar o deployment de produção pelo SHA integrado, confirmar READY e verificar as rotas públicas sem confundir preview com produção.
+
+## Revisão remota do PR 5
+
+A publicação autorizada abriu o [PR 5](https://github.com/Pedrooca4/redpro/pull/5) com a árvore original idêntica à local. A [CI do PR](https://github.com/Pedrooca4/redpro/actions/runs/40933205784) aprovou os dois jobs, incluindo 54 testes unitários, build, smoke, UI nas quatro larguras e o ciclo completo de PostgreSQL 17.11 descartável (1 teste aprovado). A limitação do PostgreSQL local foi, portanto, superada pela evidência remota; nenhum Supabase real foi utilizado.
+
+O preview inicial foi verificado via HTTP e Chromium nas quatro larguras. Uma checagem adicional em 320 × 360 px encontrou colapso da área de mensagens: a regra de altura mínima zero permitia que o compositor interceptasse cliques nas ferramentas. A correção remove apenas essa exceção e mantém a altura útil mínima já definida, permitindo rolagem vertical do documento em janelas muito baixas. Não há redesenho ou alteração de componentes.
+
+Foi adicionado um teste de regressão que exige área de mensagens utilizável, ausência de sobreposição/overflow horizontal, preservação do rascunho e acesso às ferramentas, envio e menu mobile em 320 × 360 px. Os quatro tamanhos anteriores e todos os testes existentes permanecem exigidos. A revisão final da correção, a CI do novo commit e o preview correspondente devem ser conferidos no PR antes da autorização separada de merge. Teclado virtual em aparelho físico continua sem teste direto.
