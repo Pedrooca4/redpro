@@ -1,8 +1,10 @@
-# RedPro
+# MinePRO
 
-Base do RedPro, uma plataforma em desenvolvimento para inteligência artificial especializada em redstone e farms de Minecraft. Esta entrega inicia a **RED-001 — Criar repositório e projeto base**.
+Plataforma em desenvolvimento para ajudar jogadores de Minecraft Java Edition e Bedrock Edition. O lote S1 adiciona a identidade MinePRO, chat demonstrativo, JavaMine/BedMine, versão e seis modos de especialidade na aplicação Next.js existente.
 
-A aplicação contém uma página inicial com identidade verde e preta, uma página de status e um endpoint de saúde do processo. Chat com IA, biblioteca, comunidade, autenticação e persistência de dados do produto ainda não estão implementados. A RED-011/012 comprovou conexão PostgreSQL e aplicação/reversão de uma migração técnica no Supabase de desenvolvimento; o site público continua sem consumir banco.
+As mensagens desta etapa são locais e temporárias. Não há provedor de IA, histórico por conta, ferramentas reais, biblioteca publicada ou comunidade operacional. O site público não consome banco; a infraestrutura e as migrações anteriores foram preservadas.
+
+Veja [a entrega S1](docs/MINEPRO_S1.md) e o [System Prompt oficial](docs/AI_SYSTEM_PROMPT.md). Os relatórios RED anteriores permanecem como histórico técnico.
 
 ## Executar localmente
 
@@ -55,11 +57,14 @@ Execute `pnpm smoke` com o servidor local iniciado. Resultados e limitações da
 - `src/components`: componentes visuais compartilhados.
 - `docs`: escopo da entrega e preparação para publicação.
 
-| Rota          | Função atual                                                           |
-| ------------- | ---------------------------------------------------------------------- |
-| `/`           | Apresentação inicial e escopo da plataforma.                           |
-| `/status`     | Estado atual da implementação.                                         |
-| `/api/health` | Resposta de saúde do processo web. Não verifica Supabase, banco ou IA. |
+| Rota          | Função atual                                                                   |
+| ------------- | ------------------------------------------------------------------------------ |
+| `/`           | Apresentação inicial e escopo da plataforma.                                   |
+| `/chat`       | Interface demonstrativa com seletores, seis modos e ferramentas em preparação. |
+| `/projetos`   | Estado vazio da futura biblioteca.                                             |
+| `/comunidade` | Estado vazio da futura comunidade.                                             |
+| `/status`     | Estado atual da implementação.                                                 |
+| `/api/health` | Resposta de saúde do processo web. Não verifica Supabase, banco ou IA.         |
 
 ## Stack e decisões
 
@@ -101,7 +106,7 @@ Site publicado: https://redpro-pp-0c16.vercel.app. Repositório: https://github.
 
 O lote RED-009/RED-010 adiciona tratamento de erros descrito em [docs/ERRORS.md](docs/ERRORS.md) e registra [ADRs iniciais](docs/adr/README.md). O lote RED-011/RED-012 configura conexão privada de desenvolvimento, Kysely/pg e migrações reversíveis. Consulte [docs/DATABASE.md](docs/DATABASE.md), [RED-011](docs/RED-011.md) e [RED-012](docs/RED-012.md) para evidências, limites e reprodução.
 
-Próximo lote recomendado: RED-013 e RED-014 (schemas de perfis e conversas), considerando RED-023 para a política de IDs/datas antes de criar os schemas. As permissões existentes e as credenciais de desenvolvimento precisam ser revisadas conforme a documentação. Envio e integração continuam sujeitos a autorização separada do usuário.
+Próximo lote recomendado: RED-023 antes de RED-013 e RED-014 (schemas de perfis e conversas), considerando RED-023 para a política de IDs/datas antes de criar os schemas. As permissões existentes e as credenciais de desenvolvimento precisam ser revisadas conforme a documentação. Envio e integração continuam sujeitos a autorização separada do usuário.
 
 ## Comandos de banco
 

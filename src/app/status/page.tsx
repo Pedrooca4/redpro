@@ -13,16 +13,16 @@ export default function StatusPage() {
           <ArrowLeft size={16} aria-hidden="true" /> Voltar ao início
         </Link>
         <p className="eyebrow">
-          <span className="status-dot" /> VERSÃO 0.1.0 • FUNDAÇÃO
+          <span className="status-dot" /> PROTÓTIPO • INTERFACE EM EVOLUÇÃO
         </p>
         <h1>
-          O primeiro bloco
+          Uma nova interface
           <br />
-          <span className="text-green">do RedPro.</span>
+          <span className="text-green">do MinePRO.</span>
         </h1>
         <p className="status-lead">
-          Esta é a primeira entrega do projeto. A base do site existe; os recursos de IA, biblioteca
-          e comunidade serão construídos nas próximas etapas.
+          A interface demonstrativa permite escolher edição, versão e especialidade. IA real,
+          contas, biblioteca e comunidade continuam em desenvolvimento.
         </p>
         <div className="status-grid">
           <section className="status-panel">
@@ -32,7 +32,9 @@ export default function StatusPage() {
             <h2>A estrutura inicial</h2>
             <ul>
               <li>Página inicial e navegação responsiva.</li>
-              <li>Identidade visual verde e preta.</li>
+              <li>Identidade visual MinePRO em obsidiana e esmeralda.</li>
+              <li>Chat local, JavaMine/BedMine, versão e seis modos.</li>
+              <li>Prévias das ferramentas, sem execução real.</li>
               <li>Aplicação Next.js com TypeScript.</li>
               <li>Endpoint para verificar se a aplicação responde.</li>
             </ul>
@@ -52,20 +54,18 @@ export default function StatusPage() {
             <ul>
               <li>Cadastro, login e perfis.</li>
               <li>Chat com IA e consulta a fontes.</li>
-              <li>Biblioteca de farms e projetos.</li>
+              <li>Biblioteca de projetos de Minecraft.</li>
               <li>Publicações e interações da comunidade.</li>
             </ul>
             <p className="small-note">
-              A integração com Supabase está preparada no código. Conexão, permissões e persistência
-              ainda precisam ser configuradas e verificadas.
+              O site público não consome banco de dados. A preparação técnica existente não implica
+              contas ou persistência de mensagens.
             </p>
           </section>
         </div>
         <div className="status-footnote">
-          <span>RED-001</span>
-          <p>
-            Projeto base e documentação de execução. Esta versão não representa a conclusão do MVP.
-          </p>
+          <span>MinePRO</span>
+          <p>Interface demonstrativa. Esta versão não representa a conclusão do MVP.</p>
         </div>
       </main>
       <SiteFooter />

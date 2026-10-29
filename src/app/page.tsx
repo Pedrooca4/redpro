@@ -14,12 +14,14 @@ import {
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { CircuitScene } from "@/components/circuit-scene";
+import { MODES } from "@/features/chat/config";
+import { MODE_ICONS } from "@/features/chat/icons";
 
 const features = [
   {
     icon: Bot,
     number: "01",
-    title: "Uma IA que entende redstone",
+    title: "Ajuda para o jogo inteiro",
     description:
       "Planeje uma farm, entenda a lógica de um circuito e encontre caminhos para resolver o que não funciona.",
     tags: ["Construir", "Entender", "Corrigir"],
@@ -50,27 +52,26 @@ export default function Home() {
         <section className="hero shell" aria-labelledby="hero-title">
           <div className="hero-copy">
             <p className="eyebrow">
-              <span className="status-dot" /> LABORATÓRIO DE REDSTONE{" "}
+              <span className="status-dot" /> SEU PRÓXIMO MUNDO{" "}
               <span className="edition-label">/ EM CONSTRUÇÃO</span>
             </p>
             <h1 id="hero-title">
-              Sua próxima farm
+              Minecraft inteiro.
               <br />
-              começa{" "}
+              Uma ajuda{" "}
               <span className="title-last">
-                aqui
+                inteligente
                 <span className="pixel-period" aria-hidden="true" />.
               </span>
             </h1>
             <p className="hero-description">
-              Da primeira alavanca à sua próxima grande ideia.
-              <br className="desktop-break" /> Estamos construindo um lugar para criar, entender
-              <br className="desktop-break" /> e ir além com redstone.
+              Farms, redstone, construções, mods, comandos e sobrevivência — para sua edição e
+              versão.
             </p>
             <div className="hero-actions">
-              <a className="button button-primary" href="#projeto">
-                Conheça o RedPro <ArrowRight size={18} aria-hidden="true" />
-              </a>
+              <Link className="button button-primary" href="/chat">
+                Abrir assistente <ArrowRight size={18} aria-hidden="true" />
+              </Link>
               <a className="button button-text" href="#etapas">
                 Veja o que vem a seguir <ArrowDown size={16} aria-hidden="true" />
               </a>
@@ -78,9 +79,9 @@ export default function Home() {
             <div className="hero-note">
               <CircleDashed size={16} aria-hidden="true" />
               <p>
-                Primeira etapa disponível.
+                Experimente a interface do assistente.
                 <br />
-                <span>IA, biblioteca e comunidade ainda não estão disponíveis.</span>
+                <span>IA real, biblioteca e comunidade ainda em desenvolvimento.</span>
               </p>
             </div>
           </div>
@@ -91,7 +92,7 @@ export default function Home() {
               <span className="tiny-cross" aria-hidden="true">
                 +
               </span>{" "}
-              REDSTONE LAB <span>001</span>
+              MINEPRO LAB <span>001</span>
             </div>
             <CircuitScene />
             <figcaption>
@@ -105,13 +106,33 @@ export default function Home() {
               <Box size={17} aria-hidden="true" /> Feito para quem constrói
             </span>
             <span>
-              <Layers3 size={17} aria-hidden="true" /> Java & Bedrock no planejamento
+              <Layers3 size={17} aria-hidden="true" /> JavaMine e BedMine
             </span>
             <span>
               <Network size={17} aria-hidden="true" /> Fontes e compatibilidade em primeiro lugar
             </span>
           </div>
         </div>
+        <section className="home-specialties shell" aria-labelledby="specialties-title">
+          <p className="eyebrow">ESCOLHA SEU PRÓXIMO DESAFIO</p>
+          <h2 id="specialties-title">Seis modos. Seu mundo inteiro.</h2>
+          <p>Explore as especialidades na demonstração do assistente.</p>
+          <div className="home-mode-grid">
+            {MODES.map((mode) => {
+              const Icon = MODE_ICONS[mode.id];
+              return (
+                <article key={mode.id}>
+                  <p className="home-mode-label">
+                    <Icon size={20} aria-hidden="true" />
+                    {mode.id}
+                  </p>
+                  <h3>{mode.title}</h3>
+                  <p>{mode.description}</p>
+                </article>
+              );
+            })}
+          </div>
+        </section>
         <section id="projeto" className="project-section shell" aria-labelledby="project-title">
           <div className="section-heading">
             <div>
@@ -126,7 +147,7 @@ export default function Home() {
             </div>
             <p>
               Três partes de uma mesma ideia: tornar
-              <br className="desktop-break" /> o universo da redstone mais acessível.
+              <br className="desktop-break" /> o Minecraft inteiro mais acessível.
               <br />
               <span className="planned-label">Recursos planejados</span>
             </p>
@@ -177,8 +198,8 @@ export default function Home() {
               <span className="step-number">01</span>
               <div>
                 <span className="step-kicker">ETAPA ATUAL</span>
-                <h3>Fundação do RedPro</h3>
-                <p>Projeto base, identidade visual inicial e preparação das integrações.</p>
+                <h3>Interface do MinePRO</h3>
+                <p>Chat demonstrativo, seis modos e seletores de edição e versão.</p>
               </div>
               <span className="current-badge">Agora</span>
             </li>
@@ -193,7 +214,7 @@ export default function Home() {
               <span className="step-number">03</span>
               <div>
                 <h3>IA e projetos reais</h3>
-                <p>Assistente especializado, fontes e biblioteca de farms.</p>
+                <p>Assistente especializado, fontes e biblioteca de projetos.</p>
               </div>
             </li>
             <li>

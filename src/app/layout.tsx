@@ -2,9 +2,12 @@ import type { Metadata } from "next";
 import "@/styles/globals.css";
 
 export const metadata: Metadata = {
-  title: { default: "RedPro — Sua próxima farm começa aqui", template: "%s | RedPro" },
+  title: {
+    default: "MinePRO — Minecraft inteiro. Uma ajuda inteligente.",
+    template: "%s | MinePRO",
+  },
   description:
-    "O RedPro está sendo construído: inteligência artificial para redstone, farms e mecanismos de Minecraft. Conheça o projeto e acompanhe a primeira etapa.",
+    "Farms, redstone, construções, mods, comandos e sobrevivência — para sua edição e versão. Explore a demonstração do MinePRO.",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

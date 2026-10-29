@@ -9,14 +9,19 @@ function checkId(response) {
 }
 const base = process.env.SMOKE_BASE_URL || "http://127.0.0.1:3000";
 for (const [path, expectedStatus, text] of [
-  ["/", 200, "Sua próxima farm"],
+  ["/", 200, "Seis modos. Seu mundo inteiro."],
   ["/status", 200, "AINDA NÃO DISPONÍVEL"],
-  ["/rota-inexistente-redpro", 404, "Este bloco"],
+  ["/chat", 200, "Assistente MinePRO"],
+  ["/projetos", 200, "ainda não há projetos publicados"],
+  ["/comunidade", 200, "ainda não há publicações"],
+  ["/rota-inexistente-minepro", 404, "Este bloco"],
 ]) {
   const response = await fetch(new URL(path, base), { signal: AbortSignal.timeout(15000) });
   assert.equal(response.status, expectedStatus, path);
   checkId(response);
-  assert.ok((await response.text()).includes(text), "Conteúdo ausente em " + path);
+  const html = await response.text();
+  assert.ok(html.includes(text), "Conteúdo ausente em " + path);
+  assert.ok(!/redpro/i.test(html), "Identidade anterior no HTML público: " + path);
   console.log("PASS " + path + " — HTTP " + expectedStatus);
 }
 const response = await fetch(new URL("/api/health", base), { signal: AbortSignal.timeout(15000) });
