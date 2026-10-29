@@ -1,5 +1,7 @@
 # MinePRO — inspeção de segurança S2A
 
+**Estado atual — S2C, 29/10/2026:** correção pontual de permissões aplicada e verificada no Supabase de desenvolvimento autorizado. Alertas 0028 e 0029 ausentes na consulta posterior. Senha PostgreSQL redefinida conforme confirmação do proprietário; validação dos consumidores e sincronização das variáveis privadas PostgreSQL na Vercel continuam pendentes separadamente. As seções anteriores ao encerramento abaixo preservam a cronologia da preparação e não representam pendências já resolvidas de permissões.
+
 Inspeção em 29/10/2026. Somente documentos, código, advisors e consultas de catálogo em transação **READ ONLY** no Supabase de desenvolvimento já existente. Nenhuma credencial lida, nenhum dado de jogador consultado e nenhum grant, função, trigger ou schema alterado.
 
 ## Credenciais — pendência não resolvida
@@ -101,3 +103,33 @@ Inventário adicional autorizado da Vercel, projeto existente da equipe pp-0c16:
 Reinspeção local: arquivo .env.development.local ausente, nomes DATABASE_URL/REDPRO_DB_PASSWORD ausentes no processo. O workflow continua usando somente credenciais sintéticas do serviço PostgreSQL descartável, sem referências a secrets de banco real. Não há consumidor SQL real ativo identificável no código publicado. Os serviços gerenciados Supabase não devem ser confundidos com cópias externas de variáveis. A API de gerenciamento acessível não prova autenticação com a nova senha PostgreSQL.
 
 Pendência concreta: confirmar sincronização dessas configurações privadas, identificar eventual automação fora do repositório que as use e validar uma conexão nova dos consumidores efetivos por meio seguro. Não foi exigido nem usado o segredo compartilhado anteriormente. Não substituir chaves API por causa da troca da senha PostgreSQL; são credenciais diferentes e não houve evidência adicional de comprometimento delas nesta inspeção.
+
+## Resultado real da correção autorizada — S2C
+
+O proprietário autorizou exclusivamente o REVOKE abaixo no projeto de desenvolvimento `rdwchjjxaipkufgxlnvh` (nome técnico REDPRO). Antes da execução, a listagem de projetos confirmou destino ACTIVE_HEALTHY e PostgreSQL 17.11. A inspeção em transação READ ONLY comparou o catálogo com a definição congelada no fixture S2C e a ACL do relatório: assinatura sem argumentos/retorno event_trigger, corpo, proprietário postgres, SECURITY DEFINER, search_path=pg_catalog, ACL, gatilho e dependências corresponderam ao snapshot. Não foram encontradas alterações inesperadas.
+
+Foi executada com sucesso somente esta transação:
+
+```sql
+BEGIN;
+REVOKE EXECUTE ON FUNCTION public.rls_auto_enable()
+  FROM PUBLIC, anon, authenticated;
+COMMIT;
+```
+
+| Verificação posterior, somente leitura | Resultado comprovado                                                                                                                                        |
+| -------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| PUBLIC                                 | Sem EXECUTE na ACL da função.                                                                                                                               |
+| anon e authenticated                   | has_function_privilege(..., 'EXECUTE') retornou false para ambos.                                                                                           |
+| Acessos administrativos                | EXECUTE do proprietário postgres e service_role preservado. ACL final: `{postgres=X/postgres,service_role=X/postgres}`.                                     |
+| Função                                 | Corpo/definição, assinatura, proprietário, SECURITY DEFINER e search_path idênticos à inspeção anterior.                                                    |
+| ensure_rls                             | Nome, evento ddl_command_end, proprietário postgres, tags CREATE TABLE / CREATE TABLE AS / SELECT INTO e dependência preservados; evtenabled=O.             |
+| Security Advisors                      | Consulta posterior retornou `lints: []`; alertas 0028 e 0029 desapareceram nessa verificação. Isso não é uma certificação de segurança integral do projeto. |
+
+Não houve falha reportada na aplicação ou verificação; não foi necessária reversão. Nenhuma tabela, linha, migração, credencial ou variável Vercel foi alterada. Não foram criados objetos de teste no Supabase real. Nenhum merge ou implementação RED-013/014 foi autorizado por essa operação.
+
+O funcionamento por DDL foi comprovado no **PostgreSQL 17.11 descartável**, não no banco real: [job do PR #7](https://github.com/Pedrooca4/redpro/actions/runs/40959188281/job/123747164242), com 3 integrações aprovadas, incluindo revogação, privilégios administrativos, acionamento do trigger, RLS, reversão e limpeza. No real, comprovou-se a integridade/habilitação pelo catálogo e os privilégios efetivos; não houve acionamento DDL de prova. A simulação não reproduz integralmente Supautils, PostgREST ou consumidores externos. Validação real por DDL exige autorização separada.
+
+**Credenciais:** a nova redefinição da senha PostgreSQL foi confirmada pelo proprietário, sem envio do valor nesta conversa. Isso não comprova autenticação com a senha nova nos consumidores. O código atual não utiliza as variáveis PostgreSQL externas identificadas; ainda existem configurações privadas POSTGRES_PASSWORD, POSTGRES_URL, POSTGRES_URL_NON_POOLING e POSTGRES_PRISMA_URL na Vercel cuja sincronização precisa ser verificada em operação própria autorizada. Valores não foram descriptografados ou examinados. Não pedir novamente sobre os aplicativos manuais já descartados pelo proprietário.
+
+**Pendências para encerrar toda a S2C:** confirmar sincronização/necessidade dos consumidores privados e validar conexões novas quando aplicável; concluir revisão documental e obter autorização separada para merge do PR #7. A correção dos alertas 0028/0029 está concluída no escopo autorizado. Neste registro documental não foram repetidas consultas ou alterações no Supabase, nem operações de credenciais/Vercel.
