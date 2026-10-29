@@ -7,7 +7,7 @@ export function SiteFooter() {
       <div className="shell footer-inner">
         <div>
           <Link className="footer-brand" href="/">
-            <Blocks size={18} aria-hidden="true" /> RedPro
+            <Blocks size={18} aria-hidden="true" /> MinePRO
           </Link>
           <p>Uma ideia de cada vez. Bloco por bloco.</p>
         </div>

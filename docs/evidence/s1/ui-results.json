@@ -1,0 +1,42 @@
+[
+  {
+    "width": 320,
+    "result": "PASS",
+    "routes": 5,
+    "editions": 2,
+    "modes": 6,
+    "tools": 6,
+    "consoleErrors": 0,
+    "aiRequests": 0
+  },
+  {
+    "width": 390,
+    "result": "PASS",
+    "routes": 5,
+    "editions": 2,
+    "modes": 6,
+    "tools": 6,
+    "consoleErrors": 0,
+    "aiRequests": 0
+  },
+  {
+    "width": 768,
+    "result": "PASS",
+    "routes": 5,
+    "editions": 2,
+    "modes": 6,
+    "tools": 6,
+    "consoleErrors": 0,
+    "aiRequests": 0
+  },
+  {
+    "width": 1440,
+    "result": "PASS",
+    "routes": 5,
+    "editions": 2,
+    "modes": 6,
+    "tools": 6,
+    "consoleErrors": 0,
+    "aiRequests": 0
+  }
+]

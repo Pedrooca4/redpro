@@ -75,7 +75,7 @@ function Torch({ x, y }: { x: number; y: number }) {
       <path d="M-7-31V-43L1-47L10-42V-30L2-25Z" fill="#E45D48" />
       <path d="M-7-43L1-47L10-42L2-38Z" fill="#FFA683" />
       <path d="M2-38V-25L10-30V-42Z" fill="#A43D30" />
-      <circle cy="-36" r="22" fill="url(#redpro-torch-glow)" />
+      <circle cy="-36" r="22" fill="url(#minepro-torch-glow)" />
     </g>
   );
 }
@@ -91,21 +91,21 @@ export function CircuitScene() {
       xmlns="http://www.w3.org/2000/svg"
     >
       <defs>
-        <radialGradient id="redpro-board-glow">
+        <radialGradient id="minepro-board-glow">
           <stop stopColor="#55F56B" stopOpacity=".12" />
           <stop offset="1" stopColor="#55F56B" stopOpacity="0" />
         </radialGradient>
-        <radialGradient id="redpro-torch-glow">
+        <radialGradient id="minepro-torch-glow">
           <stop stopColor="#E45D48" stopOpacity=".28" />
           <stop offset="1" stopColor="#E45D48" stopOpacity="0" />
         </radialGradient>
-        <linearGradient id="redpro-core-top" x1="0" y1="0" x2="1" y2="1">
+        <linearGradient id="minepro-core-top" x1="0" y1="0" x2="1" y2="1">
           <stop stopColor="#84FF87" />
           <stop offset="1" stopColor="#42C95A" />
         </linearGradient>
       </defs>
 
-      <ellipse cx="320" cy="264" rx="280" ry="192" fill="url(#redpro-board-glow)" />
+      <ellipse cx="320" cy="264" rx="280" ry="192" fill="url(#minepro-board-glow)" />
       <ellipse cx="320" cy="365" rx="190" ry="45" fill="#060B07" opacity=".55" />
 
       <g stroke="#55F56B" strokeOpacity=".1" strokeWidth="1">
@@ -205,7 +205,7 @@ export function CircuitScene() {
         height={42}
         elevation={42}
         size={0.82}
-        top="url(#redpro-core-top)"
+        top="url(#minepro-core-top)"
         left="#24743A"
         right="#319745"
       />
