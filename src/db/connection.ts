@@ -26,6 +26,7 @@ export function developmentPoolConfig(config: DevelopmentDatabaseConfig): PoolCo
     statement_timeout: 15_000,
     lock_timeout: 5_000,
     application_name: "redpro-development",
+    options: "-c timezone=UTC",
   };
 }
 

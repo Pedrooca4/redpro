@@ -24,7 +24,7 @@
     "db:status": "node --env-file-if-exists=.env.development.local --experimental-strip-types scripts/db.ts status",
     "db:up": "node --env-file-if-exists=.env.development.local --experimental-strip-types scripts/db.ts up",
     "db:down": "node --env-file-if-exists=.env.development.local --experimental-strip-types scripts/db.ts down",
-    "test:db": "node --experimental-strip-types --test tests/integration/database.test.ts",
+    "test:db": "node --experimental-strip-types --test tests/integration/*.test.ts",
     "test:ui": "node scripts/test-ui.mjs"
   },
   "dependencies": {
