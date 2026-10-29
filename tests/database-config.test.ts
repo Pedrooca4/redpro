@@ -23,6 +23,7 @@ test("remote configuration pins the project and always verifies TLS", () => {
   assert.equal(pool.max, 1);
   assert.equal(pool.connectionTimeoutMillis, 10_000);
   assert.equal(pool.statement_timeout, 15_000);
+  assert.equal(pool.options, "-c timezone=UTC");
   assert.ok(!("connectionString" in pool), "URL options cannot override SSL settings");
 });
 
