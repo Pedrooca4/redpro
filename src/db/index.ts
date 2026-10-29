@@ -5,3 +5,5 @@ export { createDevelopmentDatabase, checkDevelopmentConnection } from "./connect
 export type { Database } from "./connection.ts";
 export { newRecordId, parseRecordId, toUtcTimestamp, updatedAt } from "./record-policy.ts";
 export type { RecordId, RecordColumns } from "./record-policy.ts";
+export { parseAuthUserId } from "./profiles.ts";
+export type { AuthUserId, ProfilesTable, ProfilePreferences } from "./profiles.ts";

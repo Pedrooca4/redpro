@@ -2,9 +2,12 @@ import { readFileSync } from "node:fs";
 import { Kysely, PostgresDialect, sql } from "kysely";
 import { Pool, type PoolConfig } from "pg";
 import type { DevelopmentDatabaseConfig } from "../config/database.ts";
+import type { ProfilesTable } from "./profiles.ts";
 
-// No product tables exist yet. Add their contracts in their own backlog tasks.
-export type Database = Record<never, never>;
+// A compile-time contract, not proof that a migration ran in any environment.
+export interface Database {
+  profiles: ProfilesTable;
+}
 
 export function developmentPoolConfig(config: DevelopmentDatabaseConfig): PoolConfig {
   return {
