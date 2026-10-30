@@ -9,3 +9,11 @@ export { parseAuthUserId } from "./profiles.ts";
 export type { AuthUserId, ProfilesTable, ProfilePreferences } from "./profiles.ts";
 export { parseMessageRole, parseMessageSequence } from "./conversations.ts";
 export type { ConversationsTable, MessagesTable, MessageRole } from "./conversations.ts";
+export { parseProjectCount, parseAuthorDeclaredStatus } from "./projects.ts";
+export type {
+  ProjectsTable,
+  ProjectStepsTable,
+  MaterialsTable,
+  ProjectValidationStatus,
+  ProjectDifficulty,
+} from "./projects.ts";

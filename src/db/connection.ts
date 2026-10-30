@@ -4,12 +4,16 @@ import { Pool, type PoolConfig } from "pg";
 import type { DevelopmentDatabaseConfig } from "../config/database.ts";
 import type { ProfilesTable } from "./profiles.ts";
 import type { ConversationsTable, MessagesTable } from "./conversations.ts";
+import type { ProjectsTable, ProjectStepsTable, MaterialsTable } from "./projects.ts";
 
 // A compile-time contract, not proof that a migration ran in any environment.
 export interface Database {
   profiles: ProfilesTable;
   conversations: ConversationsTable;
   messages: MessagesTable;
+  projects: ProjectsTable;
+  project_steps: ProjectStepsTable;
+  materials: MaterialsTable;
 }
 
 export function developmentPoolConfig(config: DevelopmentDatabaseConfig): PoolConfig {
