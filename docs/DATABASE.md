@@ -58,13 +58,25 @@ pnpm db:status
 
 Cada comando altera no máximo uma migração. Fingerprint errada, nome diferente da próxima migração, projeto divergente, ambiente ausente/produção ou execução na Vercel são recusados. Esses controles conferem configuração e confirmação explícita; não conseguem inferir por conta própria se um projeto foi rotulado incorretamente como desenvolvimento.
 
+## Concorrência e confirmação da etapa
+
+O runner fixa uma conexão e adquire o advisory lock PostgreSQL do próprio Kysely **antes** de ler o ledger e escolher a etapa. Mantém esse lock de sessão até depois do commit/rollback. Dentro de uma transação READ COMMITTED, valida novamente o proprietário do ledger e o nome autorizado, cria metadados se necessário, executa somente `migrateUp()` ou `migrateDown()` e compara nome, direção, quantidade e resultado com a solicitação. Confere também que somente a etapa esperada mudou de estado no ledger antes de permitir o commit.
+
+O adaptador de desenvolvimento usa a mesma chave do Kysely 0.29.7 para um lock interno de transação. Isso evita reter uma aquisição de sessão interna quando SQL falha e a transação fica abortada: PostgreSQL libera o lock interno no fim da transação e o runner libera o externo após o rollback. A chave é um contrato da versão fixada; os testes usam o adaptador PostgreSQL original como bloqueador, detectando incompatibilidades em futuras atualizações.
+
+Duas solicitações simultâneas para a mesma etapa não avançam duas migrações: uma pode terminar e a outra relê o estado atualizado e falha com `DB_SAFETY_REFUSED`. Se ambas forem válidas mas nomearem etapas diferentes, cada uma ainda precisa corresponder exatamente à próxima etapa quando obtiver o lock. Erros SQL não deixam novos registros de sucesso, e divergência de resultado/ledger é recusada **antes** do commit.
+
+A integração de concorrência abre sessões independentes num banco adicional exclusivamente descartável (`redpro_runner_concurrency_<pid>`), criado a partir do serviço local de testes, e o remove ao terminar. Ela precisa de `CREATEDB` e leitura dos waiters das próprias sessões; o usuário do serviço PostgreSQL da CI já possui esses privilégios. Não transfira esses privilégios para consumidores do produto. Barreiras consultam `pg_stat_activity`, sem depender de pausas arbitrárias; pausas curtas apenas controlam a frequência da consulta. Fixtures sintéticas de duas etapas reproduzem a seleção antiga antes do lock (duas solicitações da primeira etapa executam a primeira e a segunda) e demonstram que, com o runner corrigido, a etapa vizinha executável não é aplicada/revertida por engano; outras suítes preservam os testes dos seis arquivos reais. Injeção controlada de resultado comprova rollback antes do commit, não um defeito observado no retorno do Kysely.
+
+Limites: advisory locks coordenam participantes que usam a mesma chave, não bloqueiam SQL administrativo que deliberadamente os ignore. Não são autorização de usuário nem substituem confirmação do destino. Use conexão direta ou **session pooler**, nunca transaction pooler; TLS, fingerprint e bloqueios de ambiente permanecem obrigatórios. Os testes descartáveis não validam credenciais, rede, pooler ou objetos do Supabase real. A conexão privada no computador do proprietário continua pendente; nenhuma migração real é autorizada por esta manutenção.
+
 ## Demonstração executada
 
 O gerador criou `20261028185150423_development_probe.ts`. Após autorização específica, o runner criou `redpro_migrations` com `kysely_migration` e `kysely_migration_lock`, e aplicou a migração que cria o schema privado `redpro_dev_check` e sua tabela técnica vazia `migration_probe` (`id` inteiro como chave e `checked_at` timestamptz).
 
 Foi comprovado: migração aplicada, zero linhas, RLS ativada, nenhum acesso ao schema por `anon`/`authenticated` e zero tabelas em `public`. A reversão removeu apenas a tabela e schema vazios de demonstração. O ledger privado foi mantido, com zero migrações aplicadas; a demonstração aparece como pendente e pode ser reaplicada futuramente mediante revisão/autorização. O ledger representa o estado aplicado, não uma auditoria completa de todos os eventos; as evidências externas registram o ciclo.
 
-`up` não adota objetos existentes (`IF NOT EXISTS` não é usado na demonstração). `down` recusa tabela ocupada e não usa `CASCADE`. Falhas de DDL são revertidas pela transação PostgreSQL do Kysely. Um ledger existente sem a marca do RedPro é recusado. A criação inicial do ledger ocorre antes da transação da migração; se esta falhar, o ledger pode permanecer vazio.
+`up` não adota objetos existentes (`IF NOT EXISTS` não é usado na demonstração). `down` recusa tabela ocupada e não usa `CASCADE`. Falhas de DDL são revertidas pela transação PostgreSQL do Kysely. Um ledger existente sem a marca do RedPro é recusado. A criação inicial do ledger e a migração agora pertencem à mesma transação: uma falha reverte também os novos metadados. Um ledger anterior é preservado.
 
 ## Testes e CI
 
