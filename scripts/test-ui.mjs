@@ -148,13 +148,30 @@ try {
     await page.getByRole("button", { name: "Preparar pergunta", exact: true }).click();
     assert.match(await draft.inputValue(), /medidas e materiais/);
     assert.equal(await mode("BUILDER").getAttribute("aria-pressed"), "true");
-    await page.getByLabel("Versão do Minecraft", { exact: true }).selectOption("custom");
-    await page.getByLabel("Outra versão (ex.: 1.21.1)").fill("invalid");
-    await page.getByRole("button", { name: "Aplicar", exact: true }).click();
-    await page.locator(".composer-error").waitFor();
-    await page.getByLabel("Outra versão (ex.: 1.21.1)").fill("1.20.2");
-    await page.getByRole("button", { name: "Aplicar", exact: true }).click();
-    assert.match(await page.locator(".composer-footnote").innerText(), /1.20.2/);
+    for (let round = 0; round < 20; round++) {
+      await page.getByLabel("Versão do Minecraft", { exact: true }).selectOption("custom");
+      await page.getByLabel("Outra versão (ex.: 1.21.1)").fill("invalid");
+      await page.getByRole("button", { name: "Aplicar", exact: true }).click();
+      try {
+        await page.locator(".composer-error").waitFor();
+      } catch (error) {
+        console.error("Version validation diagnostic", {
+          width,
+          round,
+          input: await page.getByLabel("Outra versão (ex.: 1.21.1)").inputValue(),
+          busy: await page.locator(".chat-composer").getAttribute("aria-busy"),
+          footnote: await page.locator(".composer-footnote").innerText(),
+          openDialogs: await page.locator("dialog[open]").count(),
+        });
+        throw error;
+      }
+      await page.getByLabel("Outra versão (ex.: 1.21.1)").fill("1.20.2");
+      await page.getByRole("button", { name: "Aplicar", exact: true }).click();
+      assert.match(await page.locator(".composer-footnote").innerText(), /1.20.2/);
+      await page.locator(".composer-error").waitFor({ state: "hidden" });
+      if (round < 19)
+        await page.getByLabel("Versão do Minecraft", { exact: true }).selectOption("");
+    }
     // Native dialog must keep focus within the modal on repeated Tab navigation.
     await page.getByRole("button", { name: "Assistente de seeds", exact: true }).click();
     for (let i = 0; i < 6; i++) {
