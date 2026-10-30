@@ -6,6 +6,7 @@ import type { ProfilesTable } from "./profiles.ts";
 import type { ConversationsTable, MessagesTable } from "./conversations.ts";
 import type { ProjectsTable, ProjectStepsTable, MaterialsTable } from "./projects.ts";
 import type { PostsTable, CommentsTable, ReactionsTable, FavoritesTable } from "./community.ts";
+import type { ReportsTable, ModerationTable } from "./moderation.ts";
 
 // A compile-time contract, not proof that a migration ran in any environment.
 export interface Database {
@@ -19,6 +20,8 @@ export interface Database {
   comments: CommentsTable;
   reactions: ReactionsTable;
   favorites: FavoritesTable;
+  reports: ReportsTable;
+  moderation: ModerationTable;
 }
 
 export function developmentPoolConfig(config: DevelopmentDatabaseConfig): PoolConfig {

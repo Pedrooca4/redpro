@@ -26,3 +26,5 @@ export type {
   ReactionKind,
   FavoriteTarget,
 } from "./community.ts";
+export { parseReportTarget, parseReportReason } from "./moderation.ts";
+export type { ReportsTable, ModerationTable, ReportStatus, ReportTarget } from "./moderation.ts";
