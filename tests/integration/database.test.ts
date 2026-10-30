@@ -15,7 +15,7 @@ test("PostgreSQL: connect, migrate, protect data, roll back, reapply and preserv
     const proof = await checkDevelopmentConnection(db, config);
     assert.equal(proof.readOnly, true);
     const before = await migrationStatus(db);
-    assert.equal(before.length, 4);
+    assert.equal(before.length, 5);
     assert.match(before[0]!.name, /_development_probe$/);
     assert.match(before[1]!.name, /_profiles$/);
     assert.equal(before[1]?.applied, false);
@@ -23,6 +23,8 @@ test("PostgreSQL: connect, migrate, protect data, roll back, reapply and preserv
     assert.equal(before[2]?.applied, false);
     assert.match(before[3]!.name, /_projects$/);
     assert.equal(before[3]?.applied, false);
+    assert.match(before[4]!.name, /_community$/);
+    assert.equal(before[4]?.applied, false);
     assert.equal(before[0]?.applied, false);
     const name = before[0]!.name;
     await db.schema.createTable("redpro_ci_guard").addColumn("value", "text").execute();
