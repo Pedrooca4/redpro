@@ -55,13 +55,20 @@ test("PostgreSQL projects: private authorship, child isolation, honest validatio
           id: string | null,
           run: () => Promise<void>,
         ) => {
+          // Preserve the original SQL failure instead of masking it with RESET
+          // ROLE in an aborted transaction. Successful writes must remain.
+          await sql`savepoint project_role_scope`.execute(trx);
           await sql`set local role ${sql.id(role)}`.execute(trx);
           await sql`select set_config('request.jwt.claim.sub',${id ?? ""},true)`.execute(trx);
           try {
             await run();
-          } finally {
-            await sql`reset role`.execute(trx);
+          } catch (error) {
+            await sql`rollback to savepoint project_role_scope`.execute(trx);
+            await sql`release savepoint project_role_scope`.execute(trx);
+            throw error;
           }
+          await sql`reset role`.execute(trx);
+          await sql`release savepoint project_role_scope`.execute(trx);
         };
         await mustFail(() => up<Database>(trx), "P0001");
         await sql`create role anon nologin nosuperuser nobypassrls`.execute(trx);
@@ -176,6 +183,15 @@ test("PostgreSQL projects: private authorship, child isolation, honest validatio
         await down<Database>(trx); // Empty schema reverses without touching prerequisites.
         assert.deepEqual(await snapshot(), before);
         await up<Database>(trx);
+        // Down deliberately sets LOCAL row_security=off to refuse hidden rows.
+        // The real runner ends that transaction; this fixture reuses it, so
+        // restore enforcement before exercising ordinary authenticated sessions.
+        await sql`set local row_security=on`.execute(trx);
+        assert.equal(
+          (await sql<{ mode: string }>`select current_setting('row_security') as mode`.execute(trx))
+            .rows[0]?.mode,
+          "on",
+        );
 
         const projectBase = {
           description: "Synthetic private project",
