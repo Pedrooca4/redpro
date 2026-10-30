@@ -17,3 +17,12 @@ export type {
   ProjectValidationStatus,
   ProjectDifficulty,
 } from "./projects.ts";
+export { parseReactionKind, parseFavoriteTarget } from "./community.ts";
+export type {
+  PostsTable,
+  CommentsTable,
+  ReactionsTable,
+  FavoritesTable,
+  ReactionKind,
+  FavoriteTarget,
+} from "./community.ts";
