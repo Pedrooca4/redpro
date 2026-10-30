@@ -2,7 +2,12 @@ import { promises as fs } from "node:fs";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { sql, type Kysely } from "kysely";
-import { FileMigrationProvider, Migrator } from "kysely/migration";
+import {
+  DEFAULT_MIGRATION_LOCK_TABLE,
+  FileMigrationProvider,
+  MIGRATION_LOCK_ID,
+  Migrator,
+} from "kysely/migration";
 import {
   DatabaseSafetyError,
   confirmDatabaseMutation,
@@ -52,24 +57,72 @@ export async function runDevelopmentMigration(
   expectedMigration: string | undefined,
 ) {
   confirmDatabaseMutation(config, confirmation);
-  const before = await migrationStatus(db);
-  const next =
-    direction === "up" ? before.find((m) => !m.applied) : before.filter((m) => m.applied).at(-1);
-  if (!next || next.name !== expectedMigration) throw new DatabaseSafetyError();
-  if (!(await inspectLedger(db))) {
-    // All metadata creation is an explicit mutation, never part of check/status/build.
-    await db.transaction().execute(async (trx) => {
-      await trx.schema.createSchema(MIGRATION_SCHEMA).execute();
-      await sql`comment on schema redpro_migrations is 'RedPro development migration ledger v1'`.execute(
-        trx,
-      );
-      await sql`revoke all on schema redpro_migrations from public`.execute(trx);
-    });
-  }
-  const migrator = createMigrator(db);
-  const result = direction === "up" ? await migrator.migrateUp() : await migrator.migrateDown();
-  if (result.error) throw new Error("Migration failed");
-  if (result.results?.length !== 1 || result.results[0]?.status !== "Success")
-    throw new Error("Migration result mismatch");
-  return { event: "database.migration", direction, migration: next.name, status: "success" };
+  // Use PostgreSQL's existing Kysely lock, on one pinned connection. The outer
+  // acquisition remains held through COMMIT/ROLLBACK. The dialect uses the same
+  // key for transaction-scoped inner acquisitions, including aborted SQL.
+  return db.connection().execute(async (connection) => {
+    const adapter = connection.getExecutor().adapter;
+    const lockOptions = {
+      lockTable: DEFAULT_MIGRATION_LOCK_TABLE,
+      lockRowId: MIGRATION_LOCK_ID,
+      lockTableSchema: MIGRATION_SCHEMA,
+    };
+    await adapter.acquireMigrationLock(connection, lockOptions);
+    try {
+      return await connection
+        .transaction()
+        .setIsolationLevel("read committed")
+        .execute(async (trx) => {
+          const before = await migrationStatus(trx);
+          const next =
+            direction === "up"
+              ? before.find((m) => !m.applied)
+              : before.filter((m) => m.applied).at(-1);
+          if (!next || next.name !== expectedMigration) throw new DatabaseSafetyError();
+          if (!(await inspectLedger(trx))) {
+            // Metadata and the migration itself commit together, under the lock.
+            await trx.schema.createSchema(MIGRATION_SCHEMA).execute();
+            await sql`comment on schema redpro_migrations is 'RedPro development migration ledger v1'`.execute(
+              trx,
+            );
+            await sql`revoke all on schema redpro_migrations from public`.execute(trx);
+          }
+          const migrator = createMigrator(trx);
+          const result =
+            direction === "up" ? await migrator.migrateUp() : await migrator.migrateDown();
+          if (result.error) throw new Error("Migration failed");
+          const executed = result.results?.[0];
+          // This check must run BEFORE the outer transaction commits. Merely
+          // comparing a name after migrateUp() committed would be too late.
+          if (
+            result.results?.length !== 1 ||
+            executed?.status !== "Success" ||
+            executed.migrationName !== expectedMigration ||
+            executed.direction !== (direction === "up" ? "Up" : "Down")
+          )
+            throw new DatabaseSafetyError();
+          const after = await migrationStatus(trx);
+          if (
+            after.length !== before.length ||
+            after.some((migration, index) => {
+              const previous = before[index]!;
+              return (
+                migration.name !== previous.name ||
+                migration.applied !==
+                  (migration.name === expectedMigration ? direction === "up" : previous.applied)
+              );
+            })
+          )
+            throw new DatabaseSafetyError();
+          return {
+            event: "database.migration",
+            direction,
+            migration: executed.migrationName,
+            status: "success",
+          };
+        });
+    } finally {
+      await adapter.releaseMigrationLock(connection, lockOptions);
+    }
+  });
 }

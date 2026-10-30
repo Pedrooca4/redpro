@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
-import { Kysely, PostgresDialect, sql } from "kysely";
+import { Kysely, sql } from "kysely";
 import { Pool, type PoolConfig } from "pg";
+import { DevelopmentPostgresDialect } from "./migration-lock.ts";
 import type { DevelopmentDatabaseConfig } from "../config/database.ts";
 import type { ProfilesTable } from "./profiles.ts";
 import type { ConversationsTable, MessagesTable } from "./conversations.ts";
@@ -52,7 +53,7 @@ export function createDevelopmentDatabase(config: DevelopmentDatabaseConfig) {
   const pool = new Pool(developmentPoolConfig(config));
   // Idle connection failures must not emit the raw pg error or crash the process.
   pool.on("error", () => console.error('{"event":"database.failed","code":"DB_POOL_IDLE_FAILED"}'));
-  return new Kysely<Database>({ dialect: new PostgresDialect({ pool }) });
+  return new Kysely<Database>({ dialect: new DevelopmentPostgresDialect({ pool }) });
 }
 
 export async function checkDevelopmentConnection(
