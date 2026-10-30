@@ -3,10 +3,13 @@ import { Kysely, PostgresDialect, sql } from "kysely";
 import { Pool, type PoolConfig } from "pg";
 import type { DevelopmentDatabaseConfig } from "../config/database.ts";
 import type { ProfilesTable } from "./profiles.ts";
+import type { ConversationsTable, MessagesTable } from "./conversations.ts";
 
 // A compile-time contract, not proof that a migration ran in any environment.
 export interface Database {
   profiles: ProfilesTable;
+  conversations: ConversationsTable;
+  messages: MessagesTable;
 }
 
 export function developmentPoolConfig(config: DevelopmentDatabaseConfig): PoolConfig {
