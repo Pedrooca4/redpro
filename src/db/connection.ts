@@ -67,6 +67,7 @@ export function createDevelopmentDatabase(
 export async function checkDevelopmentConnection(
   db: Kysely<Database>,
   config: DevelopmentDatabaseConfig,
+  options: { requireReadOnlySession?: boolean } = {},
 ) {
   return db
     .transaction()
@@ -77,13 +78,20 @@ export async function checkDevelopmentConnection(
         database: string;
         version: string;
         read_only: string;
+        default_read_only: string;
       }>`
       select 1 as ok, current_database() as database,
              current_setting('server_version_num') as version,
-             current_setting('transaction_read_only') as read_only
+             current_setting('transaction_read_only') as read_only,
+             current_setting('default_transaction_read_only') as default_read_only
     `.execute(trx);
       const row = result.rows[0];
-      if (row?.ok !== 1 || row.database !== config.database || row.read_only !== "on")
+      if (
+        row?.ok !== 1 ||
+        row.database !== config.database ||
+        row.read_only !== "on" ||
+        (options.requireReadOnlySession && row.default_read_only !== "on")
+      )
         throw new Error("Database check failed");
       // Do not return the URL, role, host, password or database contents.
       return {

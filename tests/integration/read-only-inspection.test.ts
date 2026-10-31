@@ -16,7 +16,14 @@ test("PostgreSQL inspection: read-only sessions reject DML and DDL without chang
     await sql`create table public.redpro_inspection_fixture(id integer primary key)`.execute(admin);
     created = true;
     await sql`insert into public.redpro_inspection_fixture values (1)`.execute(admin);
-    assert.equal((await checkDevelopmentConnection(reader, config)).readOnly, true);
+    await assert.rejects(
+      checkDevelopmentConnection(admin, config, { requireReadOnlySession: true }),
+      { message: "Database check failed" },
+    );
+    assert.equal(
+      (await checkDevelopmentConnection(reader, config, { requireReadOnlySession: true })).readOnly,
+      true,
+    );
     assert.equal((await migrationStatus(reader)).length, 6);
     const state = await sql<{
       mode: string;

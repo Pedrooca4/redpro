@@ -33,7 +33,13 @@ try {
     db = createDevelopmentDatabase(config, {
       readOnly: command === "check" || command === "status",
     });
-    console.log(JSON.stringify(await checkDevelopmentConnection(db, config)));
+    console.log(
+      JSON.stringify(
+        await checkDevelopmentConnection(db, config, {
+          requireReadOnlySession: command === "check" || command === "status",
+        }),
+      ),
+    );
     if (command === "status")
       console.log(
         JSON.stringify({ event: "database.migrations", migrations: await migrationStatus(db) }),
