@@ -22,6 +22,7 @@ Use `.env.development.local`, ignorado pelo Git, com os nomes do `.env.example`.
 | ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
 | `DATABASE_URL`          | URL PostgreSQL privada do destino de desenvolvimento. Direta ou session pooler na porta 5432.                                       |
 | `REDPRO_DB_PASSWORD`    | Alternativa privada: senha sem codificação de URL, somente se a URL estiver sem senha. Não configure as duas fontes ao mesmo tempo. |
+| `REDPRO_DB_AUTH_MODE`   | Opcional: password (padrão) ou temporary. Não é credencial; detalhes e limitações em [CODESPACES.md](CODESPACES.md).                |
 | `REDPRO_DB_ENV`         | `development` para o Supabase confirmado; `test` somente para PostgreSQL descartável em loopback.                                   |
 | `REDPRO_DB_TARGET_REF`  | Ref pública do projeto, conferida com hostname/usuário. Em testes locais: `local-test`.                                             |
 | `REDPRO_DB_SSL_CA_FILE` | Caminho opcional da CA pública oficial baixada no painel Supabase, Database Settings → SSL Configuration.                           |
