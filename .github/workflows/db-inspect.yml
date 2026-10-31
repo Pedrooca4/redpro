@@ -1,0 +1,92 @@
+name: MinePRO development database inspection
+run-name: Inspect development database at ${{ inputs.approved_sha }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      approved_sha:
+        description: "SHA completo da main revisada e com CI aprovada (40 caracteres)"
+        required: true
+        type: string
+
+permissions: {}
+
+concurrency:
+  group: minepro-development-database
+  cancel-in-progress: false
+
+jobs:
+  preflight:
+    name: Validate reviewed main and protected environment
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      actions: read
+    steps:
+      - name: Refuse unapproved event, repository, actor or ref before checkout
+        shell: bash
+        env:
+          EXPECTED_SHA: ${{ inputs.approved_sha }}
+          TRIGGERING_ACTOR: ${{ github.triggering_actor }}
+        run: |
+          set -euo pipefail
+          [[ "$GITHUB_EVENT_NAME" == workflow_dispatch && "$GITHUB_REF" == refs/heads/main ]]
+          [[ "$GITHUB_REPOSITORY" == Pedrooca4/redpro && "$GITHUB_REPOSITORY_ID" == 1436162515 ]]
+          [[ "$GITHUB_ACTOR" == Pedrooca4 && "$TRIGGERING_ACTOR" == Pedrooca4 ]]
+          [[ "$EXPECTED_SHA" =~ ^[a-f0-9]{40}$ && "$EXPECTED_SHA" == "$GITHUB_SHA" ]]
+      - name: Checkout exact reviewed commit without retained credentials
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Node.js
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version-file: .nvmrc
+          package-manager-cache: false
+      - name: Inspect environment protections and successful main CI (no database secrets)
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EXPECTED_SHA: ${{ inputs.approved_sha }}
+        run: node --experimental-strip-types scripts/db-inspect-gate.ts
+
+  inspect:
+    name: Read-only development connection and ledger
+    needs: preflight
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && github.repository == 'Pedrooca4/redpro'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      actions: read
+    environment:
+      name: minepro-development-inspection
+    steps:
+      - name: Checkout the same reviewed commit
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Node.js
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version-file: .nvmrc
+          package-manager-cache: false
+      - name: Install pinned dependencies before exposing database credentials
+        run: |
+          npm install --global pnpm@10.28.1 --ignore-scripts
+          pnpm install --frozen-lockfile --ignore-scripts
+      - name: Recheck protections, exact main and CI after approval and installation
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EXPECTED_SHA: ${{ inputs.approved_sha }}
+        run: node --experimental-strip-types scripts/db-inspect-gate.ts
+      - name: Run db:target, db:check and db:status only
+        env:
+          DATABASE_URL: ${{ secrets.MINEPRO_DEV_DATABASE_URL }}
+          REDPRO_DB_PASSWORD: ${{ secrets.MINEPRO_DEV_DB_PASSWORD }}
+          MINEPRO_DEV_DB_CA_PEM: ${{ secrets.MINEPRO_DEV_DB_CA_PEM }}
+          REDPRO_DB_ENV: development
+          REDPRO_DB_TARGET_REF: rdwchjjxaipkufgxlnvh
+        run: node --experimental-strip-types scripts/db-inspect.ts

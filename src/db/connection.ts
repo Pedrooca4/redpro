@@ -25,7 +25,10 @@ export interface Database {
   moderation: ModerationTable;
 }
 
-export function developmentPoolConfig(config: DevelopmentDatabaseConfig): PoolConfig {
+export function developmentPoolConfig(
+  config: DevelopmentDatabaseConfig,
+  options: { readOnly?: boolean } = {},
+): PoolConfig {
   return {
     host: config.host,
     port: config.port,
@@ -45,12 +48,17 @@ export function developmentPoolConfig(config: DevelopmentDatabaseConfig): PoolCo
     statement_timeout: 15_000,
     lock_timeout: 5_000,
     application_name: "redpro-development",
-    options: "-c timezone=UTC",
+    options: options.readOnly
+      ? "-c timezone=UTC -c default_transaction_read_only=on"
+      : "-c timezone=UTC",
   };
 }
 
-export function createDevelopmentDatabase(config: DevelopmentDatabaseConfig) {
-  const pool = new Pool(developmentPoolConfig(config));
+export function createDevelopmentDatabase(
+  config: DevelopmentDatabaseConfig,
+  options: { readOnly?: boolean } = {},
+) {
+  const pool = new Pool(developmentPoolConfig(config, options));
   // Idle connection failures must not emit the raw pg error or crash the process.
   pool.on("error", () => console.error('{"event":"database.failed","code":"DB_POOL_IDLE_FAILED"}'));
   return new Kysely<Database>({ dialect: new DevelopmentPostgresDialect({ pool }) });
@@ -59,6 +67,7 @@ export function createDevelopmentDatabase(config: DevelopmentDatabaseConfig) {
 export async function checkDevelopmentConnection(
   db: Kysely<Database>,
   config: DevelopmentDatabaseConfig,
+  options: { requireReadOnlySession?: boolean } = {},
 ) {
   return db
     .transaction()
@@ -69,13 +78,20 @@ export async function checkDevelopmentConnection(
         database: string;
         version: string;
         read_only: string;
+        default_read_only: string;
       }>`
       select 1 as ok, current_database() as database,
              current_setting('server_version_num') as version,
-             current_setting('transaction_read_only') as read_only
+             current_setting('transaction_read_only') as read_only,
+             current_setting('default_transaction_read_only') as default_read_only
     `.execute(trx);
       const row = result.rows[0];
-      if (row?.ok !== 1 || row.database !== config.database || row.read_only !== "on")
+      if (
+        row?.ok !== 1 ||
+        row.database !== config.database ||
+        row.read_only !== "on" ||
+        (options.requireReadOnlySession && row.default_read_only !== "on")
+      )
         throw new Error("Database check failed");
       // Do not return the URL, role, host, password or database contents.
       return {
