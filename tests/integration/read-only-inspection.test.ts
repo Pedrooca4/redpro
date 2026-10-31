@@ -18,7 +18,9 @@ test("PostgreSQL inspection: read-only sessions reject DML and DDL without chang
     await sql`insert into public.redpro_inspection_fixture values (1)`.execute(admin);
     assert.equal((await checkDevelopmentConnection(reader, config)).readOnly, true);
     assert.equal((await migrationStatus(reader)).length, 6);
-    const state = await sql<{ mode: string }>`show default_transaction_read_only`.execute(reader);
+    const state = await sql<{
+      mode: string;
+    }>`select current_setting('default_transaction_read_only') as mode`.execute(reader);
     assert.equal(state.rows[0]?.mode, "on");
     for (const query of [
       sql`insert into public.redpro_inspection_fixture values (2)`,
