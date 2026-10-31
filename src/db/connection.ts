@@ -25,7 +25,10 @@ export interface Database {
   moderation: ModerationTable;
 }
 
-export function developmentPoolConfig(config: DevelopmentDatabaseConfig): PoolConfig {
+export function developmentPoolConfig(
+  config: DevelopmentDatabaseConfig,
+  options: { readOnly?: boolean } = {},
+): PoolConfig {
   return {
     host: config.host,
     port: config.port,
@@ -45,12 +48,17 @@ export function developmentPoolConfig(config: DevelopmentDatabaseConfig): PoolCo
     statement_timeout: 15_000,
     lock_timeout: 5_000,
     application_name: "redpro-development",
-    options: "-c timezone=UTC",
+    options: options.readOnly
+      ? "-c timezone=UTC -c default_transaction_read_only=on"
+      : "-c timezone=UTC",
   };
 }
 
-export function createDevelopmentDatabase(config: DevelopmentDatabaseConfig) {
-  const pool = new Pool(developmentPoolConfig(config));
+export function createDevelopmentDatabase(
+  config: DevelopmentDatabaseConfig,
+  options: { readOnly?: boolean } = {},
+) {
+  const pool = new Pool(developmentPoolConfig(config, options));
   // Idle connection failures must not emit the raw pg error or crash the process.
   pool.on("error", () => console.error('{"event":"database.failed","code":"DB_POOL_IDLE_FAILED"}'));
   return new Kysely<Database>({ dialect: new DevelopmentPostgresDialect({ pool }) });

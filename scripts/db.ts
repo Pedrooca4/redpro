@@ -30,7 +30,9 @@ try {
         !args[1]?.startsWith("--migration="))
     )
       throw new Error("Migration confirmation required");
-    db = createDevelopmentDatabase(config);
+    db = createDevelopmentDatabase(config, {
+      readOnly: command === "check" || command === "status",
+    });
     console.log(JSON.stringify(await checkDevelopmentConnection(db, config)));
     if (command === "status")
       console.log(
