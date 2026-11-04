@@ -45,7 +45,12 @@ export function developmentPoolConfig(config: DevelopmentDatabaseConfig): PoolCo
     statement_timeout: 15_000,
     lock_timeout: 5_000,
     application_name: "redpro-development",
-    options: "-c timezone=UTC",
+    // Supavisor temporary access is explicit, never an arbitrary URL option.
+    // Direct connections accept the token as the password without this flag.
+    options:
+      config.authentication === "temporary" && config.host.endsWith(".pooler.supabase.com")
+        ? "-c timezone=UTC -c jit=on"
+        : "-c timezone=UTC",
   };
 }
 

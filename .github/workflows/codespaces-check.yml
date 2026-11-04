@@ -1,0 +1,42 @@
+name: MinePRO Codespaces preparation
+
+on:
+  push:
+    branches: ["codex/codespaces-kysely-preparation"]
+  pull_request:
+    paths:
+      - ".devcontainer/**"
+      - "scripts/codespace*"
+      - "src/config/database.ts"
+      - "src/db/connection.ts"
+      - "tests/codespace.test.ts"
+      - ".github/workflows/codespaces-check.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: minepro-codespaces-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  container:
+    name: Codespaces container and disposable PostgreSQL
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - name: Build and test devcontainer without private credentials or publishing images
+        uses: devcontainers/ci@513af61f4de4f75d37e4438f184ba4358f0fc1ca # v0.3
+        with:
+          push: never
+          inheritEnv: false
+          runCmd: |
+            bash scripts/codespace.sh setup
+            node --version
+            pnpm --version
+            pnpm test
+            pnpm test:db:disposable

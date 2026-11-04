@@ -17,6 +17,7 @@ export type DevelopmentDatabaseConfig = {
   database: string;
   user: string;
   password: string;
+  authentication: "password" | "temporary";
   caFile?: string;
 };
 
@@ -57,11 +58,14 @@ export function readDevelopmentDatabaseConfig(
   )
     refuse();
 
+  const authentication = env.REDPRO_DB_AUTH_MODE || "password";
+  if (authentication !== "password" && authentication !== "temporary") return refuse();
   const local = ["localhost", "127.0.0.1", "[::1]"].includes(host);
   const target = env.REDPRO_DB_TARGET_REF ?? "";
   if (environment === "test") {
     if (
       !local ||
+      authentication !== "password" ||
       database !== "redpro_test" ||
       target !== "local-test" ||
       env.REDPRO_DB_SSL_CA_FILE
@@ -89,6 +93,7 @@ export function readDevelopmentDatabaseConfig(
     database,
     user,
     password,
+    authentication,
     ...(env.REDPRO_DB_SSL_CA_FILE ? { caFile: env.REDPRO_DB_SSL_CA_FILE } : {}),
   };
 }

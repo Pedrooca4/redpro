@@ -9,3 +9,6 @@ coverage/
 *.tsbuildinfo
 .DS_Store
 Thumbs.db
+
+# Public Supabase server CA only; credentials must never be written here.
+.minepro-ca/
