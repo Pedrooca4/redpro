@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { Kysely, sql } from "kysely";
 import { Pool, type PoolConfig } from "pg";
 import { DevelopmentPostgresDialect } from "./migration-lock.ts";
-import type { DevelopmentDatabaseConfig } from "../config/database.ts";
+import { LEDGER_READER_ROLE, type DevelopmentDatabaseConfig } from "../config/database.ts";
 import type { ProfilesTable } from "./profiles.ts";
 import type { ConversationsTable, MessagesTable } from "./conversations.ts";
 import type { ProjectsTable, ProjectStepsTable, MaterialsTable } from "./projects.ts";
@@ -74,14 +74,18 @@ export async function checkDevelopmentConnection(
         database: string;
         version: string;
         read_only: string;
+        role: string;
       }>`
       select 1 as ok, current_database() as database,
              current_setting('server_version_num') as version,
-             current_setting('transaction_read_only') as read_only
+             current_setting('transaction_read_only') as read_only,
+             current_user as role
     `.execute(trx);
       const row = result.rows[0];
       if (row?.ok !== 1 || row.database !== config.database || row.read_only !== "on")
         throw new Error("Database check failed");
+      if (config.user.split(".")[0] === LEDGER_READER_ROLE && row.role !== LEDGER_READER_ROLE)
+        throw new Error("Database inspection role mismatch");
       // Do not return the URL, role, host, password or database contents.
       return {
         event: "database.connected",

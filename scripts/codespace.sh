@@ -76,12 +76,11 @@ case "$mode" in
       [[ -n "$mineproSecret" ]] || refuse
       export REDPRO_DB_PASSWORD="$mineproSecret"
       unset mineproSecret
-      if [[ "$host" == "db.rdwchjjxaipkufgxlnvh.supabase.co" ]]; then user=postgres; else user=postgres.rdwchjjxaipkufgxlnvh; fi
-      export DATABASE_URL="postgresql://${user}@${host}:5432/postgres"
+      export DATABASE_URL="postgresql://minepro_ledger_reader.rdwchjjxaipkufgxlnvh@${host}:5432/postgres"
       export REDPRO_DB_ENV=development REDPRO_DB_TARGET_REF=rdwchjjxaipkufgxlnvh
       export REDPRO_DB_AUTH_MODE="$auth" REDPRO_DB_SSL_CA_FILE="$ca"
       for command in target check status; do
-        node --experimental-strip-types scripts/db.ts "$command"
+        node --experimental-strip-types scripts/db-inspect.ts "$command"
       done
     )
     ;;
