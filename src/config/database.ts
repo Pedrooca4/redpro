@@ -1,5 +1,9 @@
 import { createHash } from "node:crypto";
 
+export const DEVELOPMENT_PROJECT_REF = "rdwchjjxaipkufgxlnvh";
+export const LEDGER_READER_ROLE = "minepro_ledger_reader";
+const SESSION_POOLER = /^aws-[0-9]+-[a-z0-9-]+\.pooler\.supabase\.com$/;
+
 export class DatabaseSafetyError extends Error {
   constructor() {
     super("Database configuration or target confirmation refused. See docs/DATABASE.md.");
@@ -75,7 +79,7 @@ export function readDevelopmentDatabaseConfig(
     // Only the explicitly confirmed Supabase development project. Never arbitrary hosts.
     if (!/^[a-z]{20}$/.test(target) || database !== "postgres" || port !== 5432) refuse();
     const direct = host === `db.${target}.supabase.co`;
-    const session = /^aws-[0-9]+-[a-z0-9-]+\.pooler\.supabase\.com$/.test(host);
+    const session = SESSION_POOLER.test(host);
     if (!direct && !session) refuse();
     if (session && !user.endsWith(`.${target}`)) refuse();
     if (direct && user.includes(".")) refuse();
@@ -98,8 +102,26 @@ export function readDevelopmentDatabaseConfig(
   };
 }
 
+export function readInspectionDatabaseConfig(
+  env: Readonly<Record<string, string | undefined>> = process.env,
+): DevelopmentDatabaseConfig {
+  const config = readDevelopmentDatabaseConfig(env);
+  if (config.provider === "local-test") {
+    if (config.user !== LEDGER_READER_ROLE) throw new DatabaseSafetyError();
+  } else if (
+    config.target !== DEVELOPMENT_PROJECT_REF ||
+    config.user !== `${LEDGER_READER_ROLE}.${DEVELOPMENT_PROJECT_REF}` ||
+    !SESSION_POOLER.test(config.host) ||
+    !config.caFile
+  ) {
+    throw new DatabaseSafetyError();
+  }
+  return config;
+}
+
 export function confirmDatabaseMutation(config: DevelopmentDatabaseConfig, fingerprint?: string) {
-  if (fingerprint !== config.fingerprint) throw new DatabaseSafetyError();
+  if (config.user.split(".")[0] === LEDGER_READER_ROLE || fingerprint !== config.fingerprint)
+    throw new DatabaseSafetyError();
 }
 
 // Never serialize driver errors: they can include a URL, SQL, parameters or private rows.

@@ -5,7 +5,11 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { rootCertificates } from "node:tls";
 import { spawnSync } from "node:child_process";
-import { readDevelopmentDatabaseConfig } from "../src/config/database.ts";
+import {
+  LEDGER_READER_ROLE,
+  readDevelopmentDatabaseConfig,
+  readInspectionDatabaseConfig,
+} from "../src/config/database.ts";
 import { developmentPoolConfig } from "../src/db/connection.ts";
 import { validateCodespaceConnection } from "../scripts/codespace-connection.ts";
 
@@ -20,6 +24,7 @@ const session = {
   ...direct,
   DATABASE_URL: `postgresql://postgres.${target}@aws-1-us-east-2.pooler.supabase.com:5432/postgres`,
 };
+const sessionHost = "aws-1-us-east-2.pooler.supabase.com";
 
 test("temporary authentication is explicit and direct access preserves TLS and target identity", () => {
   const normal = readDevelopmentDatabaseConfig(direct);
@@ -72,40 +77,104 @@ test("authentication mode never accepts arbitrary options, production, local tem
   );
 });
 
-test("private preflight accepts only the fixed project, public CA, reviewed SHA and known authentication modes", () => {
+test("private preflight accepts the fixed reader on the Session pooler with a public CA", () => {
   const folder = mkdtempSync(path.join(tmpdir(), "minepro-public-ca-test-"));
   const ca = path.join(folder, "public.crt");
   const sha = "a".repeat(40);
   try {
     writeFileSync(ca, rootCertificates[0]!);
-    const result = validateCodespaceConnection(sha, `db.${target}.supabase.co`, ca, "temporary");
+    const result = validateCodespaceConnection(sha, sessionHost, ca, "temporary");
     assert.equal(result.target, target);
     assert.equal(result.connected, false);
     assert.match(result.fingerprint, /^[a-f0-9]{64}$/);
     assert.ok(!JSON.stringify(result).includes("synthetic"));
     assert.equal(
-      validateCodespaceConnection(sha, "aws-1-us-east-2.pooler.supabase.com", ca, "password")
-        .authentication,
+      validateCodespaceConnection(sha, sessionHost, ca, "password").authentication,
       "password",
     );
     for (const [s, host, mode] of [
-      ["bad", `db.${target}.supabase.co`, "temporary"],
+      ["bad", sessionHost, "temporary"],
+      [sha, `db.${target}.supabase.co`, "temporary"],
       [sha, "db.abcdefghijklmnopqrst.supabase.co", "temporary"],
       [sha, "127.0.0.1", "password"],
       [sha, "evil.example", "temporary"],
-      [sha, `db.${target}.supabase.co:6543`, "temporary"],
-      [sha, `db.${target}.supabase.co`, "up"],
+      [sha, `${sessionHost}:6543`, "temporary"],
+      [sha, `bad@${sessionHost}`, "temporary"],
+      [sha, sessionHost, "up"],
     ])
       assert.throws(() => validateCodespaceConnection(s!, host!, ca, mode!));
     writeFileSync(
       ca,
       "-----BEGIN PRIVATE KEY-----\nsynthetic-private-marker\n-----END PRIVATE KEY-----",
     );
-    assert.throws(() =>
-      validateCodespaceConnection(sha, `db.${target}.supabase.co`, ca, "temporary"),
-    );
+    assert.throws(() => validateCodespaceConnection(sha, sessionHost, ca, "temporary"));
   } finally {
     rmSync(folder, { recursive: true, force: true });
+  }
+});
+
+test("inspection configuration rejects another role, project, connection mode or missing CA", () => {
+  const reader = {
+    ...session,
+    DATABASE_URL: session.DATABASE_URL.replace("postgres.", `${LEDGER_READER_ROLE}.`),
+    REDPRO_DB_SSL_CA_FILE: "public.crt",
+  };
+  assert.equal(readInspectionDatabaseConfig(reader).user, `${LEDGER_READER_ROLE}.${target}`);
+  for (const env of [
+    { ...reader, DATABASE_URL: session.DATABASE_URL },
+    { ...reader, DATABASE_URL: reader.DATABASE_URL.replace(LEDGER_READER_ROLE, "another_role") },
+    {
+      ...reader,
+      DATABASE_URL: reader.DATABASE_URL.replaceAll(target, "abcdefghijklmnopqrst"),
+      REDPRO_DB_TARGET_REF: "abcdefghijklmnopqrst",
+    },
+    { ...reader, DATABASE_URL: reader.DATABASE_URL.replace(":5432", ":6543") },
+    {
+      ...reader,
+      DATABASE_URL: `postgresql://${LEDGER_READER_ROLE}@db.${target}.supabase.co:5432/postgres`,
+    },
+    { ...reader, REDPRO_DB_SSL_CA_FILE: "" },
+  ])
+    assert.throws(() => readInspectionDatabaseConfig(env));
+});
+
+test("the inspection entry point and migration CLI refuse up and down before connecting", () => {
+  const env: NodeJS.ProcessEnv = {
+    NODE_ENV: "test",
+    DATABASE_URL: `postgresql://${LEDGER_READER_ROLE}:synthetic@127.0.0.1:1/redpro_test`,
+    REDPRO_DB_ENV: "test",
+    REDPRO_DB_TARGET_REF: "local-test",
+  };
+  const config = readInspectionDatabaseConfig(env);
+  const inspect = (args: string[]) =>
+    spawnSync(process.execPath, ["--experimental-strip-types", "scripts/db-inspect.ts", ...args], {
+      env,
+      encoding: "utf8",
+    });
+  const target = inspect(["target"]);
+  assert.equal(target.status, 0, target.stderr);
+  assert.equal(JSON.parse(target.stdout).connected, false);
+  for (const args of [["up"], ["down"], ["status", "up"]]) {
+    const result = inspect(args);
+    assert.equal(result.status, 1);
+    assert.equal(result.stdout, "");
+    assert.match(result.stderr, /DB_SAFETY_REFUSED/);
+  }
+  for (const command of ["up", "down"]) {
+    const result = spawnSync(
+      process.execPath,
+      [
+        "--experimental-strip-types",
+        "scripts/db.ts",
+        command,
+        `--confirm-target=${config.fingerprint}`,
+        "--migration=synthetic",
+      ],
+      { env, encoding: "utf8" },
+    );
+    assert.equal(result.status, 1);
+    assert.equal(result.stdout, "");
+    assert.match(result.stderr, /DB_SAFETY_REFUSED/);
   }
 });
 

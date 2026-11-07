@@ -3,7 +3,9 @@ import { readFileSync } from "node:fs";
 import { pathToFileURL } from "node:url";
 import {
   DatabaseSafetyError,
-  readDevelopmentDatabaseConfig,
+  DEVELOPMENT_PROJECT_REF,
+  LEDGER_READER_ROLE,
+  readInspectionDatabaseConfig,
   safeDatabaseFailure,
 } from "../src/config/database.ts";
 
@@ -13,18 +15,21 @@ export function validateCodespaceConnection(
   ca: string,
   authentication: string,
 ) {
-  const target = "rdwchjjxaipkufgxlnvh";
-  if (!/^[a-f0-9]{40}$/.test(sha) || !["password", "temporary"].includes(authentication) || !ca)
+  const target = DEVELOPMENT_PROJECT_REF;
+  if (
+    !/^[a-f0-9]{40}$/.test(sha) ||
+    !["password", "temporary"].includes(authentication) ||
+    !/^aws-[0-9]+-[a-z0-9-]+\.pooler\.supabase\.com$/.test(host) ||
+    !ca
+  )
     throw new DatabaseSafetyError();
-  const direct = host === `db.${target}.supabase.co`;
-  if (!direct && !/^aws-[0-9]+-[a-z0-9-]+\.pooler\.supabase\.com$/.test(host))
-    throw new DatabaseSafetyError();
-  const config = readDevelopmentDatabaseConfig({
-    DATABASE_URL: `postgresql://${direct ? "postgres" : `postgres.${target}`}@${host}:5432/postgres`,
+  const config = readInspectionDatabaseConfig({
+    DATABASE_URL: `postgresql://${LEDGER_READER_ROLE}.${target}@${host}:5432/postgres`,
     REDPRO_DB_PASSWORD: "synthetic-preflight-placeholder-not-a-credential",
     REDPRO_DB_ENV: "development",
     REDPRO_DB_TARGET_REF: target,
     REDPRO_DB_AUTH_MODE: authentication,
+    REDPRO_DB_SSL_CA_FILE: ca,
   });
   // Only the public server CA is ever read from disk. Reject private keys/bundles.
   const pem = readFileSync(ca, "utf8");

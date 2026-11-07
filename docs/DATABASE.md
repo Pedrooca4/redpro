@@ -59,6 +59,20 @@ pnpm db:status
 
 Cada comando altera no máximo uma migração. Fingerprint errada, nome diferente da próxima migração, projeto divergente, ambiente ausente/produção ou execução na Vercel são recusados. Esses controles conferem configuração e confirmação explícita; não conseguem inferir por conta própria se um projeto foi rotulado incorretamente como desenvolvimento.
 
+### Inspeção com papel leitor
+
+O helper privado de Codespaces usa o projeto de desenvolvimento `rdwchjjxaipkufgxlnvh`, Session pooler (porta 5432), usuário `minepro_ledger_reader.rdwchjjxaipkufgxlnvh` e CA pública. A checagem confirma `current_user`. `check` e `status` usam transações `READ ONLY`. O status lê um snapshot consistente com `getMigrations()` do Kysely fixado. Se faltar o schema ou a tabela do ledger, as migrações locais aparecem pendentes e nenhum metadado é criado. Um schema existente sem a marca esperada é recusado.
+
+Para aprovação futura, o papel `minepro_ledger_reader` deve ter login e não ter atributos administrativos, propriedade de objetos, memberships ou `BYPASSRLS`. As permissões explícitas mínimas são:
+
+- `CONNECT` no database `postgres`.
+- `USAGE` no schema `redpro_migrations`, quando existir.
+- `SELECT (name, "timestamp")` em `redpro_migrations.kysely_migration`, quando existir. A introspecção usa os catálogos padrão do PostgreSQL. O leitor dispensa acesso a `kysely_migration_lock`.
+
+Revisar os privilégios efetivos, inclusive os concedidos a `PUBLIC` no database, schemas, tabelas e funções. Por exemplo, `TEMP` pode estar concedido a `PUBLIC` e `NOINHERIT` não remove esse acesso. A fixture de testes usa um database isolado para comprovar as recusas de escrita, DDL e leitura de objetos alheios. Se houver acesso efetivo além do necessário, revisar o impacto e aprovar a correção separadamente antes de usar o papel no Supabase.
+
+Aprovar separadamente o papel e os grants exatos, o método de autenticação e a validade da credencial. Depois, aprovar uma execução de leitura no SHA revisado e conferir o destino e a ausência de configuração herdada. O helper aceita a credencial pelo prompt oculto e o runner recusa o papel leitor para `up` e `down`. Ver [CODESPACES.md](CODESPACES.md).
+
 ## Concorrência e confirmação da etapa
 
 O runner fixa uma conexão e adquire o advisory lock PostgreSQL do próprio Kysely **antes** de ler o ledger e escolher a etapa. Mantém esse lock de sessão até depois do commit/rollback. Dentro de uma transação READ COMMITTED, valida novamente o proprietário do ledger e o nome autorizado, cria metadados se necessário, executa somente `migrateUp()` ou `migrateDown()` e compara nome, direção, quantidade e resultado com a solicitação. Confere também que somente a etapa esperada mudou de estado no ledger antes de permitir o commit.

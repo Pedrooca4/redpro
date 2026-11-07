@@ -49,6 +49,16 @@ export async function migrationStatus(db: Kysely<Database>) {
   }));
 }
 
+export function readDevelopmentMigrationStatus(db: Kysely<Database>) {
+  // Kysely getMigrations reads the ledger and treats a missing table as empty.
+  // The server must enforce read-only even if that behavior changes.
+  return db
+    .transaction()
+    .setIsolationLevel("repeatable read")
+    .setAccessMode("read only")
+    .execute(migrationStatus);
+}
+
 export async function runDevelopmentMigration(
   db: Kysely<Database>,
   config: DevelopmentDatabaseConfig,
