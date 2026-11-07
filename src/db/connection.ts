@@ -25,7 +25,9 @@ export interface Database {
   moderation: ModerationTable;
 }
 
-export function developmentPoolConfig(config: DevelopmentDatabaseConfig): PoolConfig {
+export function developmentPoolConfig(
+  config: DevelopmentDatabaseConfig & { ca?: string },
+): PoolConfig {
   return {
     host: config.host,
     port: config.port,
@@ -36,7 +38,11 @@ export function developmentPoolConfig(config: DevelopmentDatabaseConfig): PoolCo
       config.provider === "supabase"
         ? {
             rejectUnauthorized: true,
-            ...(config.caFile ? { ca: readFileSync(config.caFile, "utf8") } : {}),
+            ...(config.ca !== undefined
+              ? { ca: config.ca }
+              : config.caFile
+                ? { ca: readFileSync(config.caFile, "utf8") }
+                : {}),
           }
         : false,
     max: 1,
@@ -54,7 +60,7 @@ export function developmentPoolConfig(config: DevelopmentDatabaseConfig): PoolCo
   };
 }
 
-export function createDevelopmentDatabase(config: DevelopmentDatabaseConfig) {
+export function createDevelopmentDatabase(config: DevelopmentDatabaseConfig & { ca?: string }) {
   const pool = new Pool(developmentPoolConfig(config));
   // Idle connection failures must not emit the raw pg error or crash the process.
   pool.on("error", () => console.error('{"event":"database.failed","code":"DB_POOL_IDLE_FAILED"}'));
