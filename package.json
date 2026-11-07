@@ -28,7 +28,8 @@
     "test:ui": "node scripts/test-ui.mjs",
     "codespace:setup": "bash scripts/codespace.sh setup",
     "test:db:disposable": "bash scripts/codespace.sh test-db",
-    "db:inspect:private": "bash scripts/codespace.sh inspect"
+    "db:inspect:private": "bash scripts/codespace.sh inspect",
+    "db:inspect:admin": "node --experimental-strip-types scripts/codespace-admin.ts"
   },
   "dependencies": {
     "@supabase/ssr": "0.12.7",

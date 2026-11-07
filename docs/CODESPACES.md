@@ -83,3 +83,45 @@ Limites: processos/extensões do mesmo usuário, root e código malicioso podem 
 - Somente depois: autorização explícita de **uma migração exata por vez**, SHA/fingerprint/ledger esperados e validação posterior. Esta tarefa não autoriza nenhuma aplicação/reversão. Não disponibiliza um botão para migrar.
 
 Referências oficiais: [Codespaces e contas pessoais](https://docs.github.com/en/codespaces/developing-in-a-codespace/creating-a-codespace-for-a-repository), [cobrança](https://docs.github.com/en/billing/concepts/product-billing/github-codespaces), [orçamentos com bloqueio](https://docs.github.com/en/billing/how-tos/set-up-budgets), [inatividade](https://docs.github.com/en/codespaces/setting-your-user-preferences/setting-your-timeout-period-for-github-codespaces), [parar/iniciar](https://docs.github.com/en/codespaces/developing-in-a-codespace/stopping-and-starting-a-codespace), [acesso temporário](https://supabase.com/docs/guides/platform/temporary-access), [conexões Supabase](https://supabase.com/docs/guides/database/connecting-to-postgres).
+
+## Sessão administrativa de leitura
+
+O comando `db:inspect:admin` é independente de `db:inspect:private`. Seu uso exige
+autorização específica para a instância Codespaces, o SHA e a conexão ao projeto de
+desenvolvimento `rdwchjjxaipkufgxlnvh`. O papel `postgres` continua administrativo,
+inclusive com capacidade de contornar RLS. A transação somente leitura limita o
+helper. Ela não restringe o papel em outros programas ou sessões.
+
+1. No Codespaces existente e autorizado, confirme o nome no painel do GitHub.
+   Use a `main` limpa, no SHA completo aprovado após revisão e CI. Conclua a instalação
+   antes da sessão. Use um terminal privado sem compartilhamento, gravação, depuração,
+   injeção de código Node ou configuração de credenciais de banco no ambiente.
+2. No painel **Connect** do Supabase de desenvolvimento, confira o host da conexão
+   direta ou do **Session pooler** na porta 5432. Confirme **Enforce SSL** em
+   **Database Settings** e obtenha ali a CA pública oficial. Coloque somente a CA em
+   `.minepro-ca/server-ca.crt` dentro do Codespace. O comando valida o certificado da
+   CA, a cadeia TLS e o hostname. A origem da CA deve ser conferida no painel.
+3. Após autorização para a conexão de leitura, execute:
+
+   ```bash
+   pnpm db:inspect:admin NOME_DO_CODESPACE SHA_APROVADO HOST_DO_PAINEL .minepro-ca/server-ca.crt
+   ```
+
+   Digite a credencial administrativa já autorizada apenas no prompt oculto. O
+   helper aceita autenticação por senha e mantém a entrada na memória do processo,
+   sem histórico, exportação ao ambiente, argumentos ou arquivo. Feche o terminal
+   privado ao terminar. Um ambiente comprometido ainda pode capturar a entrada ou
+   a memória. As variáveis do Codespaces são conferências locais e o nome precisa
+   corresponder à instância autorizada pelo operador.
+
+4. Confira a sequência `database.target`, `database.connected` e
+   `database.migrations`. O helper verifica o SHA local e remoto antes do prompt
+   e novamente antes de conectar. O check e o status compartilham uma transação
+   `REPEATABLE READ READ ONLY`, com identidade `postgres` no banco `postgres`.
+   Ledger ausente aparece com `ledgerPresent: false` e migrações pendentes, sem criar metadados. Linhas
+   desconhecidas ou fora de ordem encerram a operação. O comando faz uma tentativa
+   de conexão, sem fallback de TLS ou reexecução automática. Em caso de falha,
+   verifique os pré-requisitos separadamente e obtenha autorização para nova tentativa.
+
+Uma aprovação para esta sessão cobre apenas destino, conexão e status. Aplicar
+uma migração pelo runner normal é uma operação separada e requer nova autorização.
