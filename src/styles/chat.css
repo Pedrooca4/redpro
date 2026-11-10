@@ -420,11 +420,12 @@ summary:focus-visible {
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 8px;
 }
-.tool-grid button {
+.tool-grid :is(button, a) {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 8px;
+  min-height: 44px;
   padding: 12px;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
@@ -433,7 +434,11 @@ summary:focus-visible {
   font-size: var(--text-xs);
   text-align: left;
 }
-.tool-grid button:hover {
+.tool-grid .tool-available {
+  color: var(--color-soft);
+  border-color: var(--color-accent-deep);
+}
+.tool-grid :is(button, a):hover {
   background: var(--color-elevated);
   color: var(--color-foreground);
 }

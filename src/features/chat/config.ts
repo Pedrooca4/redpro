@@ -75,10 +75,7 @@ export const TOOLS = [
     id: "materials",
     name: "Calculadora de materiais",
     mode: "BUILDER",
-    description: "Planejar quantidades, stacks, combustível e desgaste.",
-    limit:
-      "O cálculo real ainda não está disponível. Dimensões e limites de empilhamento serão necessários.",
-    question: "Quais medidas e materiais preciso reunir para calcular minha construção?",
+    href: "/ferramentas/materiais",
   },
   {
     id: "seeds",
@@ -107,14 +104,11 @@ export const TOOLS = [
       "O guia versionado ainda não está conectado. Nenhuma altura universal é recomendada aqui.",
     question: "Como conferir a distribuição de minérios para minha versão?",
   },
-] as const satisfies readonly {
+] as const satisfies readonly ({
   id: string;
   name: string;
   mode: Mode;
-  description: string;
-  limit: string;
-  question: string;
-}[];
+} & ({ href: string } | { description: string; limit: string; question: string }))[];
 
 export function suggestionsFor(context: MinecraftContext): string[] {
   const edition = EDITIONS[context.edition].label;

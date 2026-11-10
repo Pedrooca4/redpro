@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 import { useEffect, useReducer, useRef, useState } from "react";
 import {
   ArrowUp,
@@ -22,7 +23,10 @@ export function ChatShell() {
   const [drawer, setDrawer] = useState(false);
   const [settings, setSettings] = useState(false);
   const [failNext, setFailNext] = useState(false);
-  const [activeTool, setActiveTool] = useState<(typeof TOOLS)[number] | null>(null);
+  const [activeTool, setActiveTool] = useState<Exclude<
+    (typeof TOOLS)[number],
+    { href: string }
+  > | null>(null);
   const textarea = useRef<HTMLTextAreaElement>(null);
   const messages = useRef<HTMLDivElement>(null);
   const busy = state.phase === "previewing";
@@ -147,20 +151,27 @@ export function ChatShell() {
                     <Wrench size={16} aria-hidden="true" />
                     Sua bancada de ferramentas
                   </h2>
-                  <span>Em desenvolvimento</span>
+                  <span>1 disponível · 5 prévias</span>
                 </div>
                 <div className="tool-grid">
-                  {TOOLS.map((tool) => (
-                    <button
-                      type="button"
-                      key={tool.id}
-                      disabled={busy}
-                      onClick={() => setActiveTool(tool)}
-                    >
-                      <span>{tool.name}</span>
-                      <ChevronRight size={15} aria-hidden="true" />
-                    </button>
-                  ))}
+                  {TOOLS.map((tool) =>
+                    "href" in tool ? (
+                      <Link key={tool.id} href={tool.href} className="tool-available">
+                        <span>{tool.name}</span>
+                        <ChevronRight size={15} aria-hidden="true" />
+                      </Link>
+                    ) : (
+                      <button
+                        type="button"
+                        key={tool.id}
+                        disabled={busy}
+                        onClick={() => setActiveTool(tool)}
+                      >
+                        <span>{tool.name}</span>
+                        <ChevronRight size={15} aria-hidden="true" />
+                      </button>
+                    ),
+                  )}
                 </div>
               </section>
             </div>

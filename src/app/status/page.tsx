@@ -34,7 +34,13 @@ export default function StatusPage() {
               <li>Página inicial e navegação responsiva.</li>
               <li>Identidade visual MinePRO em obsidiana e esmeralda.</li>
               <li>Chat local, JavaMine/BedMine, versão e seis modos.</li>
-              <li>Prévias das ferramentas, sem execução real.</li>
+              <li>
+                <Link className="inline-link" href="/ferramentas/materiais">
+                  Calculadora de materiais
+                </Link>{" "}
+                com estimativas de blocos, stacks e slots.
+              </li>
+              <li>Prévias das demais ferramentas.</li>
               <li>Aplicação Next.js com TypeScript.</li>
               <li>Endpoint para verificar se a aplicação responde.</li>
             </ul>

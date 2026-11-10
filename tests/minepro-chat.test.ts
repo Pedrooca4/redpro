@@ -96,9 +96,14 @@ test("new conversation cancels pending preview, clears messages and retains pref
   assert.equal(state.messages.length, 0);
   assert.equal(state.draft, "");
 });
-test("all six tool previews prepare questions without executing tools", () => {
+test("the calculator links to its route and the other five tools prepare preview questions", () => {
   assert.equal(TOOLS.length, 6);
+  assert.deepEqual(
+    TOOLS.filter((tool) => "href" in tool).map(({ id, href }) => ({ id, href })),
+    [{ id: "materials", href: "/ferramentas/materiais" }],
+  );
   for (const tool of TOOLS) {
+    if ("href" in tool) continue;
     assert.ok(tool.limit.length > 20);
     const state = reduce(initialChatState(), {
       type: "prepare",
