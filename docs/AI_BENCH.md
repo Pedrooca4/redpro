@@ -131,3 +131,5 @@ pnpm ai:bench review --report .minepro-ai-bench/qwen3.5-4b/resultado.json --rati
 ```
 
 Cada execução grava um novo arquivo e preserva os relatórios existentes. Use um nome diferente para repetir o experimento. A próxima comparação é repetir a bateria com uma base local de fichas verificadas por edição e versão, mantendo os mesmos pesos e parâmetros.
+
+Para a bateria reservada de 72 casos, consulte [Avaliação reservada](AI_RESERVED_EVALUATION.md).

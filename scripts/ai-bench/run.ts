@@ -19,6 +19,7 @@ import {
   validateSuite,
   type CaseResult,
 } from "./report.ts";
+import { reservedCommand } from "./reserved.ts";
 import { loadManifest, readJSON, sha256File, startLocalServer } from "./runtime.ts";
 
 const suitePath = new URL("./cases.json", import.meta.url);
@@ -210,7 +211,18 @@ try {
   if (command === "run") await run(args);
   else if (command === "review") await review(args);
   else if (command === "compare") await compare(args);
-  else throw new BenchError("Use run, review ou compare. Veja docs/AI_BENCH.md.");
+  else if (
+    command === "reserved-check" ||
+    command === "reserved-reference-pack" ||
+    command === "reserved-run" ||
+    command === "reserved-blind-pack" ||
+    command === "reserved-score"
+  )
+    await reservedCommand(command, args);
+  else
+    throw new BenchError(
+      "Use run, review, compare ou um comando reservado. Veja docs/AI_BENCH.md.",
+    );
 } catch (error) {
   process.stderr.write(
     (error instanceof Error ? error.message : "Falha ao executar a bancada.") + "\n",
