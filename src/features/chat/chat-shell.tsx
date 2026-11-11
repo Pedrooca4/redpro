@@ -86,9 +86,24 @@ export function ChatShell() {
     return () => window.clearTimeout(timer);
   }, [busy, failNext, aiAvailable, state.pending, state.messages]);
   useEffect(() => {
-    if (state.messages.length)
-      messages.current?.scrollTo({ top: messages.current.scrollHeight, behavior: "instant" });
-  }, [state.messages.length, busy]);
+    const area = messages.current;
+    if (!area) return;
+    const questions = area.querySelectorAll<HTMLElement>(".local-message:not(.assistant-message)");
+    const target =
+      aiAvailable && busy
+        ? area.querySelector<HTMLElement>(".ai-generating")
+        : questions.item(questions.length - 1);
+    // Keep the current turn in view; the tools below it must not push answers offscreen.
+    if (target)
+      area.scrollTo({
+        top:
+          area.scrollTop +
+          target.getBoundingClientRect().top -
+          area.getBoundingClientRect().top -
+          12,
+        behavior: "instant",
+      });
+  }, [state.messages.length, busy, aiAvailable]);
   function newConversation() {
     dispatch({ type: "new" });
     setDrawer(false);

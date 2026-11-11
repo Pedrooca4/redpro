@@ -45,7 +45,7 @@ Antes da ativação, o proprietário precisa aprovar o serviço persistente e ev
 
 ## Validação e limites de evidência
 
-Os testes de provedor injetam respostas simuladas e falhas de 401/403/429/5xx, timeout, configuração e validação. O teste Chromium usa interceptação de `/api/chat` apenas no processo de teste e exibe `TESTE AUTOMATIZADO · RESPOSTA SIMULADA` no conteúdo. O Preview permanece no estado real desativado, com calculadora e demonstração local acessíveis. Não há fixture, modo de teste ou bypass de segurança habilitável pela aplicação pública.
+Os testes de provedor injetam respostas simuladas e falhas de 401/403/429/5xx, timeout, configuração e validação. O teste Chromium usa interceptação de `/api/chat` apenas no processo de teste e exibe `TESTE AUTOMATIZADO · RESPOSTA SIMULADA` no conteúdo. A rolagem mantém a pergunta atual e o início da resposta na área de conversa, sem saltar para a bancada abaixo; esse posicionamento é verificado em todas as quatro larguras. O Preview permanece no estado real desativado, com calculadora e demonstração local acessíveis. Não há fixture, modo de teste ou bypass de segurança habilitável pela aplicação pública.
 
 `pnpm test:ai-guard` executa as duas instâncias do adapter contra Lua real em Redis descartável da CI. O transporte HTTP é simulado e o comando é executado com `redis-cli` no container isolado do job. São cobertos concorrência individual/global, quotas, leases obsoletos e metadados corrompidos. Isso não comprova disponibilidade, permissões, replicação, orçamento ou semântica operacional do serviço Upstash real. Validar essas propriedades antes de qualquer ativação. As integrações PostgreSQL anteriores continuam independentes e usam exclusivamente o serviço descartável existente.
 

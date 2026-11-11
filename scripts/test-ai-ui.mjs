@@ -73,6 +73,25 @@ for (const width of [320, 390, 768, 1440]) {
       page.getByRole("article", { name: "Mensagem do jogador", exact: true }),
     ).toHaveCount(1);
     await expectUI(draft).toHaveValue("");
+    await expectUI
+      .poll(
+        () =>
+          page.evaluate(() => {
+            const area = document.querySelector(".chat-scroll").getBoundingClientRect();
+            const question = document
+              .querySelector(".local-message:not(.assistant-message)")
+              .getBoundingClientRect();
+            const response = document.querySelector(".assistant-message").getBoundingClientRect();
+            return (
+              question.top >= area.top &&
+              question.bottom <= area.bottom &&
+              response.top >= area.top &&
+              response.top < area.bottom
+            );
+          }),
+        { message: "The latest question and start of its answer must be visible above the tools" },
+      )
+      .toBe(true);
     await context.grantPermissions(["clipboard-read", "clipboard-write"]);
     await answer.getByRole("button", { name: "Copiar resposta", exact: true }).click();
     await expectUI(answer).toContainText("Resposta copiada.");
