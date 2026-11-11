@@ -12,3 +12,7 @@ Thumbs.db
 
 # Public Supabase server CA only; credentials must never be written here.
 .minepro-ca/
+
+# Local model binaries, weights and generated evaluation reports.
+.minepro-ai-bench/
+*.gguf

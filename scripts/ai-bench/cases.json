@@ -1,0 +1,411 @@
+{
+  "schemaVersion": 1,
+  "purpose": "evaluation-only",
+  "sources": {
+    "stick": {
+      "title": "Stick",
+      "url": "https://minecraft.wiki/w/Stick",
+      "license": "CC BY-NC-SA 3.0 para texto da wiki, salvo exceções. Consulta factual, sem transcrição.",
+      "usage": "fact-reference-only"
+    },
+    "furnace": {
+      "title": "Furnace",
+      "url": "https://minecraft.wiki/w/Furnace",
+      "license": "CC BY-NC-SA 3.0 para texto da wiki, salvo exceções. Consulta factual, sem transcrição.",
+      "usage": "fact-reference-only"
+    },
+    "java-give": {
+      "title": "/give",
+      "url": "https://minecraft.wiki/w/Commands/give",
+      "license": "CC BY-NC-SA 3.0 para texto da wiki, salvo exceções. Consulta factual, sem transcrição.",
+      "usage": "fact-reference-only"
+    },
+    "java-weather": {
+      "title": "/weather",
+      "url": "https://minecraft.wiki/w/Commands/weather",
+      "license": "CC BY-NC-SA 3.0 para texto da wiki, salvo exceções. Consulta factual, sem transcrição.",
+      "usage": "fact-reference-only"
+    },
+    "comparator": {
+      "title": "Redstone Comparator",
+      "url": "https://minecraft.wiki/w/Redstone_Comparator",
+      "license": "CC BY-NC-SA 3.0 para texto da wiki, salvo exceções. Consulta factual, sem transcrição.",
+      "usage": "fact-reference-only"
+    },
+    "repeater": {
+      "title": "Redstone Repeater",
+      "url": "https://minecraft.wiki/w/Redstone_Repeater",
+      "license": "CC BY-NC-SA 3.0 para texto da wiki, salvo exceções. Consulta factual, sem transcrição.",
+      "usage": "fact-reference-only"
+    },
+    "food": {
+      "title": "Food",
+      "url": "https://minecraft.wiki/w/Hunger",
+      "license": "CC BY-NC-SA 3.0 para texto da wiki, salvo exceções. Consulta factual, sem transcrição.",
+      "usage": "fact-reference-only"
+    },
+    "bed": {
+      "title": "Bed",
+      "url": "https://minecraft.wiki/w/Bed",
+      "license": "CC BY-NC-SA 3.0 para texto da wiki, salvo exceções. Consulta factual, sem transcrição.",
+      "usage": "fact-reference-only"
+    },
+    "water": {
+      "title": "Water Bucket",
+      "url": "https://minecraft.wiki/w/Water_Bucket",
+      "license": "CC BY-NC-SA 3.0 para texto da wiki, salvo exceções. Consulta factual, sem transcrição.",
+      "usage": "fact-reference-only"
+    },
+    "anchor": {
+      "title": "Respawn Anchor",
+      "url": "https://minecraft.wiki/w/Respawn_Anchor",
+      "license": "CC BY-NC-SA 3.0 para texto da wiki, salvo exceções. Consulta factual, sem transcrição.",
+      "usage": "fact-reference-only"
+    },
+    "qc": {
+      "title": "Tutorial:Quasi-connectivity",
+      "url": "https://minecraft.wiki/w/Tutorial:Quasi-connectivity",
+      "license": "CC BY-NC-SA 3.0 para texto da wiki, salvo exceções. Consulta factual, sem transcrição.",
+      "usage": "fact-reference-only"
+    },
+    "sweep": {
+      "title": "Sweeping Edge",
+      "url": "https://minecraft.wiki/w/Sweeping_Edge",
+      "license": "CC BY-NC-SA 3.0 para texto da wiki, salvo exceções. Consulta factual, sem transcrição.",
+      "usage": "fact-reference-only"
+    },
+    "data": {
+      "title": "/data",
+      "url": "https://minecraft.wiki/w/Commands/data",
+      "license": "CC BY-NC-SA 3.0 para texto da wiki, salvo exceções. Consulta factual, sem transcrição.",
+      "usage": "fact-reference-only"
+    },
+    "offhand": {
+      "title": "Dual wielding",
+      "url": "https://minecraft.wiki/w/Dual_wielding",
+      "license": "CC BY-NC-SA 3.0 para texto da wiki, salvo exceções. Consulta factual, sem transcrição.",
+      "usage": "fact-reference-only"
+    },
+    "golem": {
+      "title": "Tutorial:Iron golem farming",
+      "url": "https://minecraft.wiki/w/Tutorial:Iron_golem_farming",
+      "license": "CC BY-NC-SA 3.0 para texto da wiki, salvo exceções. Consulta factual, sem transcrição.",
+      "usage": "fact-reference-only"
+    },
+    "craft": {
+      "title": "Como criar no Minecraft",
+      "url": "https://www.minecraft.net/pt-br/article/how-craft",
+      "license": "Mojang/Microsoft. Página consultada como referência factual; sem licença aberta identificada para o texto.",
+      "usage": "fact-reference-only"
+    },
+    "java-components": {
+      "title": "Minecraft Java Edition 1.20.5",
+      "url": "https://www.minecraft.net/en-us/article/minecraft-java-edition-1-20-5",
+      "license": "Mojang/Microsoft. Página consultada como referência factual; sem licença aberta identificada para o texto.",
+      "usage": "fact-reference-only"
+    },
+    "gamerule": {
+      "title": "Introduction to Gamerules",
+      "url": "https://learn.microsoft.com/en-us/minecraft/creator/documents/introductiontogamerules?view=minecraft-bedrock-stable",
+      "license": "CC BY 4.0 para a documentação correspondente no repositório MicrosoftDocs/minecraft-creator, salvo exceções.",
+      "usage": "fact-reference-only"
+    },
+    "effect": {
+      "title": "/effect",
+      "url": "https://learn.microsoft.com/en-us/minecraft/creator/commands/commands/effect?view=minecraft-bedrock-stable",
+      "license": "CC BY 4.0 para a documentação correspondente no repositório MicrosoftDocs/minecraft-creator, salvo exceções.",
+      "usage": "fact-reference-only"
+    },
+    "bedrock-redstone": {
+      "title": "Guide to Redstone",
+      "url": "https://learn.microsoft.com/en-us/minecraft/creator/documents/redstoneguide?view=minecraft-bedrock-stable",
+      "license": "CC BY 4.0 para a documentação correspondente no repositório MicrosoftDocs/minecraft-creator, salvo exceções.",
+      "usage": "fact-reference-only"
+    },
+    "fill": {
+      "title": "/fill",
+      "url": "https://learn.microsoft.com/en-us/minecraft/creator/reference/content/commandsreference/examples/commands/fill?view=minecraft-bedrock-stable",
+      "license": "CC BY 4.0 para a documentação correspondente no repositório MicrosoftDocs/minecraft-creator, salvo exceções.",
+      "usage": "fact-reference-only"
+    }
+  },
+  "cases": [
+    {
+      "id": "CRA-J01",
+      "category": "crafting",
+      "edition": "Java",
+      "version": "1.21.5",
+      "question": "Tenho um tronco de carvalho. Quantas tábuas posso fazer e preciso de bancada?",
+      "sourceIds": ["craft"],
+      "reference": "Um tronco rende quatro tábuas de carvalho na grade do inventário.",
+      "rubric": ["Indica 4 tábuas de carvalho", "aceita um único tronco na grade 2×2."],
+      "criticalError": "Indica outra quantidade ou exige bancada."
+    },
+    {
+      "id": "CRA-J02",
+      "category": "crafting",
+      "edition": "Java",
+      "version": "1.21.5",
+      "question": "Como faço gravetos usando exatamente duas tábuas? Quantos saem?",
+      "sourceIds": ["stick"],
+      "reference": "Coloque duas tábuas na mesma coluna, uma acima da outra. A receita produz quatro gravetos.",
+      "rubric": ["Posicionamento vertical e rendimento de 4 gravetos."],
+      "criticalError": "Prescreve uma linha horizontal ou indica outro rendimento."
+    },
+    {
+      "id": "CRA-B01",
+      "category": "crafting",
+      "edition": "Bedrock",
+      "version": "1.21.80",
+      "question": "Acabei de começar. Como faço a bancada usando a grade pequena do inventário?",
+      "sourceIds": ["craft"],
+      "reference": "Preencha os quatro espaços da grade 2×2 com tábuas para obter uma bancada.",
+      "rubric": ["Quatro tábuas", "grade do inventário completa", "uma bancada."],
+      "criticalError": "Exige uma bancada pronta ou usa troncos sem transformá-los em tábuas."
+    },
+    {
+      "id": "CRA-B02",
+      "category": "crafting",
+      "edition": "Bedrock",
+      "version": "1.21.80",
+      "question": "Como monto uma fornalha comum só com pedregulho?",
+      "sourceIds": ["furnace"],
+      "reference": "Na bancada, coloque oito pedregulhos nas bordas da grade 3×3, deixando o centro vazio.",
+      "rubric": ["Oito pedregulhos", "centro vazio", "grade 3×3."],
+      "criticalError": "Enche o centro ou confunde a receita com a de alto-forno."
+    },
+    {
+      "id": "CMD-J01",
+      "category": "comandos",
+      "edition": "Java",
+      "version": "1.21.5",
+      "question": "Qual comando de chat dá exatamente três blocos de pedra para mim? Estou como jogador com permissão.",
+      "sourceIds": ["java-give"],
+      "reference": "/give @s minecraft:stone 3",
+      "rubric": [
+        "Seleciona o jogador executor, identifica pedra comum e especifica três unidades."
+      ],
+      "criticalError": "Usa @a, pedregulho ou uma quantidade diferente.",
+      "exactCommand": "/give @s minecraft:stone 3"
+    },
+    {
+      "id": "CMD-J02",
+      "category": "comandos",
+      "edition": "Java",
+      "version": "1.21.5",
+      "question": "Qual comando limpa o clima agora? Não quero mudar o horário.",
+      "sourceIds": ["java-weather"],
+      "reference": "/weather clear",
+      "rubric": ["Muda apenas o clima para limpo", "não usa /time."],
+      "criticalError": "Prescreve um comando que altera a hora ou define tempestade.",
+      "exactCommand": "/weather clear"
+    },
+    {
+      "id": "CMD-B01",
+      "category": "comandos",
+      "edition": "Bedrock",
+      "version": "1.21.80",
+      "question": "Qual comando mantém o inventário ao morrer? Tenho cheats habilitados.",
+      "sourceIds": ["gamerule"],
+      "reference": "/gamerule keepinventory true",
+      "rubric": ["Usa a regra keepinventory com true e explica que afeta o mundo."],
+      "criticalError": "Sugere false ou um comando de outra edição que falha no alvo.",
+      "exactCommand": "/gamerule keepinventory true"
+    },
+    {
+      "id": "CMD-B02",
+      "category": "comandos",
+      "edition": "Bedrock",
+      "version": "1.21.80",
+      "question": "Escreva o comando para aplicar Velocidade I em mim por 10 segundos no chat.",
+      "sourceIds": ["effect"],
+      "reference": "/effect @s speed 10 0",
+      "rubric": [
+        "Usa a sintaxe Bedrock sem o subcomando give, alvo @s, 10 segundos e nível I (amplificador 0, que pode ser omitido)."
+      ],
+      "criticalError": "Usa sintaxe Java, amplificador 1 para nível I ou alvo coletivo.",
+      "exactCommand": "/effect @s speed 10 0"
+    },
+    {
+      "id": "RED-J01",
+      "category": "redstone",
+      "edition": "Java",
+      "version": "1.21.5",
+      "question": "Meu comparador está no modo subtração. Recebe 10 atrás e 4 em um lado. O outro lado tem zero. Qual é a saída?",
+      "sourceIds": ["comparator"],
+      "reference": "A saída é 6, pois o maior sinal lateral é 4 e 10 menos 4 dá 6.",
+      "rubric": ["Calcula 6 e reconhece o modo de subtração."],
+      "criticalError": "Dá 10 como se estivesse no modo comparação ou soma entradas."
+    },
+    {
+      "id": "RED-J02",
+      "category": "redstone",
+      "edition": "Java",
+      "version": "1.21.5",
+      "question": "Quais são os quatro atrasos configuráveis de um repetidor, em ticks de redstone?",
+      "sourceIds": ["repeater"],
+      "reference": "1, 2, 3 e 4 ticks de redstone. Cada um corresponde a dois ticks do jogo.",
+      "rubric": ["Lista os quatro valores e distingue ticks de redstone de ticks de jogo."],
+      "criticalError": "Apresenta 0–3, 2–8 como ticks de redstone ou mistura as unidades."
+    },
+    {
+      "id": "RED-B01",
+      "category": "redstone",
+      "edition": "Bedrock",
+      "version": "1.21.80",
+      "question": "Um repetidor bem orientado e sem trava recebe sinal de força 4 atrás. Qual força ele entrega na frente?",
+      "sourceIds": ["bedrock-redstone"],
+      "reference": "O repetidor entrega força 15 pela frente, dado um sinal positivo atrás.",
+      "rubric": ["Reconhece saída 15 e entrada pela traseira."],
+      "criticalError": "Afirma que a saída é 4 ou que não há saída."
+    },
+    {
+      "id": "RED-B02",
+      "category": "redstone",
+      "edition": "Bedrock",
+      "version": "1.21.80",
+      "question": "Quero continuar uma linha de pó com um repetidor. Para que lado ele deve apontar? Ele também conduz ao contrário?",
+      "sourceIds": ["bedrock-redstone", "repeater"],
+      "reference": "A traseira recebe o sinal da fonte e a frente aponta para o trecho de destino. A condução ocorre nesse sentido.",
+      "rubric": ["Identifica corretamente entrada, saída e sentido único."],
+      "criticalError": "Inverte entrada e saída ou afirma condução nos dois sentidos."
+    },
+    {
+      "id": "SUR-J01",
+      "category": "sobrevivencia",
+      "edition": "Java",
+      "version": "1.21.5",
+      "question": "Com saturação zerada e regeneração natural ligada, qual a menor quantidade de pontos de fome para regenerar vida naturalmente?",
+      "sourceIds": ["food"],
+      "reference": "18 pontos de fome, equivalentes a nove ícones inteiros de comida.",
+      "rubric": ["Indica 18 pontos ou nove ícones", "respeita a hipótese sobre saturação."],
+      "criticalError": "Indica outro limiar ou promete regeneração em qualquer nível de fome."
+    },
+    {
+      "id": "SUR-J02",
+      "category": "sobrevivencia",
+      "edition": "Java",
+      "version": "1.21.5",
+      "question": "Estou no Nether em sobrevivência. Posso usar uma cama para dormir ou salvar o renascimento?",
+      "sourceIds": ["bed", "anchor"],
+      "reference": "A tentativa de dormir explode a cama sob as regras padrão. Uma âncora carregada é a opção para marcar renascimento no Nether.",
+      "rubric": ["Alerta sobre a explosão e distingue cama de âncora carregada."],
+      "criticalError": "Recomenda tentar dormir na cama como opção segura no Nether."
+    },
+    {
+      "id": "SUR-B01",
+      "category": "sobrevivencia",
+      "edition": "Bedrock",
+      "version": "1.21.80",
+      "question": "Se eu despejar um balde de água direto no chão do Nether, consigo formar uma poça? É em sobrevivência vanilla.",
+      "sourceIds": ["water"],
+      "reference": "Não. A água evapora quando é despejada normalmente no chão do Nether.",
+      "rubric": ["Nega a poça e mantém o escopo de despejo direto."],
+      "criticalError": "Promete uma fonte de água comum no chão do Nether."
+    },
+    {
+      "id": "SUR-B02",
+      "category": "sobrevivencia",
+      "edition": "Bedrock",
+      "version": "1.21.80",
+      "question": "Coloquei uma âncora de renascimento carregada no Overworld. Posso usá-la para marcar o ponto de renascimento aqui?",
+      "sourceIds": ["anchor"],
+      "reference": "Não. Usar a âncora carregada no Overworld causa explosão com as regras padrão. Sua função de renascimento é no Nether.",
+      "rubric": ["Alerta sobre explosão no Overworld e indica o Nether como dimensão de uso."],
+      "criticalError": "Recomenda ativá-la no Overworld para renascer."
+    },
+    {
+      "id": "EDI-J01",
+      "category": "edicoes",
+      "edition": "Java",
+      "version": "1.21.5",
+      "question": "Minha máquina de pistões usa quasi-conectividade do Java. Posso copiar o projeto bloco por bloco no Bedrock e esperar o mesmo comportamento?",
+      "sourceIds": ["qc"],
+      "reference": "Não. A quasi-conectividade usada pelo projeto Java não é equivalente no Bedrock. É necessário redesenhar a alimentação e conferir o circuito.",
+      "rubric": ["Reconhece a diferença e evita promessa de portabilidade direta."],
+      "criticalError": "Garante funcionamento idêntico nas duas edições."
+    },
+    {
+      "id": "EDI-J02",
+      "category": "edicoes",
+      "edition": "Java",
+      "version": "1.21.5",
+      "question": "Um tutorial de Java cita o encantamento Sweeping Edge. Ele também existe no Bedrock vanilla nessa geração do jogo?",
+      "sourceIds": ["sweep"],
+      "reference": "Sweeping Edge é um encantamento exclusivo do Java; o Bedrock vanilla não oferece esse encantamento.",
+      "rubric": ["Distingue disponibilidade nas edições", "pode manter o nome em inglês."],
+      "criticalError": "Diz que o encantamento existe no Bedrock vanilla."
+    },
+    {
+      "id": "EDI-B01",
+      "category": "edicoes",
+      "edition": "Bedrock",
+      "version": "1.21.80",
+      "question": "Copiei do Java o comando /data get entity @s. Ele funciona no Bedrock vanilla?",
+      "sourceIds": ["data"],
+      "reference": "O comando /data do Java não está disponível no Bedrock vanilla. Uma alternativa depende do que o jogador precisa consultar.",
+      "rubric": ["Reconhece que a sintaxe não é portável e não inventa equivalente universal."],
+      "criticalError": "Afirma que /data get entity @s funciona no Bedrock."
+    },
+    {
+      "id": "EDI-B02",
+      "category": "edicoes",
+      "edition": "Bedrock",
+      "version": "1.21.80",
+      "question": "Sem addons, consigo usar uma tocha comum na mão secundária para colocar tochas, como no Java?",
+      "sourceIds": ["offhand"],
+      "reference": "Não no Bedrock vanilla. A mão secundária tem uso limitado a itens específicos; a tocha comum não tem o mesmo uso do Java.",
+      "rubric": ["Responde sobre tocha comum e mão secundária nas duas edições."],
+      "criticalError": "Afirma que uma tocha comum pode ser equipada e colocada pela mão secundária do Bedrock vanilla."
+    },
+    {
+      "id": "AMB-J01",
+      "category": "ambiguidade",
+      "edition": "Java",
+      "version": null,
+      "question": "Me passe um /give para uma espada com nome personalizado. Não sei qual versão estou usando.",
+      "sourceIds": ["java-components"],
+      "reference": "Pedir a versão exata e o nome desejado, ou indicar um nome de exemplo. A sintaxe de dados de item mudou em 1.20.5; um comando precisa indicar para qual versão vale.",
+      "rubric": [
+        "Pede a versão ou apresenta alternativas claramente condicionadas",
+        "não finge universalidade."
+      ],
+      "criticalError": "Fornece um comando supostamente válido em todas as versões ou afirma que verificou o jogo do usuário."
+    },
+    {
+      "id": "AMB-J02",
+      "category": "ambiguidade",
+      "edition": "Java",
+      "version": "1.21.5",
+      "question": "Minha farm de ferro não funciona. Qual bloco eu troco? Ainda não descrevi o projeto nem mandei imagem.",
+      "sourceIds": ["golem"],
+      "reference": "Pedir detalhes do projeto e sintomas, por exemplo quantos aldeões e camas existem, onde os golems aparecem e a posição das plataformas. A troca depende do diagnóstico.",
+      "rubric": ["Faz perguntas concretas sobre o projeto", "admite que falta contexto."],
+      "criticalError": "Garante a correção trocando um bloco escolhido sem evidência."
+    },
+    {
+      "id": "AMB-B01",
+      "category": "ambiguidade",
+      "edition": "Bedrock",
+      "version": "1.21.80",
+      "question": "Quero preencher uma sala com /fill. Me dá o comando pronto. Ainda não medi nada.",
+      "sourceIds": ["fill"],
+      "reference": "Pedir as coordenadas dos dois cantos e o bloco desejado, além de confirmar se quer preencher ou só contornar. Pode mostrar um molde identificado como exemplo.",
+      "rubric": [
+        "Pede dois cantos e material ou apresenta parâmetros explícitos sem fingir valores reais."
+      ],
+      "criticalError": "Dá coordenadas inventadas como se fossem da sala do jogador."
+    },
+    {
+      "id": "AMB-B02",
+      "category": "ambiguidade",
+      "edition": "Bedrock",
+      "version": "1.21.80",
+      "question": "Qual é a receita desse item? Não anexei foto nem escrevi o nome.",
+      "sourceIds": ["craft"],
+      "reference": "Perguntar qual é o item. Pode pedir o identificador ou uma imagem e confirmar a versão se a receita depender dela.",
+      "rubric": ["Identifica que falta o nome do item e pede esclarecimento."],
+      "criticalError": "Inventa qual é o item e apresenta uma receita como se tivesse recebido o nome."
+    }
+  ]
+}
