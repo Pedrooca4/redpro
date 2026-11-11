@@ -145,7 +145,7 @@
         "Bedrock": ["1.21.80"]
       },
       "keywords": ["tronco", "tábuas de madeira", "carvalho", "tronco tábuas", "troncos"],
-      "fact": "Um tronco comum de madeira rende quatro tábuas do tipo correspondente. Uma única célula da grade de fabricação do inventário é suficiente.",
+      "fact": "Coloque um tronco comum em uma célula da grade 2×2 do inventário para fabricar quatro tábuas do mesmo tipo. A bancada de fabricação é dispensável.",
       "example": "Dois troncos de bétula rendem oito tábuas de bétula.",
       "sourceIds": ["mojang-craft"],
       "verifiedOn": "2026-11-11",
@@ -181,7 +181,7 @@
         "crafting table",
         "bancada grade"
       ],
-      "fact": "Uma bancada é fabricada ocupando as quatro células do quadrado 2×2 com tábuas. A bancada resultante disponibiliza uma grade 3×3.",
+      "fact": "Use quatro tábuas, uma em cada célula da grade 2×2 do inventário, para fabricar um item bancada. Coloque o item no mundo para poder usar sua grade 3×3.",
       "example": "Quatro tábuas de bétula no inventário produzem uma bancada.",
       "sourceIds": ["mojang-craft"],
       "verifiedOn": "2026-11-11",
@@ -196,7 +196,7 @@
         "Bedrock": ["1.21.80"]
       },
       "keywords": ["fornalha", "furnace", "pedregulho fornalha", "forno de pedra", "fornalhas"],
-      "fact": "A receita básica da fornalha usa oito blocos de pedregulho contornando a grade 3×3. O espaço central fica vazio e combustível não é ingrediente da fabricação.",
+      "fact": "A grade 3×3 da bancada com um pedregulho em cada célula da borda e o centro vazio fabrica uma fornalha. A receita usa oito pedregulhos e nenhum outro ingrediente.",
       "example": "Com 16 pedregulhos há material para fabricar duas fornalhas.",
       "sourceIds": ["wiki-furnace"],
       "verifiedOn": "2026-11-11",
@@ -258,7 +258,7 @@
         "Bedrock": ["1.21.80"]
       },
       "keywords": ["effect", "velocidade", "amplificador", "speed"],
-      "fact": "A sintaxe Bedrock é /effect seguido de alvo, efeito, duração em segundos e amplificador. Não há a palavra give nessa forma. speed é Velocidade e amplificador 0 corresponde ao nível I.",
+      "fact": "Na edição Bedrock, a forma de aplicação é /effect alvo efeito segundos amplificador. O alvo do próprio jogador é @s no chat. A duração é literal em segundos. speed significa Velocidade, com nível I no amplificador zero. A forma Bedrock não contém give.",
       "example": "/effect @s speed 25 1 aplica Velocidade II ao executor por 25 segundos.",
       "sourceIds": ["learn-effect"],
       "verifiedOn": "2026-11-11",
@@ -314,7 +314,7 @@
         "Bedrock": ["1.21.80"]
       },
       "keywords": ["repetidor", "força do sinal", "sinal de força", "repeater", "intensidade"],
-      "fact": "Com entrada traseira de pelo menos 1 e sem trava, o repetidor gera força 15 na saída frontal, mesmo que a entrada seja fraca.",
+      "fact": "Na edição Bedrock, a saída frontal estável de um repetidor orientado corretamente e destravado tem força 15 com qualquer entrada traseira de 1 a 15. Com entrada zero, a saída estável é zero.",
       "example": "Com entrada de força 2 atrás, a força de saída na frente é 15.",
       "sourceIds": ["learn-red"],
       "verifiedOn": "2026-11-11",
@@ -378,7 +378,7 @@
         "Bedrock": ["1.21.80"]
       },
       "keywords": ["balde de água", "água no nether", "poça", "despejar", "água evapora"],
-      "fact": "Ao despejar um balde de água no terreno do Nether em sobrevivência vanilla, a água evapora sem criar um bloco-fonte. O material do chão não muda esse comportamento.",
+      "fact": "Em sobrevivência vanilla, despejar um balde de água sobre o terreno no Nether faz a água evaporar. Nenhum bloco de água é colocado, nem por um instante. Encher um caldeirão com água é uma interação separada.",
       "example": "Despejar o balde sobre netherrack ou sobre terra no Nether não cria uma poça.",
       "sourceIds": ["wiki-water"],
       "verifiedOn": "2026-11-11",
@@ -429,7 +429,7 @@
         "Bedrock": ["1.21.80"]
       },
       "keywords": ["sweeping edge", "alcance", "borda cortadora", "encantamento sweeping"],
-      "fact": "Sweeping Edge pertence à edição Java e não existe no Bedrock vanilla. Seu papel é aumentar o dano do ataque de varredura da espada.",
+      "fact": "Sweeping Edge aumenta o dano do ataque de varredura da espada na edição Java. Existe no Java 1.21.5 e está ausente no Bedrock 1.21.80 vanilla. Os números de versão dessas duas edições são distintos.",
       "example": "Um livro desse encantamento no Java não tem equivalente vanilla no Bedrock.",
       "sourceIds": ["wiki-sweep"],
       "verifiedOn": "2026-11-11",

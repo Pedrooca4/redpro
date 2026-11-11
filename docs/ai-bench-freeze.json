@@ -1,0 +1,61 @@
+{
+  "schemaVersion": 1,
+  "purpose": "frozen-local-evaluation",
+  "frozenOn": "2026-11-11",
+  "baseCommit": "eab08f38958dd0b04d9b2fea91e3250cb6a56200",
+  "weights": {
+    "model": "Qwen/Qwen3.5-4B",
+    "revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+    "conversion": "SoAIHQ/Qwen3.5-4B-GGUF",
+    "conversionRevision": "5f113e0dbe6862596f7f5927dbe583c592e887aa",
+    "quantization": "Q4_K_M",
+    "sha256": "2ebe6eb67cb92adeffc7073c48dd4e3baf79465ac650793dc751cad2b29cf219"
+  },
+  "templateSha256": "a4aee8afcf2e0711942cf848899be66016f8d14a889ff9ede07bca099c28f715",
+  "runtime": {
+    "tag": "b12110",
+    "commit": "cd959bae99ff4bed22bef2604f45241c09bbb8c8",
+    "executableSha256": "eaf9c1c664cc0ae1f4dea4b171bb91aac8409fcfea0574c9b6bcc93792ce2400"
+  },
+  "settings": {
+    "contextTokens": 4096,
+    "maxOutputTokens": 256,
+    "parallel": 1,
+    "threads": 8,
+    "gpuLayers": 0,
+    "seed": 42,
+    "temperature": 0,
+    "thinking": false
+  },
+  "files": {
+    "scripts/ai-bench/models.json": "7ebb30d89bf0ce6481ef3e181035a5b03771fa4dd038e2470f53add8e431d60e",
+    "scripts/ai-bench/cases.json": "823fb35681fd70d68f2ab9d1d66effef08559af3096b92c549c894308d01e33a",
+    "scripts/ai-bench/retrieval-dev.json": "cdc008530b46c4b65c0c5168f8ee45309b0f276b8356738e11897b4c6a32d8dd",
+    "scripts/ai-bench/knowledge.json": "e7e97287b0ea51a440a3a78f2866abc9929f80c829c3c4e158d123ea2dcdb6b0",
+    "scripts/ai-bench/knowledge.ts": "a4d5db7ff82f227abcd80b0f6e0b5ef4897e6a0a17fcace243766bf159b1b285",
+    "scripts/ai-bench/grounding.ts": "f23fa0c797890d0c1d3b4cbac28a6c2d6e5eb02a85241c9c0a4bc26e12260282",
+    "scripts/ai-bench/local.ts": "49840ae418e9033682b147edb8b6f45f976fc1667d5b53e1ecacd87b267c314a",
+    "scripts/ai-bench/report.ts": "7b77f78e72b273d1aac78dce2846fffda5f45c9f20d251665304e760b69c4d95",
+    "scripts/ai-bench/runtime.ts": "dedc9e970621b49d796096170145cc95484c6d42c0f69790da3b47ac5692d34f",
+    "scripts/ai-bench/run.ts": "c047cc02533d8acdbf08e083827f753a79824c1fe43d7888f9b45196d7869f4f"
+  },
+  "reserved": {
+    "name": "minepro-ai-3c-bateria-reservada-v2.json",
+    "revision": 2,
+    "sha256": "d54f5086a8ff29bad21175e3935d8ad98db663a2923589146215edb0d007e5f7",
+    "cases": 72,
+    "generatedResponses": 0,
+    "independentReview": "pending",
+    "priorArtifact": {
+      "name": "minepro-ai-3c-bateria-reservada.json",
+      "sha256": "a338c501f21df56820276f229e2bdff3a41a0b0b6c2c84dd62091d88f2e5b0d3",
+      "availability": "not-recovered"
+    }
+  },
+  "diagnostics": {
+    "name": "minepro-ai-3c-evidencias-diagnosticas.json",
+    "sha256": "e0078be8cc56780caf5b8c11be85cc2c1a98214ec989970fc03d94656b1710de",
+    "kind": "reconstructed-evidence",
+    "originalFull3CReport": "not-recovered"
+  }
+}
