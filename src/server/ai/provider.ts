@@ -26,6 +26,8 @@ export function createGatewayProvider(
           stream: false,
           max_tokens: AI_LIMITS.outputTokens,
           temperature: 0.2,
+          reasoning: { effort: "low" },
+          providerOptions: { gateway: { only: ["vertex"], disallowPromptTraining: true } },
           messages: [
             { role: "system", content: buildSystemPrompt(input.context) },
             ...input.messages,
@@ -34,7 +36,12 @@ export function createGatewayProvider(
       });
       if (!response.ok) {
         void response.body?.cancel().catch(() => {});
-        if (response.status === 429) throw new AIError("RATE_LIMITED", 60);
+        if (response.status === 402) throw new AIError("BUDGET_EXHAUSTED");
+        if (response.status === 429) {
+          const retryAfter = response.headers.get("retry-after") ?? "";
+          const seconds = /^\d{1,5}$/.test(retryAfter) ? Number(retryAfter) : 0;
+          throw new AIError("RATE_LIMITED", seconds > 0 && seconds <= 86400 ? seconds : 60);
+        }
         if (response.status === 401 || response.status === 403) throw new AIError("UNAVAILABLE");
         throw new AIError("PROVIDER_FAILED");
       }

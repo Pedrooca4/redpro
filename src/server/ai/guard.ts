@@ -3,41 +3,51 @@ import type { AIConfig } from "./config.ts";
 import { AIError } from "./errors.ts";
 import { readLimitedJSON } from "./http.ts";
 
+export const EVALUATION_NAMESPACE = "minepro:ai:evaluation:v2";
 export const GUARD_LIMITS = {
+  evaluationAttempts: 8,
   perWindow: 5,
   windowSeconds: 600,
-  perDay: 30,
-  concurrent: 2,
+  concurrent: 1,
   leaseSeconds: 45,
 } as const;
 
-// Atomic and shared across instances and deployments. Redis TIME avoids host clock drift.
-// Every admitted attempt spends quota, including provider failures. There are no refunds.
+// The owner initializes remaining once. A missing or expiring counter must never refill it.
+// Reserve before the model call. Failures after DECR burn an attempt rather than refunding it.
 export const ADMIT_SCRIPT = `
-local time = redis.call('TIME')
-local now = tonumber(time[1])
-local day = math.floor(now / 86400)
-local window = math.floor(now / tonumber(ARGV[3]))
-local daily = 0
-local user = 0
-if tonumber(redis.call('HGET', KEYS[1], 'period')) == day then daily = tonumber(redis.call('HGET', KEYS[1], 'count')) end
-if tonumber(redis.call('HGET', KEYS[2], 'period')) == window then user = tonumber(redis.call('HGET', KEYS[2], 'count')) end
-redis.call('ZREMRANGEBYSCORE', KEYS[3], '-inf', now)
-if daily >= tonumber(ARGV[4]) then return {0, (day + 1) * 86400 - now} end
-if user >= tonumber(ARGV[2]) then return {0, (window + 1) * tonumber(ARGV[3]) - now} end
-if redis.call('EXISTS', KEYS[4]) == 1 or redis.call('ZCARD', KEYS[3]) >= tonumber(ARGV[5]) then return {0, 10} end
-redis.call('HSET', KEYS[1], 'period', day, 'count', daily + 1)
-redis.call('EXPIRE', KEYS[1], 86500)
-redis.call('HSET', KEYS[2], 'period', window, 'count', user + 1)
-redis.call('EXPIRE', KEYS[2], tonumber(ARGV[3]) + 60)
-redis.call('ZADD', KEYS[3], now + tonumber(ARGV[6]), ARGV[1])
-redis.call('EXPIRE', KEYS[3], tonumber(ARGV[6]) * 2)
-redis.call('SET', KEYS[4], ARGV[1], 'EX', ARGV[6])
+local remaining = redis.call('GET', KEYS[1])
+if not remaining or not string.match(remaining, '^%d$') or
+   tonumber(remaining) > tonumber(ARGV[5]) or redis.call('TTL', KEYS[1]) ~= -1 then
+  return {3, 0}
+end
+if remaining == '0' then return {2, 0} end
+
+local count = redis.call('GET', KEYS[2])
+if count then
+  local ttl = redis.call('TTL', KEYS[2])
+  if not string.match(count, '^[1-9]%d*$') or tonumber(count) > tonumber(ARGV[2]) or
+     ttl < 0 or ttl > tonumber(ARGV[3]) then
+    return {3, 0}
+  end
+  if tonumber(count) == tonumber(ARGV[2]) then return {0, math.max(1, ttl)} end
+end
+
+local leaseTTL = redis.call('TTL', KEYS[3])
+if leaseTTL == -1 or leaseTTL > tonumber(ARGV[4]) then return {3, 0} end
+if leaseTTL >= 0 then return {0, math.max(1, leaseTTL)} end
+
+redis.call('DECR', KEYS[1])
+if count then
+  redis.call('INCR', KEYS[2])
+else
+  redis.call('SET', KEYS[2], '1', 'EX', ARGV[3])
+end
+if not redis.call('SET', KEYS[3], ARGV[1], 'NX', 'EX', ARGV[4]) then return {3, 0} end
 return {1, 0}
 `;
 export const RELEASE_SCRIPT = `
-if redis.call('GET', KEYS[2]) == ARGV[1] then redis.call('DEL', KEYS[2]) end
-return redis.call('ZREM', KEYS[1], ARGV[1])
+if redis.call('GET', KEYS[1]) ~= ARGV[1] then return 0 end
+return redis.call('DEL', KEYS[1])
 `;
 
 export type Admission = { release: () => Promise<void> };
@@ -46,7 +56,7 @@ export type Admit = (identity: string) => Promise<Admission>;
 export function createDurableGuard(
   config: AIConfig,
   transport: typeof fetch = fetch,
-  namespace = "minepro:ai:v1",
+  namespace = `${EVALUATION_NAMESPACE}:${new URL(config.previewOrigin).hostname}`,
 ): Admit {
   const prefix = `{${namespace}}`;
   async function command(parts: (string | number)[]): Promise<unknown> {
@@ -61,7 +71,7 @@ export function createDurableGuard(
           Authorization: `Bearer ${config.redisToken}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(parts),
+        body: JSON.stringify(parts.map(String)),
       });
       if (!response.ok) {
         void response.body?.cancel().catch(() => {});
@@ -82,36 +92,34 @@ export function createDurableGuard(
     if (!/^[a-f0-9]{64}$/.test(identity)) throw new AIError("FORBIDDEN");
     const token = randomUUID();
     const user = `${prefix}:ip:${identity}`;
-    const shared = `${prefix}:active`;
+    const lease = `${prefix}:active`;
     const result = await command([
       "EVAL",
       ADMIT_SCRIPT,
-      4,
-      `${prefix}:daily`,
+      3,
+      `${prefix}:remaining`,
       user,
-      shared,
-      `${user}:active`,
+      lease,
       token,
       GUARD_LIMITS.perWindow,
       GUARD_LIMITS.windowSeconds,
-      GUARD_LIMITS.perDay,
-      GUARD_LIMITS.concurrent,
       GUARD_LIMITS.leaseSeconds,
+      GUARD_LIMITS.evaluationAttempts,
     ]);
+    if (!Array.isArray(result) || result.length !== 2) throw new AIError("UNAVAILABLE");
+    const [decision, seconds] = result;
+    if (decision === 2 && seconds === 0) throw new AIError("BUDGET_EXHAUSTED");
     if (
-      !Array.isArray(result) ||
-      result.length !== 2 ||
-      ![0, 1].includes(result[0]) ||
-      !Number.isInteger(result[1]) ||
-      result[1] < 0 ||
-      result[1] > 86400
+      decision === 0 &&
+      Number.isInteger(seconds) &&
+      seconds >= 1 &&
+      seconds <= GUARD_LIMITS.windowSeconds
     )
-      throw new AIError("UNAVAILABLE");
-    if (result[0] === 1 && result[1] !== 0) throw new AIError("UNAVAILABLE");
-    if (result[0] === 0) throw new AIError("RATE_LIMITED", Math.max(1, result[1]));
+      throw new AIError("RATE_LIMITED", seconds);
+    if (decision !== 1 || seconds !== 0) throw new AIError("UNAVAILABLE");
     return {
       release: async () => {
-        await command(["EVAL", RELEASE_SCRIPT, 2, shared, `${user}:active`, token]);
+        await command(["EVAL", RELEASE_SCRIPT, 1, lease, token]);
       },
     };
   };

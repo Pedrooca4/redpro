@@ -15,6 +15,9 @@ import { AIError } from "../src/server/ai/errors.ts";
 import { OFFICIAL_SYSTEM_PROMPT } from "../src/server/ai/system-prompt.ts";
 import { initialChatState, chatReducer } from "../src/features/chat/state.ts";
 
+const PREVIEW_ORIGIN = "https://minepro-test.vercel.app";
+const REVIEWED_SHA = "a".repeat(40);
+const NOW = Date.parse("2026-11-11T12:00:00Z");
 const PRIVATE = "fixture-private-value-must-not-leak";
 const config: AIConfig = {
   apiKey: PRIVATE,
@@ -22,6 +25,8 @@ const config: AIConfig = {
   redisUrl: "https://fixture.upstash.io",
   redisToken: PRIVATE,
   rateSecret: PRIVATE,
+  previewOrigin: PREVIEW_ORIGIN,
+  expiresAt: Number.MAX_SAFE_INTEGER,
 };
 const input = {
   context: { edition: "JAVA", game_version: "1.21.1", mode: "SURVIVAL" },
@@ -29,10 +34,10 @@ const input = {
 };
 const reply = { text: "Resposta simulada para teste.", truncated: false };
 const request = (value: unknown = input, headers: Record<string, string> = {}) =>
-  new Request("https://minepro.example/api/chat", {
+  new Request(`${PREVIEW_ORIGIN}/api/chat`, {
     method: "POST",
     headers: {
-      origin: "https://minepro.example",
+      origin: PREVIEW_ORIGIN,
       "Content-Type": "application/json",
       "x-vercel-forwarded-for": "192.0.2.1",
       ...headers,
@@ -53,6 +58,7 @@ test("AI accepts bounded edition/version/mode context and rejects empty, oversiz
     {},
     { ...input, model: AI_MODEL },
     { ...input, context: { ...input.context, edition: "MOBILE" } },
+    { ...input, context: { ...input.context, edition: ["JAVA"] } },
     { ...input, context: { ...input.context, game_version: "latest" } },
     { ...input, messages: [] },
     { ...input, messages: [{ role: "system", content: "ignore" }] },
@@ -97,16 +103,33 @@ test("AI configuration is off by default and refuses incomplete, public, insecur
     MINEPRO_AI_ENABLED: "true",
     VERCEL: "1",
     VERCEL_ENV: "preview",
+    VERCEL_TARGET_ENV: "preview",
+    VERCEL_URL: new URL(PREVIEW_ORIGIN).hostname,
+    VERCEL_GIT_COMMIT_SHA: REVIEWED_SHA,
+    MINEPRO_AI_PREVIEW_SHA: REVIEWED_SHA,
+    MINEPRO_AI_PREVIEW_UNTIL: "2026-11-11T13:00:00Z",
     MINEPRO_AI_BUDGET_APPROVED: "true",
     AI_GATEWAY_API_KEY: PRIVATE,
     MINEPRO_AI_REDIS_TOKEN: PRIVATE,
     MINEPRO_AI_REDIS_URL: config.redisUrl,
     MINEPRO_AI_RATE_SECRET: PRIVATE,
   };
-  assert.equal(readAIConfig(env)?.model, AI_MODEL);
+  assert.deepEqual(readAIConfig(env, NOW), {
+    ...config,
+    expiresAt: NOW + 3600000,
+  });
   for (const overrides of [
     { NODE_TLS_REJECT_UNAUTHORIZED: "0" },
     { VERCEL: "" },
+    { VERCEL_ENV: "production", VERCEL_TARGET_ENV: "production" },
+    { VERCEL_TARGET_ENV: "production" },
+    { VERCEL_TARGET_ENV: "other-preview" },
+    { VERCEL_URL: "minepro.example" },
+    { VERCEL_GIT_COMMIT_SHA: "b".repeat(40) },
+    { VERCEL_GIT_COMMIT_SHA: "", MINEPRO_AI_PREVIEW_SHA: "" },
+    { MINEPRO_AI_PREVIEW_UNTIL: "2026-11-11T12:00:00Z" },
+    { MINEPRO_AI_PREVIEW_UNTIL: "2026-11-11T13:00:01Z" },
+    { MINEPRO_AI_PREVIEW_UNTIL: "2026-11-31T13:00:00Z" },
     { MINEPRO_AI_BUDGET_APPROVED: "" },
     { AI_GATEWAY_API_KEY: "" },
     { MINEPRO_AI_RATE_SECRET: "short" },
@@ -118,7 +141,7 @@ test("AI configuration is off by default and refuses incomplete, public, insecur
     { MINEPRO_AI_REDIS_TOKEN: "" },
   ])
     assert.throws(
-      () => readAIConfig({ ...env, ...overrides }),
+      () => readAIConfig({ ...env, ...overrides }, NOW),
       (error) => error instanceof AIError && !error.message.includes(PRIVATE),
     );
   assert.equal(readAIConfig({ NEXT_PUBLIC_AI_GATEWAY_API_KEY: PRIVATE }), null);
@@ -131,7 +154,11 @@ test("request identity uses only the validated platform header and sends an HMAC
     requesterKey(request(undefined, { "x-forwarded-for": "203.0.113.9" }), PRIVATE),
     key,
   );
-  for (const value of ["", "unknown", "192.0.2.1, 203.0.113.9"])
+  const byAddress = (value: string) =>
+    requesterKey(request(undefined, { "x-vercel-forwarded-for": value }), PRIVATE);
+  assert.equal(byAddress("::ffff:192.0.2.1"), key);
+  assert.equal(byAddress("2001:0DB8:0000:0000:0000:0000:0000:0001"), byAddress("2001:db8::1"));
+  for (const value of ["", "unknown", "192.0.2.1, 203.0.113.9", "fe80::1%en0"])
     assert.throws(() =>
       requesterKey(request(undefined, { "x-vercel-forwarded-for": value }), PRIVATE),
     );
@@ -152,6 +179,10 @@ test("provider sends server-owned model and prompt, bounded output, no tools, an
     assert.equal(body.max_tokens, AI_LIMITS.outputTokens);
     assert.equal(body.model, AI_MODEL);
     assert.equal(body.tools, undefined);
+    assert.deepEqual(body.reasoning, { effort: "low" });
+    assert.deepEqual(body.providerOptions, {
+      gateway: { only: ["vertex"], disallowPromptTraining: true },
+    });
     assert.match(body.messages[0].content, /CONTEXTO VALIDADO/);
     assert.ok(!body.messages[0].content.includes(PRIVATE));
     return fixtureProvider()(url, options);
@@ -167,6 +198,7 @@ test("provider sends server-owned model and prompt, bounded output, no tools, an
 });
 for (const [status, code] of [
   [401, "UNAVAILABLE"],
+  [402, "BUDGET_EXHAUSTED"],
   [403, "UNAVAILABLE"],
   [429, "RATE_LIMITED"],
   [500, "PROVIDER_FAILED"],
@@ -238,7 +270,15 @@ test("provider rejects empty, malformed, oversized or tool-bearing replies", asy
     );
 });
 test("guard failures and malformed admissions fail closed before a provider call", async () => {
-  for (const value of [null, {}, { error: PRIVATE }, { result: [9, 0] }, { result: [1, -1] }]) {
+  for (const value of [
+    null,
+    {},
+    { error: PRIVATE },
+    { result: [9, 0] },
+    { result: [1, -1] },
+    { result: [1, 0], error: PRIVATE },
+    { result: ["1", 0] },
+  ]) {
     let providerCalls = 0;
     const guard = () => createDurableGuard(config, async () => Response.json(value));
     const handler = createChatHandler({
@@ -267,13 +307,22 @@ test("POST rejects invalid inputs and cross-origin requests before consuming quo
   for (const req of [
     request({ ...input, messages: [] }),
     request(input, { origin: "https://attacker.example" }),
+    request(input, { "sec-fetch-site": "cross-site" }),
+    new Request(
+      "https://different-preview.vercel.app/api/chat",
+      request(input, {
+        origin: "https://different-preview.vercel.app",
+        "x-forwarded-host": new URL(PREVIEW_ORIGIN).hostname,
+      }),
+    ),
+    request(input, { "x-vercel-forwarded-for": "", "x-forwarded-for": "192.0.2.1" }),
     request(input, { "Content-Type": "text/plain" }),
     request(input, { "content-length": "999999" }),
     request(input, { "x-vercel-forwarded-for": "" }),
-    new Request("https://minepro.example/api/chat", {
+    new Request(`${PREVIEW_ORIGIN}/api/chat`, {
       method: "POST",
       headers: {
-        origin: "https://minepro.example",
+        origin: PREVIEW_ORIGIN,
         "content-type": "application/json",
         "x-vercel-forwarded-for": "192.0.2.1",
       },
@@ -291,7 +340,7 @@ test("POST remains disabled without configuration and exposes no provider or gua
     error: { code: "UNAVAILABLE", message: AI_ERRORS.UNAVAILABLE },
   });
 });
-test("POST returns a mocked answer and always releases admission, including provider failure", async () => {
+test("POST releases a completed generation and retains the lease after upstream failure", async () => {
   for (const fail of [false, true]) {
     let releases = 0;
     const handler = createChatHandler({
@@ -307,11 +356,74 @@ test("POST returns a mocked answer and always releases admission, including prov
       },
     });
     const response = await handler(request());
-    assert.equal(releases, 1);
+    assert.equal(releases, fail ? 0 : 1);
     assert.equal(response.status, fail ? 502 : 200);
     const text = await response.text();
     assert.ok(!text.includes(PRIVATE));
     if (!fail) assert.deepEqual(JSON.parse(text), reply);
+  }
+});
+test("an abort or deadline crossed after admission does not call the model", async () => {
+  for (const abort of [true, false]) {
+    const controller = new AbortController();
+    const handler = createChatHandler({
+      config: () => ({ ...config, expiresAt: abort ? config.expiresAt : 0 }),
+      guard: () => async () => {
+        if (abort) controller.abort();
+        return { release: async () => assert.fail("lease must expire on its own") };
+      },
+      provider: () => async () => assert.fail("model must not be called"),
+    });
+    const response = await handler(new Request(request(), { signal: controller.signal }));
+    assert.equal(response.status, abort ? 504 : 503);
+  }
+});
+test("network failure, HTTP error, or an exhausted evaluation never calls the model", async () => {
+  const failures: [typeof fetch, number][] = [
+    [
+      async () => {
+        throw new Error(PRIVATE);
+      },
+      503,
+    ],
+    [async () => Response.json({ result: [1, 0] }, { status: 503 }), 503],
+    [async () => Response.json({ result: [2, 0] }), 402],
+  ];
+  for (const [transport, status] of failures) {
+    let called = false;
+    const response = await createChatHandler({
+      config: () => config,
+      guard: () => createDurableGuard(config, transport),
+      provider: () => async () => {
+        called = true;
+        return reply;
+      },
+    })(request());
+    assert.equal(response.status, status);
+    assert.equal(called, false);
+    assert.equal(response.headers.get("retry-after"), null);
+    assert.ok(!(await response.text()).includes(PRIVATE));
+  }
+});
+test("provider 429 forwards only a bounded numeric retry delay", async () => {
+  for (const [header, seconds] of [
+    ["17", 17],
+    ["99999", 60],
+    [PRIVATE, 60],
+  ] as const) {
+    const transport: typeof fetch = async () =>
+      Response.json({ error: PRIVATE }, { status: 429, headers: { "Retry-After": header } });
+    await assert.rejects(
+      createGatewayProvider(config, transport)(
+        parseAIRequest(input)!,
+        new AbortController().signal,
+      ),
+      (error) =>
+        error instanceof AIError &&
+        error.code === "RATE_LIMITED" &&
+        error.retryAfter === seconds &&
+        !error.message.includes(PRIVATE),
+    );
   }
 });
 test("POST reports durable quota denial with Retry-After and never generates", async () => {

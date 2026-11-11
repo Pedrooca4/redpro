@@ -3,23 +3,40 @@ import { isIP } from "node:net";
 import { AIError } from "./errors.ts";
 
 export const AI_MODEL = "google/gemini-3.5-flash-lite";
+const MAX_EVALUATION_MS = 60 * 60 * 1000;
 export type AIConfig = {
   apiKey: string;
   model: string;
   redisUrl: string;
   redisToken: string;
   rateSecret: string;
+  previewOrigin: string;
+  expiresAt: number;
 };
 
 // Never use OIDC automatically or reuse any Supabase/Vercel database credentials.
-// A server opt-in, approved budget and durable guard are all mandatory.
+// The budget flag records operator approval. The Gateway enforces its own budget.
 export function readAIConfig(
   env: Readonly<Record<string, string | undefined>> = process.env,
+  now = Date.now(),
 ): AIConfig | null {
   if (env.MINEPRO_AI_ENABLED !== "true") return null;
+  const host = env.VERCEL_URL ?? "";
+  const sha = env.VERCEL_GIT_COMMIT_SHA ?? "";
+  const until = env.MINEPRO_AI_PREVIEW_UNTIL ?? "";
+  const expiresAt = Date.parse(until);
   if (
     env.VERCEL !== "1" ||
-    !["preview", "production"].includes(env.VERCEL_ENV ?? "") ||
+    env.VERCEL_ENV !== "preview" ||
+    env.VERCEL_TARGET_ENV !== "preview" ||
+    !/^[a-z0-9-]+\.vercel\.app$/.test(host) ||
+    !/^[a-f0-9]{40}$/.test(sha) ||
+    env.MINEPRO_AI_PREVIEW_SHA !== sha ||
+    !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/.test(until) ||
+    !Number.isFinite(expiresAt) ||
+    new Date(expiresAt).toISOString() !== until.replace(/Z$/, ".000Z") ||
+    expiresAt <= now ||
+    expiresAt - now > MAX_EVALUATION_MS ||
     env.MINEPRO_AI_BUDGET_APPROVED !== "true" ||
     env.NODE_TLS_REJECT_UNAUTHORIZED === "0" ||
     !env.AI_GATEWAY_API_KEY?.trim() ||
@@ -52,12 +69,14 @@ export function readAIConfig(
     redisUrl: url.origin,
     redisToken: env.MINEPRO_AI_REDIS_TOKEN.trim(),
     rateSecret: env.MINEPRO_AI_RATE_SECRET,
+    previewOrigin: `https://${host}`,
+    expiresAt,
   };
 }
 
-export function isAIAvailable(): boolean {
+export function isAIAvailable(request: Request): boolean {
   try {
-    return readAIConfig() !== null;
+    return readAIConfig()?.previewOrigin === new URL(request.url).origin;
   } catch {
     return false;
   }
@@ -66,6 +85,10 @@ export function isAIAvailable(): boolean {
 // Only the Vercel-controlled header is accepted. Raw addresses never reach logs or Redis.
 export function requesterKey(request: Request, secret: string): string {
   const address = request.headers.get("x-vercel-forwarded-for")?.trim() ?? "";
-  if (!isIP(address)) throw new AIError("FORBIDDEN");
-  return createHmac("sha256", secret).update(address).digest("hex");
+  const family = isIP(address);
+  if (!family || address.includes("%")) throw new AIError("FORBIDDEN");
+  // Canonicalize IPv6 and use the same identity for IPv4 and IPv4-mapped IPv6.
+  const ip = family === 4 ? `::ffff:${address}` : address;
+  const canonical = new URL(`https://[${ip}]`).hostname;
+  return createHmac("sha256", secret).update(canonical).digest("hex");
 }

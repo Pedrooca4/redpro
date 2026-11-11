@@ -15,6 +15,7 @@ export function aiErrorResponse(error: unknown): Response {
   const safe = error instanceof AIError ? error : new AIError("PROVIDER_FAILED");
   const status = {
     UNAVAILABLE: 503,
+    BUDGET_EXHAUSTED: 402,
     INVALID_INPUT: 400,
     RATE_LIMITED: 429,
     TIMEOUT: 504,

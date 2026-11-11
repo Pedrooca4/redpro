@@ -15,6 +15,8 @@ export type AIRequest = { context: MinecraftContext; messages: AIMessage[] };
 export type AIReply = { text: string; truncated: boolean };
 export const AI_ERRORS = {
   UNAVAILABLE: "A IA está indisponível no momento. A calculadora continua disponível.",
+  BUDGET_EXHAUSTED:
+    "A avaliação da IA está pausada por limite de uso. A calculadora continua disponível.",
   INVALID_INPUT: "Revise a pergunta e o contexto. Use até 4.000 caracteres por mensagem.",
   RATE_LIMITED: "O limite de perguntas foi atingido. Aguarde antes de tentar novamente.",
   TIMEOUT: "A resposta demorou além do limite. Sua pergunta foi preservada. Tente novamente.",
@@ -34,7 +36,7 @@ export function parseAIRequest(value: unknown): AIRequest | null {
   if (
     !object(context) ||
     Object.keys(context).some((key) => !["edition", "game_version", "mode"].includes(key)) ||
-    !["JAVA", "BEDROCK"].includes(String(context.edition)) ||
+    (context.edition !== "JAVA" && context.edition !== "BEDROCK") ||
     !MODES.some((mode) => mode.id === context.mode) ||
     (context.game_version !== null &&
       (typeof context.game_version !== "string" || !isGameVersion(context.game_version))) ||

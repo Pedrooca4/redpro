@@ -113,7 +113,16 @@ for (const width of [320, 390, 768, 1440]) {
       await expectUI(draft).toHaveValue("");
     }
     await expectUI(answer).toHaveCount(3);
-    assert.equal(posts, 5, "Each retry must be explicit; no automatic provider retry");
+    status = 402;
+    await draft.fill("Pergunta preservada quando a avaliação pausa");
+    await draft.press("Enter");
+    await expectUI(page.locator(".composer-error")).toContainText(
+      "A avaliação da IA está pausada por limite de uso.",
+    );
+    await expectUI(draft).toHaveValue("Pergunta preservada quando a avaliação pausa");
+    await expectUI(page.locator(".composer-error")).not.toContainText("untrusted-provider-fixture");
+    await expectUI(answer).toHaveCount(3);
+    assert.equal(posts, 6, "Each retry must be explicit; no automatic provider retry");
     assert.equal(
       await page.evaluate(() => document.documentElement.scrollWidth > innerWidth),
       false,

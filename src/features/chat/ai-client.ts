@@ -28,11 +28,13 @@ export async function askMinepro(input: AIRequest, signal: AbortSignal): Promise
       const code =
         response.status === 429
           ? "RATE_LIMITED"
-          : response.status === 504
-            ? "TIMEOUT"
-            : response.status === 503
-              ? "UNAVAILABLE"
-              : "PROVIDER_FAILED";
+          : response.status === 402
+            ? "BUDGET_EXHAUSTED"
+            : response.status === 504
+              ? "TIMEOUT"
+              : response.status === 503
+                ? "UNAVAILABLE"
+                : "PROVIDER_FAILED";
       throw new ChatRequestError(code);
     }
     const reply = parseAIReply(await response.json());
