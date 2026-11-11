@@ -19,6 +19,13 @@ const expected = [
   "REDPRO_DB_ENV",
   "REDPRO_DB_TARGET_REF",
   "REDPRO_DB_SSL_CA_FILE",
+  "MINEPRO_AI_ENABLED",
+  "AI_GATEWAY_API_KEY",
+  "MINEPRO_AI_MODEL",
+  "MINEPRO_AI_BUDGET_APPROVED",
+  "MINEPRO_AI_REDIS_URL",
+  "MINEPRO_AI_REDIS_TOKEN",
+  "MINEPRO_AI_RATE_SECRET",
 ];
 const names = [];
 for (const line of readFileSync(".env.example", "utf8").split(/\r?\n/)) {

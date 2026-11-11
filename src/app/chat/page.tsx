@@ -3,7 +3,7 @@ import { ChatShell } from "@/features/chat/chat-shell";
 export const metadata: Metadata = {
   title: "Assistente",
   description:
-    "Explore a demonstração do assistente MinePRO com JavaMine, BedMine e seis especialidades. IA real ainda não conectada.",
+    "Planeje e tire dúvidas de Minecraft no MinePRO, com JavaMine, BedMine e seis especialidades. A disponibilidade da IA é informada no chat.",
 };
 export default function ChatPage() {
   return <ChatShell />;

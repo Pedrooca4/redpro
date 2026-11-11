@@ -84,9 +84,9 @@ export default function Home() {
             <div className="hero-note">
               <CircleDashed size={16} aria-hidden="true" />
               <p>
-                Experimente a interface do assistente.
+                A disponibilidade da IA é informada no chat.
                 <br />
-                <span>IA real, biblioteca e comunidade ainda em desenvolvimento.</span>
+                <span>Biblioteca e comunidade ainda em desenvolvimento.</span>
               </p>
             </div>
           </div>

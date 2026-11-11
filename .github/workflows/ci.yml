@@ -68,6 +68,8 @@ jobs:
             coverage/ui/home-1440.png
             coverage/ui/chat-access-390.png
             coverage/ui/chat-access-1440.png
+            coverage/ui/ai-chat-390.png
+            coverage/ui/ai-chat-1440.png
           retention-days: 7
           if-no-files-found: error
 
@@ -76,6 +78,13 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     services:
+      redis:
+        image: redis:7.4.2
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
       postgres:
         image: postgres:17.11
         env:
@@ -112,3 +121,7 @@ jobs:
         env:
           DATABASE_URL: postgresql://redpro_ci:redpro_ci_disposable@127.0.0.1:${{ job.services.postgres.ports[5432] }}/redpro_test
         run: pnpm test:db
+      - name: Disposable Redis AI guard concurrency
+        env:
+          MINEPRO_TEST_REDIS_CONTAINER: ${{ job.services.redis.id }}
+        run: pnpm test:ai-guard

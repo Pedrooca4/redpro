@@ -508,6 +508,36 @@ summary:focus-visible {
   font-size: var(--text-sm);
   padding: 10px 0;
 }
+.local-message.assistant-message {
+  border-left: 3px solid var(--color-action);
+}
+.ai-copy,
+.ai-retry {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 8px 12px;
+  margin-top: 10px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-foreground);
+  background: var(--color-elevated);
+}
+.ai-copy:hover,
+.ai-retry:hover {
+  border-color: var(--color-action);
+}
+.ai-generating {
+  padding: 20px 0;
+  font-size: var(--text-sm);
+  color: var(--color-secondary);
+  overflow-wrap: anywhere;
+}
+.ai-generating > p + p {
+  margin-top: 12px;
+  color: var(--color-soft);
+}
 .chat-composer {
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
