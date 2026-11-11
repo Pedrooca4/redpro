@@ -2,6 +2,7 @@ import { writeFile } from "node:fs/promises";
 import { arch, cpus, platform, release, totalmem } from "node:os";
 import { parseArgs } from "node:util";
 
+import { groundAnswer } from "./grounding.ts";
 import { compareRuns } from "./compare.ts";
 import { createKnowledgeSearch, evidenceFor, withKnowledge } from "./knowledge.ts";
 import {
@@ -71,7 +72,10 @@ async function run(args: string[]) {
   });
   try {
     const generate = createLocalAdapter(server.apiKey, undefined, limit);
-    const results: (CaseResult & { retrieval?: ReturnType<typeof evidenceFor> })[] = [];
+    const results: (CaseResult & {
+      retrieval?: ReturnType<typeof evidenceFor>;
+      delivered?: ReturnType<typeof groundAnswer> | null;
+    })[] = [];
     for (const item of cases) {
       if (process.exitCode) break;
       const retrieval = search?.(item);
@@ -80,7 +84,11 @@ async function run(args: string[]) {
       );
       results.push(
         retrieval
-          ? { ...result, retrieval: evidenceFor(retrieval, result.answer?.text ?? null) }
+          ? {
+              ...result,
+              retrieval: evidenceFor(retrieval, result.answer?.text ?? null),
+              delivered: result.answer ? groundAnswer(item, retrieval, result.answer.text) : null,
+            }
           : result,
       );
       process.stdout.write(
@@ -123,7 +131,16 @@ async function run(args: string[]) {
         sha256: await sha256File(suitePath),
         caseIds: cases.map((item) => item.id),
       },
-      knowledge: { enabled: Boolean(search), sha256: knowledgeSha256 },
+      knowledge: {
+        enabled: Boolean(search),
+        sha256: knowledgeSha256,
+        groundingSha256: search
+          ? await sha256File(new URL("./grounding.ts", import.meta.url))
+          : null,
+        searchAndPromptSha256: search
+          ? await sha256File(new URL("./knowledge.ts", import.meta.url))
+          : null,
+      },
       serverPeakRssKiB: await server.peakRssKiB(),
       summary,
       cases: results,
