@@ -27,9 +27,21 @@ A geração recebe instruções para preservar valores, unidades, negações, ed
 
 As regras têm alcance limitado aos pedidos simples cobertos por elas. Variações de redação podem passar ao modelo e continuar sujeitas a alucinações. A extração de parâmetros e a presença de uma citação não verificam afirmações arbitrárias. As regras nunca executam comandos de jogo. O fluxo público do MinePRO está fora do escopo desta bancada.
 
+## Regressão diagnóstica
+
+| Medida assistida  | RAG 3B | Geração bruta 3C | Resposta entregue 3C |
+| ----------------- | -----: | ---------------: | -------------------: |
+| Acertos integrais |  14/24 |            16/24 |                19/24 |
+| Acertos parciais  |   5/24 |             6/24 |                 5/24 |
+| Erros críticos    |      5 |                2 |                    0 |
+
+O mesmo Qwen3.5-4B Q4_K_M executou os 24 casos localmente, com 4.096 tokens de contexto, 256 de saída, temperatura zero, seed 42 e oito threads de CPU. Sete casos melhoraram e dois regrediram em classificação em relação ao RAG 3B. O modelo ainda usou amplificador 1 para Velocidade I e devolveu força 4 no repetidor. As regras locais corrigiram a resposta entregue nesses dois casos. As regressões foram CMD-J02, com incerteza sobre o efeito de `/weather clear` no tempo, e AMB-B01, com formato errado para o identificador do bloco de `/fill`.
+
+A última rodada registrou 24 conclusões, com p50 de 7,84 s e p95 de 12,53 s. Uma rodada anterior da mesma fase registrou zero truncamentos, média de 17,3 tokens/s e pico do servidor de aproximadamente 6,60 GiB. O relatório integral da 3C não foi recuperado após a interrupção da sessão. A evidência diagnóstica reconstituída preserva a série de latências, as notas assistidas disponíveis e a proveniência das medições. O relatório original da 3B permanece disponível.
+
 ## Protocolo congelado para a próxima fase
 
-- O conjunto reservado tem 72 casos inéditos em PT-BR. Cada tema tem seis casos Java e seis Bedrock, com dois de cada dificuldade por edição. Quatro exigem reconhecer informações insuficientes. Enunciados e rubricas estão em arquivo separado, fora da busca, do repositório e da CI.
+- A cópia original do conjunto reservado não foi recuperada após a interrupção. A revisão 2 reconstitui a bateria, com novo SHA-256 e referência histórica ao hash original. O conjunto reservado tem 72 casos inéditos em PT-BR. Cada tema tem seis casos Java e seis Bedrock, com dois de cada dificuldade por edição. Quatro exigem reconhecer informações insuficientes. Enunciados e rubricas estão em arquivo separado, fora da busca, do repositório e da CI.
 - A autoria é do mesmo assistente que alterou a bancada. A checagem de texto normalizado encontrou zero duplicatas com os 24 diagnósticos e as 21 consultas de desenvolvimento. Também se revisaram as famílias de perguntas. Ainda é necessário que um revisor independente confira a originalidade semântica e as referências. Os hashes por fonte e por resposta de referência cobrem os registros locais de proveniência, sem arquivar páginas externas.
 - O artefato usa nota 2 para acerto integral, 1 para parcial e 0 para erro, evasão indevida ou falha crítica. Relatar acerto integral sobre 72, pontos sobre 144, erros críticos, edição, versão, suporte factual e clareza em português. Medir truncamentos, falhas, latência, throughput e pico de RSS. Informar resultado por categoria e edição.
 - Antes de abrir a bateria, verificar a impressão digital em `ai-bench-freeze.json`. Usar o mesmo GGUF, template, runtime e configuração para as modalidades. Usar somente enunciado, edição e versão na geração. Avaliar respostas congeladas e sem indicação de modalidade, com dois revisores humanos e adjudicação das divergências quando possível. Preservar as respostas brutas e entregues. Uma revisão prévia das referências que exigir correção gera uma nova versão do arquivo com hash próprio antes da execução.

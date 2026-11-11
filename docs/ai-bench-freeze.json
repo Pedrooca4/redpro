@@ -40,10 +40,22 @@
     "scripts/ai-bench/run.ts": "c047cc02533d8acdbf08e083827f753a79824c1fe43d7888f9b45196d7869f4f"
   },
   "reserved": {
-    "name": "minepro-ai-3c-bateria-reservada.json",
-    "sha256": "a338c501f21df56820276f229e2bdff3a41a0b0b6c2c84dd62091d88f2e5b0d3",
+    "name": "minepro-ai-3c-bateria-reservada-v2.json",
+    "revision": 2,
+    "sha256": "d54f5086a8ff29bad21175e3935d8ad98db663a2923589146215edb0d007e5f7",
     "cases": 72,
     "generatedResponses": 0,
-    "independentReview": "pending"
+    "independentReview": "pending",
+    "priorArtifact": {
+      "name": "minepro-ai-3c-bateria-reservada.json",
+      "sha256": "a338c501f21df56820276f229e2bdff3a41a0b0b6c2c84dd62091d88f2e5b0d3",
+      "availability": "not-recovered"
+    }
+  },
+  "diagnostics": {
+    "name": "minepro-ai-3c-evidencias-diagnosticas.json",
+    "sha256": "e0078be8cc56780caf5b8c11be85cc2c1a98214ec989970fc03d94656b1710de",
+    "kind": "reconstructed-evidence",
+    "originalFull3CReport": "not-recovered"
   }
 }
