@@ -1,0 +1,509 @@
+{
+  "schemaVersion": 1,
+  "purpose": "retrieval-only",
+  "sources": {
+    "mojang-craft": {
+      "title": "How to craft",
+      "url": "https://www.minecraft.net/en-us/article/how-craft",
+      "license": "Mojang/Microsoft, sem licença aberta identificada para o texto",
+      "conditions": "Referência factual com atribuição por link. A ficha usa redação e exemplos próprios. O texto, as imagens e os ativos da fonte não integram o corpus."
+    },
+    "mojang-cmd": {
+      "title": "How to Use Commands in Minecraft",
+      "url": "https://www.minecraft.net/en-us/article/minecraft-commands",
+      "license": "Mojang/Microsoft, sem licença aberta identificada para o texto",
+      "conditions": "Referência factual com atribuição por link. A ficha usa redação e exemplos próprios. O texto, as imagens e os ativos da fonte não integram o corpus."
+    },
+    "mojang-1205": {
+      "title": "Java Edition 1.20.5",
+      "url": "https://feedback.minecraft.net/hc/en-us/articles/26136167989005-Minecraft-Java-Edition-1-20-5-Armored-Paws",
+      "license": "Mojang/Microsoft, sem licença aberta identificada para o texto",
+      "conditions": "Referência factual com atribuição por link. A ficha usa redação e exemplos próprios. O texto, as imagens e os ativos da fonte não integram o corpus."
+    },
+    "mojang-1215": {
+      "title": "Java Edition 1.21.5",
+      "url": "https://www.minecraft.net/pt-br/article/minecraft-java-edition-1-21-5",
+      "license": "Mojang/Microsoft, sem licença aberta identificada para o texto",
+      "conditions": "Referência factual com atribuição por link. A ficha usa redação e exemplos próprios. O texto, as imagens e os ativos da fonte não integram o corpus."
+    },
+    "learn-red": {
+      "title": "Guide to Redstone",
+      "url": "https://learn.microsoft.com/en-us/minecraft/creator/documents/redstoneguide?view=minecraft-bedrock-stable",
+      "license": "CC BY 4.0 para documentação coberta no MicrosoftDocs/minecraft-creator, salvo exceções",
+      "conditions": "Referência factual com atribuição por link. A ficha usa redação e exemplos próprios. O texto, as imagens e os ativos da fonte não integram o corpus."
+    },
+    "learn-rules": {
+      "title": "Introduction to Gamerules",
+      "url": "https://learn.microsoft.com/en-us/minecraft/creator/documents/introductiontogamerules?view=minecraft-bedrock-stable",
+      "license": "CC BY 4.0 para documentação coberta no MicrosoftDocs/minecraft-creator, salvo exceções",
+      "conditions": "Referência factual com atribuição por link. A ficha usa redação e exemplos próprios. O texto, as imagens e os ativos da fonte não integram o corpus."
+    },
+    "learn-effect": {
+      "title": "Effect",
+      "url": "https://learn.microsoft.com/en-us/minecraft/creator/commands/commands/effect?view=minecraft-bedrock-stable",
+      "license": "CC BY 4.0 para documentação coberta no MicrosoftDocs/minecraft-creator, salvo exceções",
+      "conditions": "Referência factual com atribuição por link. A ficha usa redação e exemplos próprios. O texto, as imagens e os ativos da fonte não integram o corpus."
+    },
+    "learn-fill": {
+      "title": "Fill",
+      "url": "https://learn.microsoft.com/pt-br/minecraft/creator/reference/content/commandsreference/examples/commands/fill?view=minecraft-bedrock-stable",
+      "license": "CC BY 4.0 para documentação coberta no MicrosoftDocs/minecraft-creator, salvo exceções",
+      "conditions": "Referência factual com atribuição por link. A ficha usa redação e exemplos próprios. O texto, as imagens e os ativos da fonte não integram o corpus."
+    },
+    "wiki-stick": {
+      "title": "Stick",
+      "url": "https://minecraft.wiki/w/Stick",
+      "license": "CC BY-NC-SA 3.0 para o texto da Minecraft Wiki, salvo exceções",
+      "conditions": "Referência factual com atribuição por link. A ficha usa redação e exemplos próprios. O texto, as imagens e os ativos da fonte não integram o corpus."
+    },
+    "wiki-furnace": {
+      "title": "Furnace",
+      "url": "https://minecraft.wiki/w/Furnace",
+      "license": "CC BY-NC-SA 3.0 para o texto da Minecraft Wiki, salvo exceções",
+      "conditions": "Referência factual com atribuição por link. A ficha usa redação e exemplos próprios. O texto, as imagens e os ativos da fonte não integram o corpus."
+    },
+    "wiki-compare": {
+      "title": "Redstone Comparator",
+      "url": "https://minecraft.wiki/w/Redstone_Comparator",
+      "license": "CC BY-NC-SA 3.0 para o texto da Minecraft Wiki, salvo exceções",
+      "conditions": "Referência factual com atribuição por link. A ficha usa redação e exemplos próprios. O texto, as imagens e os ativos da fonte não integram o corpus."
+    },
+    "wiki-repeater": {
+      "title": "Redstone Repeater",
+      "url": "https://minecraft.wiki/w/Redstone_Repeater",
+      "license": "CC BY-NC-SA 3.0 para o texto da Minecraft Wiki, salvo exceções",
+      "conditions": "Referência factual com atribuição por link. A ficha usa redação e exemplos próprios. O texto, as imagens e os ativos da fonte não integram o corpus."
+    },
+    "wiki-hunger": {
+      "title": "Food",
+      "url": "https://minecraft.wiki/w/Hunger",
+      "license": "CC BY-NC-SA 3.0 para o texto da Minecraft Wiki, salvo exceções",
+      "conditions": "Referência factual com atribuição por link. A ficha usa redação e exemplos próprios. O texto, as imagens e os ativos da fonte não integram o corpus."
+    },
+    "wiki-bed": {
+      "title": "Bed",
+      "url": "https://minecraft.wiki/w/Bed",
+      "license": "CC BY-NC-SA 3.0 para o texto da Minecraft Wiki, salvo exceções",
+      "conditions": "Referência factual com atribuição por link. A ficha usa redação e exemplos próprios. O texto, as imagens e os ativos da fonte não integram o corpus."
+    },
+    "wiki-anchor": {
+      "title": "Respawn Anchor",
+      "url": "https://minecraft.wiki/w/Respawn_Anchor",
+      "license": "CC BY-NC-SA 3.0 para o texto da Minecraft Wiki, salvo exceções",
+      "conditions": "Referência factual com atribuição por link. A ficha usa redação e exemplos próprios. O texto, as imagens e os ativos da fonte não integram o corpus."
+    },
+    "wiki-water": {
+      "title": "Water Bucket",
+      "url": "https://minecraft.wiki/w/Water_Bucket",
+      "license": "CC BY-NC-SA 3.0 para o texto da Minecraft Wiki, salvo exceções",
+      "conditions": "Referência factual com atribuição por link. A ficha usa redação e exemplos próprios. O texto, as imagens e os ativos da fonte não integram o corpus."
+    },
+    "wiki-qc": {
+      "title": "Quasi-connectivity",
+      "url": "https://minecraft.wiki/w/Tutorial:Quasi-connectivity",
+      "license": "CC BY-NC-SA 3.0 para o texto da Minecraft Wiki, salvo exceções",
+      "conditions": "Referência factual com atribuição por link. A ficha usa redação e exemplos próprios. O texto, as imagens e os ativos da fonte não integram o corpus."
+    },
+    "wiki-sweep": {
+      "title": "Sweeping Edge",
+      "url": "https://minecraft.wiki/w/Sweeping_Edge",
+      "license": "CC BY-NC-SA 3.0 para o texto da Minecraft Wiki, salvo exceções",
+      "conditions": "Referência factual com atribuição por link. A ficha usa redação e exemplos próprios. O texto, as imagens e os ativos da fonte não integram o corpus."
+    },
+    "wiki-data": {
+      "title": "Commands/data",
+      "url": "https://minecraft.wiki/w/Commands/data",
+      "license": "CC BY-NC-SA 3.0 para o texto da Minecraft Wiki, salvo exceções",
+      "conditions": "Referência factual com atribuição por link. A ficha usa redação e exemplos próprios. O texto, as imagens e os ativos da fonte não integram o corpus."
+    },
+    "wiki-offhand": {
+      "title": "Dual wielding",
+      "url": "https://minecraft.wiki/w/Dual_wielding",
+      "license": "CC BY-NC-SA 3.0 para o texto da Minecraft Wiki, salvo exceções",
+      "conditions": "Referência factual com atribuição por link. A ficha usa redação e exemplos próprios. O texto, as imagens e os ativos da fonte não integram o corpus."
+    },
+    "wiki-golem": {
+      "title": "Iron golem farming",
+      "url": "https://minecraft.wiki/w/Tutorial:Iron_golem_farming",
+      "license": "CC BY-NC-SA 3.0 para o texto da Minecraft Wiki, salvo exceções",
+      "conditions": "Referência factual com atribuição por link. A ficha usa redação e exemplos próprios. O texto, as imagens e os ativos da fonte não integram o corpus."
+    },
+    "wiki-give": {
+      "title": "Commands/give",
+      "url": "https://minecraft.wiki/w/Commands/give",
+      "license": "CC BY-NC-SA 3.0 para o texto da Minecraft Wiki, salvo exceções",
+      "conditions": "Referência factual com atribuição por link. A ficha usa redação e exemplos próprios. O texto, as imagens e os ativos da fonte não integram o corpus."
+    }
+  },
+  "cards": [
+    {
+      "id": "MP-planks",
+      "topic": "crafting",
+      "title": "Tábuas a partir de troncos",
+      "versions": {
+        "Java": ["1.21.5"],
+        "Bedrock": ["1.21.80"]
+      },
+      "keywords": ["tronco", "tábuas de madeira", "carvalho", "tronco tábuas", "troncos"],
+      "fact": "Um tronco comum de madeira rende quatro tábuas do tipo correspondente. Uma única célula da grade de fabricação do inventário é suficiente.",
+      "example": "Dois troncos de bétula rendem oito tábuas de bétula.",
+      "sourceIds": ["mojang-craft"],
+      "verifiedOn": "2026-11-11",
+      "confidence": "documented"
+    },
+    {
+      "id": "MP-sticks",
+      "topic": "crafting",
+      "title": "Gravetos de madeira",
+      "versions": {
+        "Java": ["1.21.5"],
+        "Bedrock": ["1.21.80"]
+      },
+      "keywords": ["graveto", "gravetos", "palitos", "stick", "sticks"],
+      "fact": "Duas tábuas na mesma coluna, em células adjacentes, rendem quatro gravetos. A receita cabe na grade 2×2 do inventário.",
+      "example": "Uma tábua de pinheiro sobre outra na coluna esquerda rende quatro gravetos.",
+      "sourceIds": ["wiki-stick"],
+      "verifiedOn": "2026-11-11",
+      "confidence": "community-reference"
+    },
+    {
+      "id": "MP-table",
+      "topic": "crafting",
+      "title": "Fabricação da bancada",
+      "versions": {
+        "Java": ["1.21.5"],
+        "Bedrock": ["1.21.80"]
+      },
+      "keywords": [
+        "bancada",
+        "mesa de trabalho",
+        "grade pequena",
+        "crafting table",
+        "bancada grade"
+      ],
+      "fact": "Uma bancada é fabricada ocupando as quatro células do quadrado 2×2 com tábuas. A bancada resultante disponibiliza uma grade 3×3.",
+      "example": "Quatro tábuas de bétula no inventário produzem uma bancada.",
+      "sourceIds": ["mojang-craft"],
+      "verifiedOn": "2026-11-11",
+      "confidence": "documented"
+    },
+    {
+      "id": "MP-furnace",
+      "topic": "crafting",
+      "title": "Fornalha comum de pedregulho",
+      "versions": {
+        "Java": ["1.21.5"],
+        "Bedrock": ["1.21.80"]
+      },
+      "keywords": ["fornalha", "furnace", "pedregulho fornalha", "forno de pedra", "fornalhas"],
+      "fact": "A receita básica da fornalha usa oito blocos de pedregulho contornando a grade 3×3. O espaço central fica vazio e combustível não é ingrediente da fabricação.",
+      "example": "Com 16 pedregulhos há material para fabricar duas fornalhas.",
+      "sourceIds": ["wiki-furnace"],
+      "verifiedOn": "2026-11-11",
+      "confidence": "community-reference"
+    },
+    {
+      "id": "MP-give-java",
+      "topic": "comandos",
+      "title": "Itens e alvos de /give no Java",
+      "versions": {
+        "Java": ["1.21.5"]
+      },
+      "keywords": ["give", "dar itens", "blocos de pedra", "pedra para mim"],
+      "fact": "No chat do Java, /give recebe alvo, identificador do item e quantidade. @s indica o próprio executor; minecraft:stone identifica pedra comum e minecraft:cobblestone identifica pedregulho.",
+      "example": "/give @s minecraft:oak_planks 5 dá cinco tábuas de carvalho ao jogador que executou.",
+      "sourceIds": ["mojang-cmd", "wiki-give"],
+      "verifiedOn": "2026-11-11",
+      "confidence": "documented"
+    },
+    {
+      "id": "MP-weather",
+      "topic": "comandos",
+      "title": "Alteração do clima no Java",
+      "versions": {
+        "Java": ["1.21.5"]
+      },
+      "keywords": ["weather", "limpar clima", "limpa o clima", "parar chuva", "clima", "chuva"],
+      "fact": "No Java, /weather clear define clima limpo. A operação atua sobre o clima, independente da hora do dia.",
+      "example": "Em uma tarde chuvosa, /weather clear deixa o céu limpo e preserva o horário.",
+      "sourceIds": ["mojang-cmd"],
+      "verifiedOn": "2026-11-11",
+      "confidence": "documented"
+    },
+    {
+      "id": "MP-keepinventory",
+      "topic": "comandos",
+      "title": "Regra de inventário ao morrer",
+      "versions": {
+        "Bedrock": ["1.21.80"]
+      },
+      "keywords": [
+        "inventário ao morrer",
+        "morrer",
+        "keepinventory",
+        "manter inventário",
+        "perder itens"
+      ],
+      "fact": "No Bedrock, /gamerule keepinventory true ativa a retenção de inventário ao morrer para o mundo. A regra não impede a morte.",
+      "example": "Em um mapa de prática, o administrador pode usar /gamerule keepinventory false para desativar a retenção.",
+      "sourceIds": ["learn-rules"],
+      "verifiedOn": "2026-11-11",
+      "confidence": "documented"
+    },
+    {
+      "id": "MP-effect",
+      "topic": "comandos",
+      "title": "Efeitos temporários no Bedrock",
+      "versions": {
+        "Bedrock": ["1.21.80"]
+      },
+      "keywords": ["effect", "velocidade", "amplificador", "speed"],
+      "fact": "A sintaxe Bedrock é /effect seguido de alvo, efeito, duração em segundos e amplificador. Não há a palavra give nessa forma. speed é Velocidade e amplificador 0 corresponde ao nível I.",
+      "example": "/effect @s speed 25 1 aplica Velocidade II ao executor por 25 segundos.",
+      "sourceIds": ["learn-effect"],
+      "verifiedOn": "2026-11-11",
+      "confidence": "documented"
+    },
+    {
+      "id": "MP-fill",
+      "topic": "comandos",
+      "title": "Entradas e modos de /fill",
+      "versions": {
+        "Bedrock": ["1.21.80"]
+      },
+      "keywords": ["fill", "preencher uma sala", "preencher", "dois cantos"],
+      "fact": "No Bedrock, /fill precisa de dois pontos XYZ opostos da região e do bloco de destino. O modo padrão preenche o volume. O modo outline desenha sua superfície e mantém os blocos internos existentes.",
+      "example": "/fill 20 64 30 22 65 32 minecraft:stone é um exemplo com coordenadas escolhidas apenas para ilustração.",
+      "sourceIds": ["learn-fill"],
+      "verifiedOn": "2026-11-11",
+      "confidence": "documented"
+    },
+    {
+      "id": "MP-comparator",
+      "topic": "redstone",
+      "title": "Comparador em subtração",
+      "versions": {
+        "Java": ["1.21.5"]
+      },
+      "keywords": ["comparador", "subtração", "subtracao", "entrada lateral", "comparator"],
+      "fact": "No modo subtração, a saída do comparador é o sinal traseiro menos o maior dos dois sinais laterais, limitada a zero se a diferença for negativa.",
+      "example": "Uma entrada traseira 13 e laterais 7 e 2 produzem saída 6.",
+      "sourceIds": ["wiki-compare"],
+      "verifiedOn": "2026-11-11",
+      "confidence": "community-reference"
+    },
+    {
+      "id": "MP-delay",
+      "topic": "redstone",
+      "title": "Ajustes do repetidor no Java",
+      "versions": {
+        "Java": ["1.21.5"]
+      },
+      "keywords": ["atrasos", "atraso", "ticks de redstone", "repetidor"],
+      "fact": "O repetidor tem quatro ajustes de atraso: 1 a 4 ticks de redstone. Um tick de redstone equivale a dois ticks de jogo. A interação com o repetidor alterna os ajustes.",
+      "example": "O terceiro ajuste atrasa a saída em 6 ticks de jogo.",
+      "sourceIds": ["wiki-repeater"],
+      "verifiedOn": "2026-11-11",
+      "confidence": "community-reference"
+    },
+    {
+      "id": "MP-bedrock-repeater",
+      "topic": "redstone",
+      "title": "Força de saída de repetidor",
+      "versions": {
+        "Bedrock": ["1.21.80"]
+      },
+      "keywords": ["repetidor", "força do sinal", "sinal de força", "repeater", "intensidade"],
+      "fact": "Com entrada traseira de pelo menos 1 e sem trava, o repetidor gera força 15 na saída frontal, mesmo que a entrada seja fraca.",
+      "example": "Com entrada de força 2 atrás, a força de saída na frente é 15.",
+      "sourceIds": ["learn-red"],
+      "verifiedOn": "2026-11-11",
+      "confidence": "documented"
+    },
+    {
+      "id": "MP-repeater-direction",
+      "topic": "redstone",
+      "title": "Sentido do repetidor",
+      "versions": {
+        "Bedrock": ["1.21.80"]
+      },
+      "keywords": [
+        "repetidor",
+        "para que lado",
+        "conduz ao contrário",
+        "linha de pó",
+        "direção do repetidor"
+      ],
+      "fact": "O repetidor só transmite da traseira para a frente. A entrada fica no lado da fonte e a frente aponta para a parte do circuito a alimentar.",
+      "example": "Para propagar um sinal do oeste para o leste, a frente do repetidor aponta para leste.",
+      "sourceIds": ["learn-red", "wiki-repeater"],
+      "verifiedOn": "2026-11-11",
+      "confidence": "documented"
+    },
+    {
+      "id": "MP-hunger",
+      "topic": "sobrevivencia",
+      "title": "Fome e regeneração natural",
+      "versions": {
+        "Java": ["1.21.5"]
+      },
+      "keywords": ["pontos de fome", "saturação", "regeneração natural", "regenerar vida", "fome"],
+      "fact": "Com regeneração natural habilitada, vida abaixo do máximo e saturação zerada, o limiar de fome para regenerar no Java é 18 pontos em 20, ou nove ícones cheios.",
+      "example": "Com 17 pontos de fome e saturação zero, subir para 18 permite a regeneração natural se as demais condições estiverem satisfeitas.",
+      "sourceIds": ["wiki-hunger"],
+      "verifiedOn": "2026-11-11",
+      "confidence": "community-reference"
+    },
+    {
+      "id": "MP-nether-bed",
+      "topic": "sobrevivencia",
+      "title": "Cama e renascimento no Nether",
+      "versions": {
+        "Java": ["1.21.5"],
+        "Bedrock": ["1.21.80"]
+      },
+      "keywords": ["cama", "dormir no nether", "dormir", "renascimento no nether"],
+      "fact": "Sob as regras padrão, tentar dormir numa cama no Nether provoca explosão. O bloco de renascimento próprio dessa dimensão é a âncora, que precisa de carga.",
+      "example": "Em um posto no Nether, uma âncora carregada pode registrar o renascimento de quem interage com ela.",
+      "sourceIds": ["wiki-bed", "wiki-anchor"],
+      "verifiedOn": "2026-11-11",
+      "confidence": "community-reference"
+    },
+    {
+      "id": "MP-nether-water",
+      "topic": "sobrevivencia",
+      "title": "Despejo comum de água no Nether",
+      "versions": {
+        "Java": ["1.21.5"],
+        "Bedrock": ["1.21.80"]
+      },
+      "keywords": ["balde de água", "água no nether", "poça", "despejar", "água evapora"],
+      "fact": "Ao despejar um balde de água no terreno do Nether em sobrevivência vanilla, a água evapora sem criar um bloco-fonte. O material do chão não muda esse comportamento.",
+      "example": "Despejar o balde sobre netherrack ou sobre terra no Nether não cria uma poça.",
+      "sourceIds": ["wiki-water"],
+      "verifiedOn": "2026-11-11",
+      "confidence": "community-reference"
+    },
+    {
+      "id": "MP-anchor-dimensions",
+      "topic": "sobrevivencia",
+      "title": "Dimensões da âncora de renascimento",
+      "versions": {
+        "Java": ["1.21.5"],
+        "Bedrock": ["1.21.80"]
+      },
+      "keywords": ["âncora", "respawn anchor", "âncora carregada", "overworld âncora"],
+      "fact": "A âncora carregada permite fixar o ponto de renascimento no Nether. Com as regras padrão, interagir com uma âncora carregada no Overworld ou no End provoca explosão.",
+      "example": "Uma âncora com carga no End não é um substituto para ponto de renascimento.",
+      "sourceIds": ["wiki-anchor"],
+      "verifiedOn": "2026-11-11",
+      "confidence": "community-reference"
+    },
+    {
+      "id": "MP-quasi",
+      "topic": "edicoes",
+      "title": "Quasi-conectividade e portabilidade",
+      "versions": {
+        "Java": ["1.21.5"],
+        "Bedrock": ["1.21.80"]
+      },
+      "keywords": [
+        "quasi conectividade",
+        "quasi-conectividade",
+        "quase conectividade",
+        "pistão java",
+        "pistões"
+      ],
+      "fact": "Circuitos Java podem depender de quasi-conectividade de pistões. Bedrock não reproduz essa propriedade, por isso um projeto que depende dela precisa de outra ligação de redstone nessa edição.",
+      "example": "Um pistão Java acionado indiretamente por quasi-conectividade pode exigir alimentação direta quando o mecanismo é refeito no Bedrock.",
+      "sourceIds": ["wiki-qc"],
+      "verifiedOn": "2026-11-11",
+      "confidence": "community-reference"
+    },
+    {
+      "id": "MP-sweeping",
+      "topic": "edicoes",
+      "title": "Disponibilidade de Sweeping Edge",
+      "versions": {
+        "Java": ["1.21.5"],
+        "Bedrock": ["1.21.80"]
+      },
+      "keywords": ["sweeping edge", "alcance", "borda cortadora", "encantamento sweeping"],
+      "fact": "Sweeping Edge pertence à edição Java e não existe no Bedrock vanilla. Seu papel é aumentar o dano do ataque de varredura da espada.",
+      "example": "Um livro desse encantamento no Java não tem equivalente vanilla no Bedrock.",
+      "sourceIds": ["wiki-sweep"],
+      "verifiedOn": "2026-11-11",
+      "confidence": "community-reference"
+    },
+    {
+      "id": "MP-data",
+      "topic": "edicoes",
+      "title": "Comando /data por edição",
+      "versions": {
+        "Java": ["1.21.5"],
+        "Bedrock": ["1.21.80"]
+      },
+      "keywords": ["data get", "data get entity", "nbt entidade", "ler nbt"],
+      "fact": "O comando /data para acessar NBT está disponível no Java. O Bedrock vanilla não oferece esse comando nem uma variante de /data get. A solução depende de qual informação a pessoa quer consultar.",
+      "example": "No Java é possível consultar dados de um aldeão com /data get entity e um seletor de um único aldeão.",
+      "sourceIds": ["wiki-data"],
+      "verifiedOn": "2026-11-11",
+      "confidence": "community-reference"
+    },
+    {
+      "id": "MP-offhand",
+      "topic": "edicoes",
+      "title": "Tocha comum na mão secundária",
+      "versions": {
+        "Java": ["1.21.5"],
+        "Bedrock": ["1.21.80"]
+      },
+      "keywords": [
+        "mão secundária",
+        "offhand",
+        "mão esquerda",
+        "tocha comum",
+        "tocha na outra mão"
+      ],
+      "fact": "A edição Java permite colocar tocha comum a partir da mão secundária. A edição Bedrock vanilla restringe o uso da mão secundária a determinados itens, e a tocha comum não serve para esse uso.",
+      "example": "Quem ilumina uma mina no Bedrock deve alternar para a tocha na mão principal.",
+      "sourceIds": ["wiki-offhand"],
+      "verifiedOn": "2026-11-11",
+      "confidence": "community-reference"
+    },
+    {
+      "id": "MP-java-components",
+      "topic": "versoes",
+      "title": "Dados de item em comandos no Java",
+      "versions": {
+        "Java": ["1.21.5"]
+      },
+      "keywords": [
+        "nome personalizado",
+        "item renomeado",
+        "custom name",
+        "custom_name",
+        "componente de item"
+      ],
+      "fact": "A versão 1.20.5 do Java mudou a sintaxe de dados de item em comandos como /give. A versão 1.21.5 também tem mudanças na escrita de componentes de texto. A versão exata é necessária ao escolher uma sintaxe de nome personalizado.",
+      "example": "Um exemplo destinado à 1.21.5 precisa declarar essa versão quando comparado a um tutorial anterior à 1.20.5.",
+      "sourceIds": ["mojang-1205", "mojang-1215"],
+      "verifiedOn": "2026-11-11",
+      "confidence": "documented"
+    },
+    {
+      "id": "MP-iron",
+      "topic": "sobrevivencia",
+      "title": "Diagnóstico de farm de ferro",
+      "versions": {
+        "Java": ["1.21.5"]
+      },
+      "keywords": ["farm de ferro", "golem de ferro", "aldeões e camas", "fazenda de ferro"],
+      "fact": "Em farms Java, a invocação do golem depende das condições dos aldeões e de locais válidos de surgimento. Sono recente, detecção de golems e posição da plataforma podem afetar o funcionamento.",
+      "example": "Se os golems surgem fora da área de coleta, as superfícies próximas e a localização dos aldeões são dados úteis para o diagnóstico.",
+      "sourceIds": ["wiki-golem"],
+      "verifiedOn": "2026-11-11",
+      "confidence": "community-reference"
+    }
+  ]
+}
