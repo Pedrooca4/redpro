@@ -5,6 +5,7 @@ import {
   ArrowUp,
   ArrowUpRight,
   Blocks,
+  Calculator,
   ChevronRight,
   Menu,
   ShieldCheck,
@@ -98,6 +99,19 @@ export function ChatShell() {
               Esta é uma demonstração da interface; a IA real será conectada em uma etapa futura.
             </p>
           </div>
+          <Link
+            className="chat-calculator-link"
+            href="/ferramentas/materiais"
+            aria-label="Abrir Calculadora de materiais"
+            aria-describedby="calculator-availability"
+          >
+            <Calculator size={23} aria-hidden="true" />
+            <span>
+              <strong>Calculadora de materiais</strong>
+              <span id="calculator-availability">Disponível · blocos, stacks e slots</span>
+            </span>
+            <ArrowUpRight size={19} aria-hidden="true" />
+          </Link>
           <div className="chat-scroll" ref={messages} tabIndex={0} aria-label="Área de mensagens">
             <div className="chat-content">
               {state.messages.length === 0 ? (
@@ -156,18 +170,32 @@ export function ChatShell() {
                 <div className="tool-grid">
                   {TOOLS.map((tool) =>
                     "href" in tool ? (
-                      <Link key={tool.id} href={tool.href} className="tool-available">
-                        <span>{tool.name}</span>
+                      <Link
+                        key={tool.id}
+                        href={tool.href}
+                        className="tool-available"
+                        aria-label={tool.name}
+                        aria-describedby={`tool-${tool.id}-state`}
+                      >
+                        <span>
+                          {tool.name}
+                          <small id={`tool-${tool.id}-state`}>Disponível</small>
+                        </span>
                         <ChevronRight size={15} aria-hidden="true" />
                       </Link>
                     ) : (
                       <button
                         type="button"
                         key={tool.id}
+                        aria-label={tool.name}
+                        aria-describedby={`tool-${tool.id}-state`}
                         disabled={busy}
                         onClick={() => setActiveTool(tool)}
                       >
-                        <span>{tool.name}</span>
+                        <span>
+                          {tool.name}
+                          <small id={`tool-${tool.id}-state`}>Prévia · ainda não executa</small>
+                        </span>
                         <ChevronRight size={15} aria-hidden="true" />
                       </button>
                     ),

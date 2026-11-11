@@ -64,6 +64,10 @@ jobs:
           path: |
             coverage/ui/materials-390.png
             coverage/ui/materials-1440.png
+            coverage/ui/home-390.png
+            coverage/ui/home-1440.png
+            coverage/ui/chat-access-390.png
+            coverage/ui/chat-access-1440.png
           retention-days: 7
           if-no-files-found: error
 

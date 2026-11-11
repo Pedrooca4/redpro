@@ -18,7 +18,7 @@ export default function MaterialsPage() {
       <SiteHeader homePage={false} />
       <main id="conteudo" className="shell materials-page">
         <Link className="back-link" href="/chat">
-          <ArrowLeft size={17} aria-hidden="true" /> Voltar à bancada
+          <ArrowLeft size={17} aria-hidden="true" /> Voltar ao chat
         </Link>
         <header className="materials-intro">
           <span className="materials-mark">

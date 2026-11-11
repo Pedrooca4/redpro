@@ -57,9 +57,67 @@ try {
       );
       assert.doesNotMatch(await page.locator("body").innerText(), /redpro/i);
       assert.match(await page.title(), /MinePRO/);
-      if (path === "/" && [390, 1440].includes(width))
-        await page.screenshot({ path: `${artifactDir}/home-${width}.png`, fullPage: true });
+      if (path === "/") {
+        const homeCalculator = page.getByRole("link", {
+          name: "Calculadora de materiais Disponível · Java e Bedrock",
+          exact: true,
+        });
+        await uiExpect(homeCalculator).toHaveCount(1);
+        await uiExpect(homeCalculator).toHaveAttribute("href", "/ferramentas/materiais");
+        const bounds = await homeCalculator.boundingBox();
+        assert.ok(bounds && bounds.height >= 44 && bounds.width >= 44);
+        await homeCalculator.focus();
+        await page.keyboard.press("Enter");
+        await page.waitForURL(new URL("/ferramentas/materiais", base).href);
+        await uiExpect(
+          page.getByRole("heading", { name: "Calculadora de materiais", exact: true }),
+        ).toBeVisible();
+        await page.getByRole("link", { name: "Voltar ao chat", exact: true }).click();
+        await page.waitForURL(new URL("/chat", base).href);
+        await page.goto(new URL("/", base).href);
+      }
+      if (path === "/" && [390, 1440].includes(width)) {
+        await page.locator(".home-calculator-link").scrollIntoViewIfNeeded();
+        await page.screenshot({ path: `${artifactDir}/home-${width}.png` });
+      }
     }
+    const shortcut = page.getByRole("link", {
+      name: "Abrir Calculadora de materiais",
+      exact: true,
+    });
+    // Important tools must be usable on entry, outside the messages' independent scroll.
+    async function checkShortcut() {
+      await uiExpect(shortcut).toBeInViewport({ ratio: 1 });
+      const target = await shortcut.evaluate((element) => {
+        const r = element.getBoundingClientRect();
+        return {
+          height: r.height,
+          width: r.width,
+          unobstructed: element.contains(
+            document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2),
+          ),
+          inMessages: !!element.closest(".chat-scroll"),
+        };
+      });
+      assert.ok(target.height >= 44 && target.width >= 44);
+      assert.equal(target.unobstructed, true, "The composer must not cover the shortcut");
+      assert.equal(target.inMessages, false);
+    }
+    await checkShortcut();
+    await uiExpect(shortcut).toHaveAccessibleDescription("Disponível · blocos, stacks e slots");
+    const bench = page.getByRole("region", { name: "Sua bancada de ferramentas", exact: true });
+    await uiExpect(bench.getByRole("link")).toHaveCount(1);
+    await uiExpect(bench.getByRole("button")).toHaveCount(5);
+    await uiExpect(bench.getByRole("link")).toHaveAccessibleDescription("Disponível");
+    for (const tool of await bench.getByRole("button").all())
+      await uiExpect(tool).toHaveAccessibleDescription("Prévia · ainda não executa");
+    if ([390, 1440].includes(width))
+      await page.screenshot({ path: `${artifactDir}/chat-access-${width}.png` });
+    await shortcut.focus();
+    await page.keyboard.press("Enter");
+    await page.waitForURL(new URL("/ferramentas/materiais", base).href);
+    await page.getByRole("link", { name: "Voltar ao chat", exact: true }).click();
+    await page.waitForURL(new URL("/chat", base).href);
     await page.screenshot({ path: `${artifactDir}/chat-${width}-javamine.png`, fullPage: true });
     if (width <= 800) await page.getByRole("button", { name: "Abrir navegação" }).click();
     await page
@@ -99,6 +157,7 @@ try {
       .getByText("Protótipo: respostas de IA ainda não estão disponíveis.", { exact: true })
       .waitFor();
     assert.equal(await page.locator(".local-message").count(), 1);
+    await checkShortcut();
     assert.match(await page.locator(".message-meta").innerText(), /BedMine.*1.21.0.*SURVIVAL/);
     await edition("JavaMine").click();
     assert.match(await page.getByRole("status").innerText(), /perder validade/);
@@ -330,7 +389,7 @@ try {
     page.off("request", trackMaterialRequest);
     await page.reload();
     await uiExpect(inventory).toContainText("Sua lista está vazia");
-    await page.getByRole("link", { name: "Voltar à bancada" }).click();
+    await page.getByRole("link", { name: "Voltar ao chat", exact: true }).click();
     await page.waitForURL(new URL("/chat", base).href);
     console.log(
       `PASS materiais ${width}px: rota, geometria, stacks, edição, remoção, cópia e overflow`,
@@ -377,14 +436,17 @@ try {
   const geometry = await page.evaluate(() => {
     const scroll = document.querySelector(".chat-scroll").getBoundingClientRect();
     const composer = document.querySelector(".composer-area").getBoundingClientRect();
+    const shortcut = document.querySelector(".chat-calculator-link").getBoundingClientRect();
     return {
       messageRegionHeight: scroll.height,
       composerOverlaps: composer.top < scroll.bottom - 1,
+      shortcutOverlaps: shortcut.bottom > scroll.top || shortcut.bottom > composer.top,
       horizontalOverflow: document.documentElement.scrollWidth > innerWidth,
     };
   });
   assert.ok(geometry.messageRegionHeight >= 44, "Message region must retain a usable height");
   assert.equal(geometry.composerOverlaps, false);
+  assert.equal(geometry.shortcutOverlaps, false);
   assert.equal(geometry.horizontalOverflow, false);
   await page.getByRole("button", { name: "Guia de mineração Y-Level", exact: true }).click();
   await page.getByRole("dialog", { name: "Guia de mineração Y-Level", exact: true }).waitFor();

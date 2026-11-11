@@ -1,10 +1,10 @@
 import Link from "next/link";
 import {
-  ArrowDown,
   ArrowRight,
   Bot,
   BookOpen,
   Box,
+  Calculator,
   CircleDashed,
   Layers3,
   Network,
@@ -72,9 +72,14 @@ export default function Home() {
               <Link className="button button-primary" href="/chat">
                 Abrir assistente <ArrowRight size={18} aria-hidden="true" />
               </Link>
-              <a className="button button-text" href="#etapas">
-                Veja o que vem a seguir <ArrowDown size={16} aria-hidden="true" />
-              </a>
+              <Link className="button home-calculator-link" href="/ferramentas/materiais">
+                <Calculator size={21} aria-hidden="true" />
+                <span>
+                  Calculadora de materiais
+                  <small>Disponível · Java e Bedrock</small>
+                </span>
+                <ArrowRight size={17} aria-hidden="true" />
+              </Link>
             </div>
             <div className="hero-note">
               <CircleDashed size={16} aria-hidden="true" />

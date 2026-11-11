@@ -251,6 +251,30 @@ h3 {
 .button-text:hover {
   color: var(--color-action);
 }
+.home-calculator-link {
+  border: 1px solid var(--color-accent-deep);
+  color: var(--color-soft);
+  background: var(--color-surface);
+  max-width: 100%;
+  text-align: left;
+}
+.home-calculator-link span {
+  min-width: 0;
+}
+.home-calculator-link svg {
+  flex-shrink: 0;
+}
+.home-calculator-link small {
+  display: block;
+  margin-top: 3px;
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--color-secondary);
+}
+.home-calculator-link:hover {
+  border-color: var(--color-action);
+  background: var(--color-elevated);
+}
 .hero-note {
   display: flex;
   align-items: flex-start;
