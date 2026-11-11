@@ -131,7 +131,14 @@ export function parseCompletion(data: unknown, latencyMs: number): Completion {
   };
 }
 
-export function createLocalAdapter(apiKey: string, transport = localRequest) {
+export function createLocalAdapter(
+  apiKey: string,
+  transport = localRequest,
+  maxOutputTokens = MAX_OUTPUT_TOKENS,
+) {
+  if (!Number.isInteger(maxOutputTokens) || maxOutputTokens < 64 || maxOutputTokens > 512) {
+    throw new BenchError("Limite de saída deve ser um inteiro entre 64 e 512 tokens.");
+  }
   return async (messages: ChatMessage[]): Promise<Completion> => {
     const start = performance.now();
     const data = await transport(
@@ -141,7 +148,7 @@ export function createLocalAdapter(apiKey: string, transport = localRequest) {
         model: MODEL_ALIAS,
         messages,
         stream: false,
-        max_tokens: MAX_OUTPUT_TOKENS,
+        max_tokens: maxOutputTokens,
         temperature: 0,
         seed: 42,
         cache_prompt: false,

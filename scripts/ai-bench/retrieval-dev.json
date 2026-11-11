@@ -1,0 +1,153 @@
+{
+  "schemaVersion": 1,
+  "purpose": "retrieval-development-only",
+  "queries": [
+    {
+      "id": "D01",
+      "edition": "Java",
+      "version": "1.21.5",
+      "question": "Se eu processar três troncos de bétula no inventário, quantas peças de madeira saem?",
+      "expectedTop": "MP-planks"
+    },
+    {
+      "id": "D02",
+      "edition": "Bedrock",
+      "version": "1.21.80",
+      "question": "A receita de palitos funciona com a grade 2×2?",
+      "expectedTop": "MP-sticks"
+    },
+    {
+      "id": "D03",
+      "edition": "Java",
+      "version": "1.21.5",
+      "question": "Qual a proporção entre tábuas e mesa de trabalho?",
+      "expectedTop": "MP-table"
+    },
+    {
+      "id": "D04",
+      "edition": "Bedrock",
+      "version": "1.21.80",
+      "question": "Dá para fabricar três fornalhas com 24 blocos?",
+      "expectedTop": "MP-furnace"
+    },
+    {
+      "id": "D05",
+      "edition": "Java",
+      "version": "1.21.5",
+      "question": "No /give qual alvo representa o executor?",
+      "expectedTop": "MP-give-java"
+    },
+    {
+      "id": "D06",
+      "edition": "Java",
+      "version": "1.21.5",
+      "question": "Posso usar /weather clear à noite?",
+      "expectedTop": "MP-weather"
+    },
+    {
+      "id": "D07",
+      "edition": "Bedrock",
+      "version": "1.21.80",
+      "question": "Que efeito prático tem keepinventory em um mundo compartilhado?",
+      "expectedTop": "MP-keepinventory"
+    },
+    {
+      "id": "D08",
+      "edition": "Bedrock",
+      "version": "1.21.80",
+      "question": "No /effect, qual amplificador representa nível II?",
+      "expectedTop": "MP-effect"
+    },
+    {
+      "id": "D09",
+      "edition": "Bedrock",
+      "version": "1.21.80",
+      "question": "O modo outline do /fill mexe nos blocos internos?",
+      "expectedTop": "MP-fill"
+    },
+    {
+      "id": "D10",
+      "edition": "Java",
+      "version": "1.21.5",
+      "question": "Comparador em subtração, sinal lateral maior que a traseira: a saída fica negativa?",
+      "expectedTop": "MP-comparator"
+    },
+    {
+      "id": "D11",
+      "edition": "Java",
+      "version": "1.21.5",
+      "question": "O terceiro ajuste de atraso equivale a quantos ticks de jogo?",
+      "expectedTop": "MP-delay"
+    },
+    {
+      "id": "D12",
+      "edition": "Bedrock",
+      "version": "1.21.80",
+      "question": "Um repetidor com força do sinal de entrada 2 funciona?",
+      "expectedTop": "MP-bedrock-repeater"
+    },
+    {
+      "id": "D13",
+      "edition": "Bedrock",
+      "version": "1.21.80",
+      "question": "Qual é a direção do repetidor para alimentar a linha ao leste?",
+      "expectedTop": "MP-repeater-direction"
+    },
+    {
+      "id": "D14",
+      "edition": "Java",
+      "version": "1.21.5",
+      "question": "A comida está em 17 pontos de fome e sem saturação. Já recupero saúde?",
+      "expectedTop": "MP-hunger"
+    },
+    {
+      "id": "D15",
+      "edition": "Java",
+      "version": "1.21.5",
+      "question": "Um livro com Sweeping Edge é de qual edição?",
+      "expectedTop": "MP-sweeping"
+    },
+    {
+      "id": "D16",
+      "edition": "Java",
+      "version": "1.21.5",
+      "question": "Um tutorial antigo de nome personalizado se aplica aos componentes atuais?",
+      "expectedTop": "MP-java-components"
+    },
+    {
+      "id": "D17",
+      "edition": "Java",
+      "version": "1.21.4",
+      "question": "O que muda se usar /weather clear?",
+      "expectedTop": null
+    },
+    {
+      "id": "D18",
+      "edition": "Bedrock",
+      "version": "1.21.80",
+      "question": "O que é o modo subtração de comparador?",
+      "expectedTop": null
+    },
+    {
+      "id": "D19",
+      "edition": "Java",
+      "version": null,
+      "question": "Um tronco de bétula vira quantas tábuas?",
+      "expectedTop": null
+    },
+    {
+      "id": "D20",
+      "edition": "Bedrock",
+      "version": "1.21.80",
+      "question": "Qual foi a última missão tripulada do programa Apollo?",
+      "expectedTop": null
+    },
+    {
+      "id": "D21",
+      "edition": "Java",
+      "version": "1.21.5",
+      "question": "Quero desativar meu sistema meteorológico fora do jogo.",
+      "expectedTop": null
+    }
+  ]
+}
