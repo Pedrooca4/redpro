@@ -1,0 +1,59 @@
+{
+  "schemaVersion": 1,
+  "runtime": {
+    "tag": "b12110",
+    "commit": "cd959bae99ff4bed22bef2604f45241c09bbb8c8",
+    "archives": {
+      "linux-x64": {
+        "url": "https://github.com/ggml-org/llama.cpp/releases/download/b12110/llama-b12110-bin-ubuntu-x64.tar.gz",
+        "sha256": "368227edcc229be5f9bed16a2223d79b5e41d0ac2e19bcf5825e82291c060e55"
+      },
+      "win32-x64": {
+        "url": "https://github.com/ggml-org/llama.cpp/releases/download/b12110/llama-b12110-bin-win-cpu-x64.zip",
+        "sha256": "98901e327c252875accaf2d1bf364e10e868843b0b63468baad1aa945cdc5da2"
+      }
+    }
+  },
+  "models": [
+    {
+      "id": "qwen3.5-4b",
+      "upstream": {
+        "repository": "Qwen/Qwen3.5-4B",
+        "revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+        "license": "Apache-2.0"
+      },
+      "conversion": {
+        "repository": "SoAIHQ/Qwen3.5-4B-GGUF",
+        "revision": "5f113e0dbe6862596f7f5927dbe583c592e887aa",
+        "quantization": "Q4_K_M",
+        "bytes": 2783447136,
+        "sha256": "2ebe6eb67cb92adeffc7073c48dd4e3baf79465ac650793dc751cad2b29cf219",
+        "url": "https://huggingface.co/SoAIHQ/Qwen3.5-4B-GGUF/resolve/5f113e0dbe6862596f7f5927dbe583c592e887aa/Qwen3.5-4B-Q4_K_M.gguf"
+      },
+      "template": {
+        "url": "https://huggingface.co/Qwen/Qwen3.5-4B/resolve/851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a/chat_template.jinja",
+        "sha256": "a4aee8afcf2e0711942cf848899be66016f8d14a889ff9ede07bca099c28f715"
+      }
+    },
+    {
+      "id": "qwen3.5-2b",
+      "upstream": {
+        "repository": "Qwen/Qwen3.5-2B",
+        "revision": "15852e8c16360a2fea060d615a32b45270f8a8fc",
+        "license": "Apache-2.0"
+      },
+      "conversion": {
+        "repository": "SoAIHQ/Qwen3.5-2B-GGUF",
+        "revision": "377fa65bb36aa83414de1ab3b40f6f15b0324cdc",
+        "quantization": "Q4_K_M",
+        "bytes": 1312165056,
+        "sha256": "a8b50de00b780c0f3c16f07cb041a1ecd678b6e22fd8cde91e57fe4b5031523b",
+        "url": "https://huggingface.co/SoAIHQ/Qwen3.5-2B-GGUF/resolve/377fa65bb36aa83414de1ab3b40f6f15b0324cdc/Qwen3.5-2B-Q4_K_M.gguf"
+      },
+      "template": {
+        "url": "https://huggingface.co/Qwen/Qwen3.5-2B/resolve/15852e8c16360a2fea060d615a32b45270f8a8fc/chat_template.jinja",
+        "sha256": "273d8e0e683b885071fb17e08d71e5f2a5ddfb5309756181681de4f5a1822d80"
+      }
+    }
+  ]
+}

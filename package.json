@@ -29,7 +29,8 @@
     "codespace:setup": "bash scripts/codespace.sh setup",
     "test:db:disposable": "bash scripts/codespace.sh test-db",
     "db:inspect:private": "bash scripts/codespace.sh inspect",
-    "db:inspect:admin": "node --experimental-strip-types scripts/codespace-admin.ts"
+    "db:inspect:admin": "node --experimental-strip-types scripts/codespace-admin.ts",
+    "ai:bench": "node --experimental-strip-types scripts/ai-bench/run.ts"
   },
   "dependencies": {
     "@supabase/ssr": "0.12.7",
