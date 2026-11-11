@@ -36,3 +36,23 @@ assert.deepEqual(await response.json(), {
   scope: "application-only",
 });
 console.log("PASS /api/health — processo responde; sem alegar conexão externa");
+const availability = await fetch(new URL("/api/chat", base), {
+  signal: AbortSignal.timeout(15000),
+});
+assert.equal(availability.status, 200);
+checkId(availability);
+assert.equal(availability.headers.get("cache-control"), "no-store");
+const publicAI = await availability.json();
+assert.deepEqual(Object.keys(publicAI), ["available"]);
+assert.equal(typeof publicAI.available, "boolean");
+// No Origin and no valid input: this probe must never reach an AI provider, even if enabled.
+const refused = await fetch(new URL("/api/chat", base), {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: "{}",
+  signal: AbortSignal.timeout(15000),
+});
+assert.ok([403, 503].includes(refused.status));
+checkId(refused);
+assert.equal(refused.headers.get("cache-control"), "no-store");
+console.log("PASS /api/chat — public availability and refused unauthorized POST; no model call");

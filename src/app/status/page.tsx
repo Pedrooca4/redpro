@@ -21,8 +21,8 @@ export default function StatusPage() {
           <span className="text-green">do MinePRO.</span>
         </h1>
         <p className="status-lead">
-          A interface demonstrativa permite escolher edição, versão e especialidade. IA real,
-          contas, biblioteca e comunidade continuam em desenvolvimento.
+          Escolha edição, versão e especialidade no chat, que informa a disponibilidade da IA.
+          Contas, biblioteca e comunidade continuam em desenvolvimento.
         </p>
         <div className="status-grid">
           <section className="status-panel">
@@ -59,7 +59,7 @@ export default function StatusPage() {
             <h2>As próximas construções</h2>
             <ul>
               <li>Cadastro, login e perfis.</li>
-              <li>Chat com IA e consulta a fontes.</li>
+              <li>Consulta a fontes verificadas e ferramentas avançadas de IA.</li>
               <li>Biblioteca de projetos de Minecraft.</li>
               <li>Publicações e interações da comunidade.</li>
             </ul>

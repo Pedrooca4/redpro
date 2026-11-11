@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
-import { CircleDashed, FileText } from "lucide-react";
+import { useState } from "react";
+import { CircleDashed, FileText, Copy, Bot } from "lucide-react";
 import { EDITIONS } from "./config";
 import type { LocalMessage } from "./state";
 
@@ -97,17 +98,60 @@ export function StructuredAnswer({
   );
 }
 export function ChatMessage({ message }: { message: LocalMessage }) {
+  const [copyState, setCopyState] = useState<"idle" | "copied" | "failed">("idle");
+  const assistant = message.role === "assistant";
   return (
-    <article className="local-message">
+    <article
+      className={`local-message${assistant ? " assistant-message" : ""}`}
+      aria-label={assistant ? "Resposta do MinePRO" : "Mensagem do jogador"}
+    >
       <p className="message-meta">
-        <FileText size={15} aria-hidden="true" />
-        Você · mensagem local · {EDITIONS[message.context.edition].label} ·{" "}
+        {assistant ? (
+          <Bot size={15} aria-hidden="true" />
+        ) : (
+          <FileText size={15} aria-hidden="true" />
+        )}
+        {assistant ? "MinePRO · IA" : message.role === "user" ? "Você" : "Você · mensagem local"} ·{" "}
+        {EDITIONS[message.context.edition].label} ·{" "}
         {message.context.game_version ?? "Versão não informada"} · {message.context.mode}
       </p>
       <p className="message-body">{message.text}</p>
-      <p className="message-disclosure">
-        Demonstração: esta mensagem não foi enviada a um provedor de IA.
-      </p>
+      {!message.role ? (
+        <p className="message-disclosure">
+          Demonstração: esta mensagem não foi enviada a um provedor de IA.
+        </p>
+      ) : null}
+      {assistant ? (
+        <>
+          {message.truncated ? (
+            <p className="message-disclosure">
+              Resposta interrompida pelo limite de saída. Peça para continuar se necessário.
+            </p>
+          ) : null}
+          <button
+            className="ai-copy"
+            type="button"
+            onClick={async () => {
+              try {
+                await navigator.clipboard.writeText(message.text);
+                setCopyState("copied");
+              } catch {
+                setCopyState("failed");
+              }
+            }}
+          >
+            <Copy size={14} aria-hidden="true" />
+            Copiar resposta
+          </button>
+          <p role="status" aria-live="polite" className="message-disclosure">
+            {copyState === "copied"
+              ? "Resposta copiada."
+              : copyState === "failed"
+                ? "Não foi possível copiar automaticamente. Selecione o texto da resposta para copiar."
+                : ""}
+          </p>
+        </>
+      ) : null}
     </article>
   );
 }

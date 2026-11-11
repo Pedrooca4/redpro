@@ -40,7 +40,8 @@ try {
     const forbiddenRequests = [];
     page.on("pageerror", (error) => errors.push(error.message));
     page.on("request", (request) => {
-      if (/\/api\/(chat|tools|conversations)/.test(request.url()))
+      // GET /api/chat reports availability only; the disabled UI must never POST a question.
+      if (request.method() !== "GET" && /\/api\/(chat|tools|conversations)/.test(request.url()))
         forbiddenRequests.push(request.url());
     });
     for (const path of ["/", "/status", "/projetos", "/comunidade", "/chat"]) {

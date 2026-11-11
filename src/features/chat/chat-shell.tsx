@@ -18,12 +18,17 @@ import { EditionSwitcher, SpecialtyModePicker, VersionSelect } from "./chat-cont
 import { ChatMessage, ToolResultPanel } from "./chat-presentation";
 import { PrototypeDialog } from "./prototype-dialog";
 import { MODE_ICONS } from "./icons";
+import { askMinepro, ChatRequestError } from "./ai-client";
+import { buildAIHistory, type AIMessage } from "./ai-contract";
 
 export function ChatShell() {
   const [state, dispatch] = useReducer(chatReducer, undefined, initialChatState);
   const [drawer, setDrawer] = useState(false);
   const [settings, setSettings] = useState(false);
   const [failNext, setFailNext] = useState(false);
+  const [availability, setAvailability] = useState<"checking" | "available" | "disabled">(
+    "checking",
+  );
   const [activeTool, setActiveTool] = useState<Exclude<
     (typeof TOOLS)[number],
     { href: string }
@@ -31,21 +36,74 @@ export function ChatShell() {
   const textarea = useRef<HTMLTextAreaElement>(null);
   const messages = useRef<HTMLDivElement>(null);
   const busy = state.phase === "previewing";
+  const aiAvailable = availability === "available";
   const mode = MODES.find((entry) => entry.id === state.context.mode)!;
   const Icon = MODE_ICONS[mode.id];
   useEffect(() => {
+    const controller = new AbortController();
+    fetch("/api/chat", {
+      cache: "no-store",
+      signal: AbortSignal.any([controller.signal, AbortSignal.timeout(5000)]),
+    })
+      .then(async (response) => response.ok && (await response.json()).available === true)
+      .then((available) => {
+        if (!controller.signal.aborted) setAvailability(available ? "available" : "disabled");
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) setAvailability("disabled");
+      });
+    return () => controller.abort();
+  }, []);
+  useEffect(() => {
     if (!busy) return;
+    if (aiAvailable && state.pending) {
+      const controller = new AbortController();
+      const history: AIMessage[] = state.messages.map((message) => ({
+        role: message.role === "assistant" ? "assistant" : "user",
+        content: message.text,
+      }));
+      askMinepro(
+        { context: state.pending.context, messages: buildAIHistory(history, state.pending.text) },
+        controller.signal,
+      )
+        .then((answer) => {
+          if (!controller.signal.aborted) dispatch({ type: "complete", answer });
+        })
+        .catch((error: unknown) => {
+          if (!controller.signal.aborted)
+            dispatch({
+              type: "fail",
+              code: error instanceof ChatRequestError ? error.code : "PROVIDER_FAILED",
+            });
+        });
+      return () => controller.abort();
+    }
     // Local preview only: this timer never calls an API or generates an AI answer.
     const timer = window.setTimeout(() => {
       dispatch({ type: failNext ? "fail" : "complete" });
       setFailNext(false);
     }, 300);
     return () => window.clearTimeout(timer);
-  }, [busy, failNext]);
+  }, [busy, failNext, aiAvailable, state.pending, state.messages]);
   useEffect(() => {
-    if (state.messages.length)
-      messages.current?.scrollTo({ top: messages.current.scrollHeight, behavior: "instant" });
-  }, [state.messages.length]);
+    const area = messages.current;
+    if (!area) return;
+    const questions = area.querySelectorAll<HTMLElement>(".local-message:not(.assistant-message)");
+    const target =
+      aiAvailable && busy
+        ? area.querySelector<HTMLElement>(".ai-generating")
+        : questions.item(questions.length - 1);
+    // Keep the current turn in view; the tools below it must not push answers offscreen.
+    if (target)
+      area.scrollTo({
+        top:
+          area.scrollTop +
+          target.getBoundingClientRect().top -
+          area.getBoundingClientRect().top -
+          12,
+        behavior: "instant",
+      });
+  }, [state.messages.length, busy, aiAvailable]);
   function newConversation() {
     dispatch({ type: "new" });
     setDrawer(false);
@@ -58,7 +116,11 @@ export function ChatShell() {
   return (
     <div className="chat-app">
       <aside className="desktop-sidebar" aria-label="Barra lateral">
-        <AppSidebar onNew={newConversation} onSettings={() => setSettings(true)} />
+        <AppSidebar
+          onNew={newConversation}
+          onSettings={() => setSettings(true)}
+          aiAvailable={aiAvailable}
+        />
       </aside>
       <div className="chat-workspace">
         <header className="chat-topbar">
@@ -75,7 +137,8 @@ export function ChatShell() {
             <div>
               <p>SEU ESPAÇO DE IDEIAS</p>
               <h1>
-                Assistente MinePRO <span className="prototype-pill">Protótipo</span>
+                Assistente MinePRO{" "}
+                <span className="prototype-pill">{aiAvailable ? "IA" : "Protótipo"}</span>
               </h1>
             </div>
           </div>
@@ -95,8 +158,12 @@ export function ChatShell() {
         <main id="conteudo" className="chat-main">
           <div className="prototype-notice">
             <ShieldCheck size={17} aria-hidden="true" />
-            <p>
-              Esta é uma demonstração da interface; a IA real será conectada em uma etapa futura.
+            <p aria-live="polite">
+              {availability === "checking"
+                ? "Verificando a disponibilidade da IA…"
+                : aiAvailable
+                  ? "IA pode errar. Confira edição e versão. Não envie dados pessoais ou credenciais."
+                  : "A IA ainda não está ativada. Esta demonstração mantém as mensagens somente nesta página."}
             </p>
           </div>
           <Link
@@ -154,11 +221,19 @@ export function ChatShell() {
                   {state.messages.map((message) => (
                     <ChatMessage key={message.id} message={message} />
                   ))}
-                  <p className="no-ai-answer">
-                    Protótipo: respostas de IA ainda não estão disponíveis.
-                  </p>
+                  {!aiAvailable ? (
+                    <p className="no-ai-answer">
+                      Protótipo: respostas de IA ainda não estão disponíveis.
+                    </p>
+                  ) : null}
                 </section>
               )}
+              {aiAvailable && busy ? (
+                <div className="ai-generating" role="status" aria-live="polite">
+                  <p className="message-body">Você · {state.pending?.text}</p>
+                  <p>MinePRO está preparando sua resposta…</p>
+                </div>
+              ) : null}
               <section className="tools-section" aria-labelledby="tools-title">
                 <div className="tools-heading">
                   <h2 id="tools-title">
@@ -209,15 +284,26 @@ export function ChatShell() {
               {state.notice}
             </div>
             {state.error ? (
-              <p className="composer-error" role="alert">
-                {state.error}
-              </p>
+              <div className="composer-error" role="alert">
+                <p>{state.error}</p>
+                {aiAvailable ? (
+                  <button
+                    type="button"
+                    className="ai-retry"
+                    onClick={() => dispatch({ type: "submit" })}
+                    disabled={busy}
+                  >
+                    Tentar novamente
+                  </button>
+                ) : null}
+              </div>
             ) : null}
             <form
               aria-busy={busy}
               className="chat-composer"
               onSubmit={(event) => {
                 event.preventDefault();
+                if (availability === "checking") return;
                 dispatch({ type: "submit" });
               }}
             >
@@ -243,22 +329,35 @@ export function ChatShell() {
                       !event.nativeEvent.isComposing
                     ) {
                       event.preventDefault();
-                      if (!busy) event.currentTarget.form?.requestSubmit();
+                      if (!busy && availability !== "checking")
+                        event.currentTarget.form?.requestSubmit();
                     }
                   }}
                 />
                 <button
                   type="submit"
                   className="send-button"
-                  disabled={busy || !state.draft.trim()}
-                  aria-label={busy ? "Exibindo mensagem local" : "Enviar mensagem de demonstração"}
+                  disabled={busy || availability === "checking" || !state.draft.trim()}
+                  aria-label={
+                    busy
+                      ? aiAvailable
+                        ? "Gerando resposta"
+                        : "Exibindo mensagem local"
+                      : aiAvailable
+                        ? "Enviar pergunta"
+                        : "Enviar mensagem de demonstração"
+                  }
                 >
                   <ArrowUp size={21} aria-hidden="true" />
                 </button>
               </div>
               <div className="composer-bottom">
                 <p id="composer-help" aria-live="polite">
-                  {busy ? "Exibindo mensagem local…" : "Enter envia · Shift+Enter quebra linha"}
+                  {busy
+                    ? aiAvailable
+                      ? "Preparando resposta…"
+                      : "Exibindo mensagem local…"
+                    : "Enter envia · Shift+Enter quebra linha"}
                 </p>
                 <span id="composer-count">
                   {state.draft.length}/{MESSAGE_LIMIT}
@@ -269,7 +368,9 @@ export function ChatShell() {
               {EDITIONS[state.context.edition].description} ·{" "}
               {state.context.game_version ?? "Versão não informada"}
               <br />
-              Mensagens locais e temporárias. Não envie dados pessoais.
+              {aiAvailable
+                ? "Histórico temporário nesta página. Perguntas são enviadas ao provedor de IA."
+                : "Mensagens locais e temporárias. Não envie dados pessoais."}
             </p>
           </div>
         </main>
@@ -281,6 +382,7 @@ export function ChatShell() {
         drawer
       >
         <AppSidebar
+          aiAvailable={aiAvailable}
           onNew={newConversation}
           onSettings={() => {
             setDrawer(false);
@@ -292,25 +394,34 @@ export function ChatShell() {
       <PrototypeDialog
         open={settings}
         onClose={() => setSettings(false)}
-        title="Configurações da demonstração"
+        title={aiAvailable ? "Preferências da sessão" : "Configurações da demonstração"}
       >
         <p>
           As escolhas de edição, versão e modo permanecem apenas enquanto esta página estiver
           aberta. Não há conta ou histórico salvo.
         </p>
-        <label className="demo-failure-toggle">
-          <input
-            type="checkbox"
-            checked={failNext}
-            disabled={busy}
-            onChange={(event) => setFailNext(event.target.checked)}
-          />
-          Simular falha na próxima mensagem local
-        </label>
-        <p className="small-note">
-          Teste de interface: a falha mantém seu rascunho e permite tentar novamente. Nenhum serviço
-          externo será chamado.
-        </p>
+        {!aiAvailable ? (
+          <label className="demo-failure-toggle">
+            <input
+              type="checkbox"
+              checked={failNext}
+              disabled={busy}
+              onChange={(event) => setFailNext(event.target.checked)}
+            />
+            Simular falha na próxima mensagem local
+          </label>
+        ) : null}
+        {!aiAvailable ? (
+          <p className="small-note">
+            Teste de interface: a falha mantém seu rascunho e permite tentar novamente. Nenhum
+            serviço externo será chamado.
+          </p>
+        ) : (
+          <p>
+            Ao enviar, a pergunta e um contexto curto da sessão são processados pelo provedor de IA.
+            Confira as orientações antes de aplicá-las no jogo.
+          </p>
+        )}
       </PrototypeDialog>
       <PrototypeDialog
         open={!!activeTool}

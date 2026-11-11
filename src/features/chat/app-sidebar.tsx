@@ -14,10 +14,12 @@ export function AppSidebar({
   onNew,
   onSettings,
   onNavigate,
+  aiAvailable = false,
 }: {
   onNew: () => void;
   onSettings: () => void;
   onNavigate?: () => void;
+  aiAvailable?: boolean;
 }) {
   return (
     <div className="sidebar-content">
@@ -31,7 +33,7 @@ export function AppSidebar({
       <nav aria-label="Navegação do assistente">
         <Link href="/chat" aria-current="page" onClick={onNavigate}>
           <MessageSquare size={18} aria-hidden="true" />
-          Assistente<span className="nav-badge">DEMO</span>
+          Assistente<span className="nav-badge">{aiAvailable ? "IA" : "DEMO"}</span>
         </Link>
         <Link href="/projetos" onClick={onNavigate}>
           <BookOpen size={18} aria-hidden="true" />
@@ -47,13 +49,17 @@ export function AppSidebar({
           <History size={14} aria-hidden="true" />
           CONVERSAS
         </p>
-        <p>Suas conversas aparecerão aqui quando o histórico estiver disponível.</p>
+        <p>
+          {aiAvailable
+            ? "A conversa atual fica nesta página e é descartada ao sair ou recarregar."
+            : "Suas conversas aparecerão aqui quando o histórico estiver disponível."}
+        </p>
         <span>Somente nesta página, por enquanto.</span>
       </div>
       <div className="sidebar-bottom">
         <button type="button" onClick={onSettings}>
           <Settings2 size={17} aria-hidden="true" />
-          Configurações da demonstração
+          {aiAvailable ? "Preferências da sessão" : "Configurações da demonstração"}
         </button>
         <Link href="/status" onClick={onNavigate}>
           Estado do MinePRO

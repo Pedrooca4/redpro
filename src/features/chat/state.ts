@@ -1,7 +1,14 @@
 import { isGameVersion, type MinecraftContext, type Edition, type Mode } from "./config.ts";
+import { AI_ERRORS, type AIErrorCode, type AIReply } from "./ai-contract.ts";
 
 export const MESSAGE_LIMIT = 4000;
-export type LocalMessage = { id: number; text: string; context: MinecraftContext };
+export type LocalMessage = {
+  id: number;
+  text: string;
+  context: MinecraftContext;
+  role?: "user" | "assistant";
+  truncated?: boolean;
+};
 export type ChatState = {
   context: MinecraftContext;
   draft: string;
@@ -29,8 +36,8 @@ export type ChatAction =
   | { type: "mode"; value: Mode }
   | { type: "prepare"; text: string; mode: Mode }
   | { type: "submit" }
-  | { type: "complete" }
-  | { type: "fail" }
+  | { type: "complete"; answer?: AIReply }
+  | { type: "fail"; code?: AIErrorCode }
   | { type: "new" };
 
 export function chatReducer(state: ChatState, action: ChatAction): ChatState {
@@ -102,20 +109,40 @@ export function chatReducer(state: ChatState, action: ChatAction): ChatState {
       if (!state.pending) return state;
       return {
         ...state,
-        messages: [...state.messages, { ...state.pending, id: state.messages.length + 1 }],
+        messages: [
+          ...state.messages,
+          {
+            ...state.pending,
+            id: state.messages.length + 1,
+            ...(action.answer ? { role: "user" as const } : {}),
+          },
+          ...(action.answer
+            ? [
+                {
+                  id: state.messages.length + 2,
+                  text: action.answer.text,
+                  context: state.pending.context,
+                  role: "assistant" as const,
+                  truncated: action.answer.truncated,
+                },
+              ]
+            : []),
+        ],
         pending: null,
         draft: "",
         phase: "idle",
-        notice:
-          "Mensagem exibida apenas nesta página. Nenhuma pergunta foi enviada a uma IA ou salva no servidor.",
+        notice: action.answer
+          ? "Resposta recebida da IA. O histórico desta sessão fica apenas nesta página."
+          : "Mensagem exibida apenas nesta página. Nenhuma pergunta foi enviada a uma IA ou salva no servidor.",
       };
     case "fail":
       return {
         ...state,
         pending: null,
         phase: "error",
-        error:
-          "Falha de demonstração: não foi possível concluir agora. Sua mensagem foi preservada. Tente novamente.",
+        error: action.code
+          ? AI_ERRORS[action.code]
+          : "Falha de demonstração: não foi possível concluir agora. Sua mensagem foi preservada. Tente novamente.",
       };
   }
 }

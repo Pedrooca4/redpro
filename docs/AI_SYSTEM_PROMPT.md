@@ -2,7 +2,7 @@
 
 Fonte: seção 8 de MinePRO 04 Arquitetura da IA, revisão de 29/10/2026.
 
-Estado: referência versionada para integração futura; não conectada a um modelo. As 15 instruções abaixo são transcritas integralmente do documento oficial.
+Estado: referência utilizada pelo adapter HTTP do assistente, com teste de igualdade em `tests/ai-chat.test.ts`. A integração permanece desativada por padrão e ainda não foi validada com um modelo real. As 15 instruções abaixo são transcritas integralmente do documento oficial.
 
 USO O texto abaixo é o prompt de sistema de referência para futura integração. Ele não confere capacidade de tool calling, RAG ou busca sem código no servidor. Informações como edition/version/mode chegam por contexto validado da aplicação, não por afirmações arbitrárias do modelo.
 

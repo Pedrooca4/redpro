@@ -1,6 +1,6 @@
 # ADR-004 LLM por gateway e adapters
 
-Estado: aceita como arquitetura planejada; não implementada.
+Estado: fronteira de gateway implementada para o MVP, com ativação pendente.
 
 ## Contexto e decisão
 
@@ -14,4 +14,6 @@ Não treinar modelo do zero no MVP. RAG/ferramentas especializam um modelo via A
 
 ## Estado real
 
-Nenhuma chamada de IA, prompt operacional, retrieval, corpus, avaliação ou resposta de chat está implementada. A RED-043 inicia o gateway; etapas seguintes implementam provedor, contrato, orquestração e RAG. Não há fontes de vídeo automaticamente conectadas ou farms validadas.
+`src/server/ai` prepara o gateway HTTP, o prompt oficial, a validação de contexto e o controle persistente de admissão. O adapter usa Chat Completions do Vercel AI Gateway por `fetch`, sem SDK ou dependência adicional. O domínio e os componentes React não importam credenciais ou configuração privada.
+
+A ativação continua pendente de credenciais, orçamento e provisionamento autorizado da proteção persistente. Testes de provedor usam mocks. Retrieval, corpus, RAG, ferramentas e avaliação factual com modelo real continuam pendentes. Nenhuma tarefa do backlog é declarada integralmente concluída por esta entrega. Consulte `docs/AI_CHAT.md`.
