@@ -12,6 +12,7 @@ for (const [path, expectedStatus, text] of [
   ["/", 200, "Seis modos. Seu mundo inteiro."],
   ["/status", 200, "AINDA NÃO DISPONÍVEL"],
   ["/chat", 200, "Assistente MinePRO"],
+  ["/ferramentas/materiais", 200, "Calculadora de materiais"],
   ["/projetos", 200, "ainda não há projetos publicados"],
   ["/comunidade", 200, "ainda não há publicações"],
   ["/rota-inexistente-minepro", 404, "Este bloco"],

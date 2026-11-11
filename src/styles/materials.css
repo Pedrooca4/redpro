@@ -1,0 +1,269 @@
+.materials-page {
+  padding-block: clamp(24px, 4vw, 52px) 64px;
+}
+.materials-page .back-link {
+  min-height: 44px;
+  margin-bottom: 16px;
+}
+.materials-intro {
+  display: flex;
+  align-items: flex-start;
+  gap: clamp(12px, 3vw, 24px);
+  padding: clamp(16px, 4vw, 32px);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  background:
+    repeating-linear-gradient(90deg, #a3f7a608 0 1px, transparent 1px 28px),
+    repeating-linear-gradient(0deg, #a3f7a608 0 1px, transparent 1px 28px),
+    linear-gradient(105deg, var(--color-elevated), var(--color-panel));
+}
+.materials-mark {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  flex: 0 0 auto;
+  border-radius: var(--radius-md);
+  background: var(--color-action);
+  color: var(--color-background);
+  box-shadow: 4px 4px 0 var(--color-accent-deep);
+}
+.materials-intro h1 {
+  margin-block: 6px 8px;
+  font-size: clamp(1.65rem, 5vw, 3rem);
+  overflow-wrap: anywhere;
+}
+.materials-intro p:last-child,
+.materials-local,
+.material-note,
+.material-copy-status {
+  color: var(--color-secondary);
+}
+.materials-local {
+  padding-block: 14px 20px;
+  font-size: var(--text-sm);
+}
+.material-workbench {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.material-panel {
+  display: grid;
+  align-content: start;
+  gap: 16px;
+  min-width: 0;
+  padding: clamp(15px, 3vw, 24px);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-panel);
+}
+.material-panel h2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--text-lg);
+  letter-spacing: -0.02em;
+}
+.material-panel h2 svg {
+  flex-shrink: 0;
+  color: var(--color-soft);
+}
+.material-form,
+.material-fields,
+.material-field {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+.material-fields {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 115px), 1fr));
+}
+.material-field {
+  gap: 5px;
+  font-size: var(--text-sm);
+}
+.material-field label {
+  font-weight: 650;
+}
+.material-field :is(input, select, textarea) {
+  width: 100%;
+  min-width: 0;
+  min-height: 46px;
+  padding: 8px 10px;
+  border: 1px solid #536b5c;
+  border-radius: var(--radius-sm);
+  background: var(--color-background);
+  color: var(--color-foreground);
+  font-size: var(--text-base);
+}
+.material-field select {
+  appearance: auto;
+}
+.material-field :is(input, select, textarea):focus-visible {
+  outline: 2px solid var(--color-action);
+  outline-offset: 2px;
+}
+.material-field :is(input, select)[aria-invalid="true"] {
+  border-color: var(--color-error);
+}
+.material-field textarea {
+  resize: vertical;
+}
+.material-formula,
+.material-note,
+.material-error,
+.material-copy-status {
+  font-size: var(--text-sm);
+  overflow-wrap: anywhere;
+}
+.material-formula {
+  color: var(--color-soft);
+  font-family: var(--font-mono);
+}
+.material-error {
+  color: var(--color-error);
+}
+.material-panel .button {
+  min-width: 0;
+  min-height: 44px;
+  height: auto;
+  width: fit-content;
+  max-width: 100%;
+  gap: 8px;
+  padding: 8px 12px;
+  white-space: normal;
+  text-align: left;
+  cursor: pointer;
+}
+.material-panel .button svg {
+  flex-shrink: 0;
+}
+.material-panel .button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+.material-secondary {
+  border: 1px solid #536b5c;
+  background: var(--color-elevated);
+  color: var(--color-foreground);
+}
+.material-secondary:hover:not(:disabled) {
+  border-color: var(--color-soft);
+}
+.material-estimate,
+.material-conversion {
+  padding: 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-background);
+}
+.material-estimate {
+  color: var(--color-secondary);
+  overflow-wrap: anywhere;
+}
+.material-estimate strong {
+  color: var(--color-action);
+  font: 700 clamp(1.25rem, 4vw, 1.85rem) var(--font-mono);
+}
+.material-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+.material-metrics div {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.material-metrics dt {
+  color: var(--color-secondary);
+  font-size: var(--text-xs);
+}
+.material-metrics dd {
+  color: var(--color-foreground);
+  font: 700 var(--text-base) var(--font-mono);
+  line-height: 1.4;
+}
+.material-inventory {
+  margin-top: 16px;
+}
+.material-inventory-heading,
+.material-actions,
+.material-list-totals {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  align-items: center;
+}
+.material-inventory-heading {
+  justify-content: space-between;
+}
+.material-inventory-heading .material-note {
+  margin-top: 5px;
+}
+.material-list-totals {
+  color: var(--color-secondary);
+  overflow-wrap: anywhere;
+}
+.material-list-totals strong {
+  color: var(--color-soft);
+  font-family: var(--font-mono);
+}
+.material-copy-status:empty {
+  position: absolute;
+}
+.material-list {
+  display: grid;
+  gap: 8px;
+  list-style: none;
+}
+.material-list > li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 2.15fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-background);
+}
+.material-item-info {
+  overflow-wrap: anywhere;
+}
+.material-item-info h3 {
+  font-size: var(--text-base);
+  letter-spacing: normal;
+}
+.material-item-info p,
+.material-empty {
+  color: var(--color-secondary);
+  font-size: var(--text-sm);
+}
+.material-empty {
+  padding: 18px;
+  border: 1px dashed #536b5c;
+  border-radius: var(--radius-md);
+}
+
+@media (max-width: 870px) {
+  .material-list > li {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@media (max-width: 700px) {
+  .material-workbench {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@media (max-width: 430px) {
+  .materials-mark {
+    width: 39px;
+    height: 39px;
+  }
+  .materials-mark svg {
+    width: 23px;
+  }
+  .material-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

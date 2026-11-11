@@ -290,6 +290,43 @@ summary:focus-visible {
   flex-shrink: 0;
   color: var(--color-action);
 }
+.chat-calculator-link {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 12px;
+  min-height: 64px;
+  margin: 12px clamp(12px, 3vw, 32px);
+  padding: 10px 14px;
+  border: 1px solid var(--color-accent-deep);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-soft);
+}
+.chat-calculator-link > span {
+  min-width: 0;
+  flex: 1;
+}
+.chat-calculator-link strong,
+.chat-calculator-link span span {
+  display: block;
+}
+.chat-calculator-link strong {
+  font-size: var(--text-sm);
+  font-weight: 650;
+}
+.chat-calculator-link span span {
+  margin-top: 3px;
+  font-size: 11px;
+  color: var(--color-secondary);
+}
+.chat-calculator-link svg {
+  flex-shrink: 0;
+}
+.chat-calculator-link:hover {
+  background: var(--color-elevated);
+  border-color: var(--color-action);
+}
 .chat-scroll {
   flex: 1;
   min-height: 0;
@@ -420,11 +457,12 @@ summary:focus-visible {
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 8px;
 }
-.tool-grid button {
+.tool-grid :is(button, a) {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 8px;
+  min-height: 44px;
   padding: 12px;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
@@ -433,7 +471,20 @@ summary:focus-visible {
   font-size: var(--text-xs);
   text-align: left;
 }
-.tool-grid button:hover {
+.tool-grid .tool-available {
+  color: var(--color-soft);
+  border-color: var(--color-accent-deep);
+}
+.tool-grid small {
+  display: block;
+  margin-top: 4px;
+  font-size: 10px;
+  line-height: 1.5;
+}
+.tool-grid .tool-available small {
+  color: var(--color-action);
+}
+.tool-grid :is(button, a):hover {
   background: var(--color-elevated);
   color: var(--color-foreground);
 }
@@ -855,6 +906,12 @@ summary:focus-visible {
   }
 }
 @media (max-height: 600px) {
+  .chat-app {
+    min-height: 580px;
+  }
+  .chat-calculator-link {
+    margin-block: 8px;
+  }
   .chat-topbar {
     padding-block: 8px;
   }

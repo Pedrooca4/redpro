@@ -1,9 +1,11 @@
 "use client";
+import Link from "next/link";
 import { useEffect, useReducer, useRef, useState } from "react";
 import {
   ArrowUp,
   ArrowUpRight,
   Blocks,
+  Calculator,
   ChevronRight,
   Menu,
   ShieldCheck,
@@ -22,7 +24,10 @@ export function ChatShell() {
   const [drawer, setDrawer] = useState(false);
   const [settings, setSettings] = useState(false);
   const [failNext, setFailNext] = useState(false);
-  const [activeTool, setActiveTool] = useState<(typeof TOOLS)[number] | null>(null);
+  const [activeTool, setActiveTool] = useState<Exclude<
+    (typeof TOOLS)[number],
+    { href: string }
+  > | null>(null);
   const textarea = useRef<HTMLTextAreaElement>(null);
   const messages = useRef<HTMLDivElement>(null);
   const busy = state.phase === "previewing";
@@ -94,6 +99,19 @@ export function ChatShell() {
               Esta é uma demonstração da interface; a IA real será conectada em uma etapa futura.
             </p>
           </div>
+          <Link
+            className="chat-calculator-link"
+            href="/ferramentas/materiais"
+            aria-label="Abrir Calculadora de materiais"
+            aria-describedby="calculator-availability"
+          >
+            <Calculator size={23} aria-hidden="true" />
+            <span>
+              <strong>Calculadora de materiais</strong>
+              <span id="calculator-availability">Disponível · blocos, stacks e slots</span>
+            </span>
+            <ArrowUpRight size={19} aria-hidden="true" />
+          </Link>
           <div className="chat-scroll" ref={messages} tabIndex={0} aria-label="Área de mensagens">
             <div className="chat-content">
               {state.messages.length === 0 ? (
@@ -147,20 +165,41 @@ export function ChatShell() {
                     <Wrench size={16} aria-hidden="true" />
                     Sua bancada de ferramentas
                   </h2>
-                  <span>Em desenvolvimento</span>
+                  <span>1 disponível · 5 prévias</span>
                 </div>
                 <div className="tool-grid">
-                  {TOOLS.map((tool) => (
-                    <button
-                      type="button"
-                      key={tool.id}
-                      disabled={busy}
-                      onClick={() => setActiveTool(tool)}
-                    >
-                      <span>{tool.name}</span>
-                      <ChevronRight size={15} aria-hidden="true" />
-                    </button>
-                  ))}
+                  {TOOLS.map((tool) =>
+                    "href" in tool ? (
+                      <Link
+                        key={tool.id}
+                        href={tool.href}
+                        className="tool-available"
+                        aria-label={tool.name}
+                        aria-describedby={`tool-${tool.id}-state`}
+                      >
+                        <span>
+                          {tool.name}
+                          <small id={`tool-${tool.id}-state`}>Disponível</small>
+                        </span>
+                        <ChevronRight size={15} aria-hidden="true" />
+                      </Link>
+                    ) : (
+                      <button
+                        type="button"
+                        key={tool.id}
+                        aria-label={tool.name}
+                        aria-describedby={`tool-${tool.id}-state`}
+                        disabled={busy}
+                        onClick={() => setActiveTool(tool)}
+                      >
+                        <span>
+                          {tool.name}
+                          <small id={`tool-${tool.id}-state`}>Prévia · ainda não executa</small>
+                        </span>
+                        <ChevronRight size={15} aria-hidden="true" />
+                      </button>
+                    ),
+                  )}
                 </div>
               </section>
             </div>
