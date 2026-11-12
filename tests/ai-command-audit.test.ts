@@ -91,6 +91,53 @@ test("não conta comandos desaconselhados ou ilustrativos como recomendações",
   );
 });
 
+test("mantém o rótulo do exemplo e dá precedência à correção explícita", () => {
+  const examples = [
+    "Exemplo incorreto: primeiro, use `/weather clear`.",
+    "Exemplo: primeiro use `/weather clear`.",
+    "Comando correto: não use `/weather clear` neste caso.",
+    "```mcfunction\n/weather clear\n```\n\nNão use esse comando.",
+  ];
+  for (const text of examples) {
+    const result = assessCommands(text, expected);
+    assert.equal(result.referenceParametersMatch, true, text);
+    assert.equal(result.recommendedReferencePresent, false, text);
+  }
+  const correction = "Exemplo incorreto:\n- `/weather rain`\nComando correto: `/weather clear`.";
+  const result = assessCommands(correction, expected);
+  assert.deepEqual(
+    result.mentions.map((item) => item.presentation),
+    ["discouraged", "presented"],
+  );
+  assert.equal(result.recommendedReferencePresent, true);
+
+  const conditional = "```\n/weather clear\n```\nNão use esse comando sem permissão.";
+  assert.equal(assessCommands(conditional, expected).recommendedReferencePresent, true);
+});
+
+test("reconhece pontuação de prosa e mantém o namespace e argumentos em código", () => {
+  const examples = [
+    "Use /weather clear — para limpar o clima.",
+    "Use /weather clear (sem alterar o horário).",
+    "Use /weather clear: o horário é preservado.",
+  ];
+  for (const text of examples) {
+    const result = assessCommands(text, expected);
+    assert.equal(result.mentions[0]?.text, expected, text);
+    assert.equal(result.recommendedReferencePresent, true, text);
+  }
+  const give = "/give @s minecraft:stone 3";
+  assert.equal(
+    assessCommands(`Use ${give}: entrega as pedras.`, give).recommendedReferencePresent,
+    true,
+  );
+  assert.equal(
+    assessCommands("Use `/weather clear — texto dentro do código`.", expected)
+      .referenceParametersMatch,
+    false,
+  );
+});
+
 test("reavalia respostas arquivadas da 3B e mantém a nota histórica vinculada ao texto", async () => {
   const result = await replayCommandAudit(archive);
   const [base, rag] = result.runs;
