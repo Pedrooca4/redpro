@@ -11,18 +11,22 @@ const java = { edition: "Java", version: "1.21.5" };
 const bedrock = { edition: "Bedrock", version: "1.21.80" };
 const region = { from: ["-8", "70", "4"], to: ["-6", "72", "7"], block: "glass" };
 
-test("mede a bateria nova e registra as abstenções ainda sem cobertura", async () => {
+test("mantém os 65 contratos de desenvolvimento da 3E-D", async () => {
   const result = await measureRobustness();
   assert.equal(result.total.total, 65);
+  assert.equal(result.total.covered, 50);
   assert.equal(result.total.falsePositives, 0);
-  assert.deepEqual(
-    result.mismatches.map(({ id, actual }) => [id, actual]),
-    [
-      ["W29", "outside-scope"],
-      ["W30", "outside-scope"],
-      ["F32", "outside-scope"],
-    ],
-  );
+  assert.equal(result.total.falseNegatives, 0);
+  assert.deepEqual(result.mismatches, []);
+});
+
+test("verifica as paráfrases e os limites com a bateria de desenvolvimento da 3E-E", async () => {
+  const result = await measureRobustness(undefined, undefined, "3ee");
+  assert.equal(result.total.total, 38);
+  assert.equal(result.total.covered, 21);
+  assert.equal(result.total.falsePositives, 0);
+  assert.equal(result.total.falseNegatives, 0);
+  assert.deepEqual(result.mismatches, []);
 });
 
 test("interpreta clima em PT-BR e preserva o horário em Java e Bedrock", () => {
