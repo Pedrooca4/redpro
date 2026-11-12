@@ -4,11 +4,26 @@ import test from "node:test";
 
 import { resolveQuestion } from "../scripts/ai-command-validation/questions.ts";
 import { replayValidation } from "../scripts/ai-command-validation/replay.ts";
+import { measureRobustness } from "../scripts/ai-command-validation/robustness.ts";
 import { validateCandidate, validateIntent } from "../scripts/ai-command-validation/validate.ts";
 
 const java = { edition: "Java", version: "1.21.5" };
 const bedrock = { edition: "Bedrock", version: "1.21.80" };
 const region = { from: ["-8", "70", "4"], to: ["-6", "72", "7"], block: "glass" };
+
+test("mede a bateria nova e registra as abstenções ainda sem cobertura", async () => {
+  const result = await measureRobustness();
+  assert.equal(result.total.total, 65);
+  assert.equal(result.total.falsePositives, 0);
+  assert.deepEqual(
+    result.mismatches.map(({ id, actual }) => [id, actual]),
+    [
+      ["W29", "outside-scope"],
+      ["W30", "outside-scope"],
+      ["F32", "outside-scope"],
+    ],
+  );
+});
 
 test("interpreta clima em PT-BR e preserva o horário em Java e Bedrock", () => {
   const examples = [
@@ -37,7 +52,7 @@ test("interpreta clima em PT-BR e preserva o horário em Java e Bedrock", () => 
   assert.equal(validateCandidate(bedrock, "/weather rain 15s").status, "invalid");
   assert.equal(validateCandidate(bedrock, "/weather rain 1000001").status, "invalid");
   assert.equal(validateCandidate(bedrock, "/weather query 0").status, "invalid");
-  assert.equal(validateCandidate(java, "/weather clear 10s").status, "outside-scope");
+  assert.equal(validateCandidate(java, "/weather clear 10s").status, "ready");
   assert.equal(validateCandidate(java, "/weather reset").status, "invalid");
 });
 

@@ -29,6 +29,7 @@ const modes: Record<FillMode, string> = {
 const blocks = new Set(["stone", "cobblestone", "glass", "dirt", "oak_planks", "air"]);
 const itemOnly = new Set(["stick", "diamond_sword", "apple"]);
 const integer = /^-?\d{1,8}$/u;
+const javaDuration = /^(\d+(?:\.\d*)?|\.\d+)([dst]?)$/u;
 // A development guardrail. Java's actual command limit can be configured in the world.
 const MAX_REGION = 32_768;
 
@@ -48,6 +49,18 @@ function blockId(value: string) {
   return value.startsWith("minecraft:") ? value.slice("minecraft:".length) : value;
 }
 
+function weatherDuration(edition: string, duration: string) {
+  if (edition === "Bedrock") {
+    return /^\d+$/u.test(duration) && Number(duration) <= 1_000_000 ? Number(duration) : null;
+  }
+  const match = javaDuration.exec(duration);
+  if (!match) return null;
+  const unit = match[2] === "d" ? 24_000 : match[2] === "s" ? 20 : 1;
+  // Java parses a float and rounds the result in game ticks.
+  const ticks = Math.round(Math.fround(Math.fround(Number(match[1])) * unit));
+  return ticks >= 1 && ticks <= 2_147_483_647 ? ticks : null;
+}
+
 export function validateIntent(context: CommandContext, intent: CommandIntent): CommandResult {
   const { edition, version } = context;
   if (edition != null && edition !== "Java" && edition !== "Bedrock")
@@ -62,35 +75,38 @@ export function validateIntent(context: CommandContext, intent: CommandIntent): 
     const { state, duration } = intent;
     if (!state) fields.push("clima desejado");
     if (fields.length) return problem("clarify", fields, `Informe ${fields.join(", ")}.`);
-    if (
-      !state ||
-      !states.has(state) ||
-      (state === "query" && (edition !== "Bedrock" || duration !== undefined))
-    ) {
+    if (!state || !states.has(state) || (state === "query" && edition !== "Bedrock")) {
       return problem(
         "invalid",
         ["clima"],
         "O estado ou a consulta é incompatível com essa edição.",
       );
     }
+    if (state === "query" && duration !== undefined) {
+      return problem("invalid", ["duração"], "A consulta de clima no Bedrock não aceita duração.");
+    }
+    let timing = "";
     if (duration !== undefined) {
-      if (edition === "Bedrock" && (!/^\d{1,7}$/u.test(duration) || Number(duration) > 1_000_000)) {
+      const ticks = weatherDuration(edition ?? "", duration);
+      if (ticks === null) {
         return problem(
           "invalid",
           ["duração"],
-          "No Bedrock, a duração deste comando deve ser um inteiro de 0 a 1.000.000 ticks.",
+          edition === "Bedrock"
+            ? "No Bedrock, a duração deste comando deve ser um inteiro de 0 a 1.000.000 ticks."
+            : "No Java, informe uma duração representável de pelo menos um tick. As unidades são t, s e d.",
         );
       }
-      if (edition === "Java")
-        return outside(
-          "Duração explícita no Java exige validação das unidades e fica fora do protótipo.",
-        );
+      timing =
+        ticks === 0
+          ? " No Bedrock, zero usa a duração padrão aleatória."
+          : ` Duração configurada em ${ticks} ticks.`;
     }
     const command = `/weather ${state}${duration === undefined ? "" : ` ${duration}`}`;
     const message =
       state === "query"
         ? "Consulta o clima atual e preserva o horário."
-        : `Altera o clima e preserva o horário. ${state === "thunder" ? "A tempestade pode produzir raios. " : ""}O ciclo de clima continua conforme as regras do mundo.`;
+        : `Altera o clima e preserva o horário.${timing} ${state === "thunder" ? "A tempestade pode produzir raios. " : ""}O ciclo de clima continua conforme as regras do mundo.`;
     return { status: "ready", command, message };
   }
 
@@ -157,7 +173,10 @@ export function validateIntent(context: CommandContext, intent: CommandIntent): 
       "O modo keep com ar não preenche a região. Informe outro bloco.",
     );
   }
-  if (intent.preserveExisting && (mode !== "keep" || id === "air")) {
+  if (edition === "Bedrock" && mode === "destroy" && id === "air") {
+    return outside("O comportamento de destroy com ar no Bedrock precisa ser confirmado em jogo.");
+  }
+  if (intent.preserveExisting && mode !== "keep") {
     return problem(
       "caution",
       ["modo"],
@@ -192,15 +211,26 @@ export function validateIntent(context: CommandContext, intent: CommandIntent): 
 }
 
 export function validateCandidate(context: CommandContext, text: string): CommandResult {
-  const [name, ...args] = text.trim().split(/\s+/u);
+  const candidate = text.trim();
+  if (/[\r\n]/u.test(candidate)) {
+    return problem("invalid", ["comando"], "Forneça um único comando em uma linha.");
+  }
+  const [name, ...args] = candidate.split(/[\t ]+/u);
   if (name === "/weather") {
     if (args.length > 2)
       return problem("invalid", ["parâmetros"], "Parâmetros extras no comando de clima.");
     return validateIntent(context, { command: "weather", state: args[0], duration: args[1] });
   }
   if (name !== "/fill") return outside("Comando fora do protótipo.");
-  if (/[\[\]{}#]/u.test(text) || (args.length > 8 && args[7] === "replace")) {
+  if (/[\[\]{}#]/u.test(args.join(" ")) || (args.length > 8 && args[7] === "replace")) {
     return outside("Estados, tags, NBT e filtros de substituição exigem validação própria.");
+  }
+  if (context.edition === "Bedrock" && args.length >= 8 && /^-?\d+$/u.test(args[7])) {
+    return problem(
+      "invalid",
+      ["estado de bloco"],
+      "O Bedrock 1.21.80 usa estados de bloco no lugar do valor numérico legado.",
+    );
   }
   if (args.length < 7 || args.length > 8) {
     return problem(
