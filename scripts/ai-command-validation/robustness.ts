@@ -5,6 +5,8 @@ import { fileURLToPath } from "node:url";
 import { resolveQuestion } from "./questions.ts";
 import { type CommandContext, type CommandResult, validateCandidate } from "./validate.ts";
 
+type DevelopmentSuite = "3ed" | "3ee";
+
 type Example = {
   id: string;
   edition: string | null;
@@ -20,8 +22,9 @@ type Example = {
 export async function measureRobustness(
   question: (context: CommandContext, text: string) => CommandResult = resolveQuestion,
   candidate: (context: CommandContext, text: string) => CommandResult = validateCandidate,
+  suite: DevelopmentSuite = "3ed",
 ) {
-  const path = new URL("../../tests/fixtures/command-validation-3ed.json", import.meta.url);
+  const path = new URL(`../../tests/fixtures/command-validation-${suite}.json`, import.meta.url);
   const examples = JSON.parse(await readFile(path, "utf8")) as Example[];
   const rows = examples.map((item) => {
     const context = {
@@ -85,5 +88,9 @@ export async function measureRobustness(
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
-  process.stdout.write(`${JSON.stringify(await measureRobustness(), null, 2)}\n`);
+  const suite = process.argv[2] ?? "3ed";
+  if (suite !== "3ed" && suite !== "3ee") throw new Error("Use a bateria 3ed ou 3ee.");
+  process.stdout.write(
+    `${JSON.stringify(await measureRobustness(undefined, undefined, suite), null, 2)}\n`,
+  );
 }

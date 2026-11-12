@@ -9,6 +9,7 @@ export type CommandIntent =
       block?: string;
       mode?: string;
       preserveExisting?: boolean;
+      preserveInterior?: boolean;
       acceptDestructive?: boolean;
     };
 
@@ -22,7 +23,8 @@ const states = new Set(["clear", "rain", "thunder", "query"]);
 const modes: Record<FillMode, string> = {
   replace: "Pode substituir todos os blocos da região, inclusive construções.",
   keep: "Preenche apenas o ar, preservando os blocos existentes.",
-  outline: "Pode substituir os blocos da borda e preserva o interior.",
+  outline:
+    "Pode substituir os blocos da borda e preserva o interior. A borda inclui todas as faces da região, inclusive topo e base.",
   hollow: "Substitui a borda e esvazia o interior.",
   destroy: "Quebra os blocos existentes e pode gerar itens soltos antes de preencher.",
 };
@@ -106,7 +108,7 @@ export function validateIntent(context: CommandContext, intent: CommandIntent): 
     const message =
       state === "query"
         ? "Consulta o clima atual e preserva o horário."
-        : `Altera o clima e preserva o horário.${timing} ${state === "thunder" ? "A tempestade pode produzir raios. " : ""}O ciclo de clima continua conforme as regras do mundo.`;
+        : `Altera o clima e preserva o horário.${timing} ${state === "thunder" ? "A tempestade pode produzir raios. " : ""}O ciclo de clima continua conforme as regras do mundo.${state === "clear" ? " Nuvens gráficas dependem das configurações de vídeo." : ""}`;
     return { status: "ready", command, message };
   }
 
@@ -183,10 +185,15 @@ export function validateIntent(context: CommandContext, intent: CommandIntent): 
       "Para preservar os blocos existentes, indique um bloco sólido e use o modo keep.",
     );
   }
-  const volume = from.reduce(
-    (size, value, i) => size * (Math.abs(Number(value) - Number(to[i])) + 1),
-    1,
-  );
+  const dimensions = from.map((value, i) => Math.abs(Number(value) - Number(to[i])) + 1);
+  if (intent.preserveInterior && mode === "outline" && dimensions.some((size) => size < 3)) {
+    return problem(
+      "caution",
+      ["coordenadas"],
+      "Com menos de três blocos em algum eixo, todo bloco pertence à borda. O modo outline não deixaria interior protegido.",
+    );
+  }
+  const volume = dimensions.reduce((size, length) => size * length, 1);
   if (volume > MAX_REGION) {
     return problem(
       "caution",

@@ -1,0 +1,260 @@
+[
+  {
+    "id": "E01",
+    "edition": "Java",
+    "question": "Como posso retirar as nuvens do céu?",
+    "status": "ready",
+    "command": "/weather clear",
+    "message": "Nuvens gráficas dependem das configurações de vídeo."
+  },
+  {
+    "id": "E02",
+    "edition": "Bedrock",
+    "question": "No Bedrock 1.21.80, deixe o céu sem nuvens, por favor.",
+    "status": "ready",
+    "command": "/weather clear",
+    "message": "Nuvens gráficas dependem das configurações de vídeo."
+  },
+  {
+    "id": "E03",
+    "edition": "Java",
+    "question": "Gostaria de deixar o céu sem nuvens, preservando o relógio.",
+    "status": "ready",
+    "command": "/weather clear",
+    "message": "Nuvens gráficas dependem das configurações de vídeo."
+  },
+  {
+    "id": "E04",
+    "edition": "Java",
+    "question": "Não quero deixar o céu sem nuvens.",
+    "status": "outside-scope"
+  },
+  {
+    "id": "E05",
+    "edition": "Bedrock",
+    "question": "Deixe o céu sem nuvens e faça anoitecer.",
+    "status": "outside-scope"
+  },
+  {
+    "id": "E06",
+    "edition": "Java",
+    "question": "Quero tirar as nuvens do céu só nas configurações gráficas.",
+    "status": "outside-scope"
+  },
+  {
+    "id": "E07",
+    "edition": "Bedrock",
+    "question": "Como está o tempo agora?",
+    "status": "ready",
+    "command": "/weather query"
+  },
+  {
+    "id": "E08",
+    "edition": "Bedrock",
+    "question": "Confira a condição atual do clima, por favor.",
+    "status": "ready",
+    "command": "/weather query"
+  },
+  {
+    "id": "E09",
+    "edition": "Bedrock",
+    "question": "Quero saber o tempo atual, agora, por favor.",
+    "status": "ready",
+    "command": "/weather query"
+  },
+  {
+    "id": "E10",
+    "edition": "Java",
+    "question": "Qual é a condição atual do clima?",
+    "status": "invalid",
+    "fields": ["clima"]
+  },
+  {
+    "id": "E11",
+    "edition": null,
+    "version": null,
+    "question": "Dá para checar a condição atual do clima?",
+    "status": "clarify",
+    "fields": ["edição", "versão exata"]
+  },
+  {
+    "id": "E12",
+    "edition": "Bedrock",
+    "question": "Não consulte a condição do tempo atual.",
+    "status": "outside-scope"
+  },
+  {
+    "id": "E13",
+    "edition": "Bedrock",
+    "question": "Confira a condição do tempo e depois faça chover.",
+    "status": "outside-scope"
+  },
+  {
+    "id": "E14",
+    "edition": "Bedrock",
+    "question": "Quero ver o tempo de jogo agora.",
+    "status": "outside-scope"
+  },
+  {
+    "id": "E15",
+    "edition": "Bedrock",
+    "question": "Quero ver o tempo.",
+    "status": "outside-scope"
+  },
+  {
+    "id": "E16",
+    "edition": "Bedrock",
+    "question": "Como deixar o céu sem nuvens ou só consultar o clima?",
+    "status": "outside-scope"
+  },
+  {
+    "id": "E17",
+    "edition": "Bedrock",
+    "question": "Se o céu tiver nuvens, deixe o céu sem nuvens.",
+    "status": "outside-scope"
+  },
+  {
+    "id": "E18",
+    "edition": "Java",
+    "question": "Quero revestir só a borda da região com vidro, mantendo o interior.",
+    "status": "clarify",
+    "fields": ["primeiro canto XYZ", "segundo canto XYZ"]
+  },
+  {
+    "id": "E19",
+    "edition": "Bedrock",
+    "question": "Cubra somente a beirada da área com pedra; canto inicial: -8 70 4.",
+    "status": "clarify",
+    "fields": ["segundo canto XYZ"]
+  },
+  {
+    "id": "E20",
+    "edition": "Java",
+    "question": "Preencha apenas o contorno do volume com vidro, sem alterar o interior; primeiro canto: -8 70 4; segundo canto: -6 72 7.",
+    "status": "ready",
+    "command": "/fill -8 70 4 -6 72 7 minecraft:glass outline",
+    "message": "inclusive topo e base"
+  },
+  {
+    "id": "E21",
+    "edition": "Bedrock",
+    "question": "Revestir a borda da área; bloco de destino: pedregulho; modo: outline; primeiro canto: -8 70 4; segundo canto: -6 72 7.",
+    "status": "ready",
+    "command": "/fill -8 70 4 -6 72 7 minecraft:cobblestone outline"
+  },
+  {
+    "id": "E22",
+    "edition": "Java",
+    "question": "Cubra a borda da região; primeiro canto: -8 70 4; segundo canto: -6 72 7.",
+    "status": "clarify",
+    "fields": ["ID do bloco de destino"]
+  },
+  {
+    "id": "E23",
+    "edition": "Java",
+    "question": "Não preencha a borda da região com vidro; primeiro canto: -8 70 4; segundo canto: -6 72 7.",
+    "status": "outside-scope"
+  },
+  {
+    "id": "E24",
+    "edition": "Bedrock",
+    "question": "Cubra a borda da região com pedra e derrube o interior; primeiro canto: -8 70 4; segundo canto: -6 72 7.",
+    "status": "outside-scope"
+  },
+  {
+    "id": "E25",
+    "edition": "Bedrock",
+    "question": "Cubra a beirada da região com pedra sem substituir os blocos existentes; primeiro canto: -8 70 4; segundo canto: -6 72 7.",
+    "status": "outside-scope"
+  },
+  {
+    "id": "E26",
+    "edition": "Java",
+    "question": "Preencha só a borda da área com vidro; modo: hollow; primeiro canto: -8 70 4; segundo canto: -6 72 7.",
+    "status": "outside-scope"
+  },
+  {
+    "id": "E27",
+    "edition": "Java",
+    "question": "Cubra o contorno da sala com pedra, somente as paredes e sem teto; primeiro canto: -8 70 4; segundo canto: -6 72 7.",
+    "status": "outside-scope"
+  },
+  {
+    "id": "E28",
+    "edition": "Java",
+    "question": "Preencha a borda da arena com vidro no formato circular; primeiro canto: -8 70 4; segundo canto: -6 72 7.",
+    "status": "outside-scope"
+  },
+  {
+    "id": "E29",
+    "edition": "Bedrock",
+    "question": "Cubra a borda da região com ar; primeiro canto: -8 70 4; segundo canto: -6 72 7.",
+    "status": "caution",
+    "fields": ["efeito destrutivo"]
+  },
+  {
+    "id": "E30",
+    "edition": "Java",
+    "question": "Cubra a borda da região com vidro; canto inicial: -8 70 quatro; canto final: -6 72 7.",
+    "status": "invalid",
+    "fields": ["primeiro canto XYZ"]
+  },
+  {
+    "id": "E31",
+    "edition": "Bedrock",
+    "question": "Preencha a borda da arena com /weather.",
+    "status": "outside-scope"
+  },
+  {
+    "id": "E32",
+    "edition": "Bedrock",
+    "candidate": "/fill -8 70 4 -6 72 7 air destroy",
+    "status": "outside-scope"
+  },
+  {
+    "id": "E33",
+    "edition": "Java",
+    "candidate": "/fill -8 70 4 -6 72 7 air destroy",
+    "status": "caution",
+    "fields": ["efeito destrutivo"]
+  },
+  {
+    "id": "E34",
+    "edition": "Bedrock",
+    "candidate": "/fill -8 70 4 -6 72 7 air 0 destroy",
+    "status": "invalid",
+    "fields": ["estado de bloco"]
+  },
+  {
+    "id": "E35",
+    "edition": "Bedrock",
+    "candidate": "/fill -8 70 4 -6 72 7 glass outline",
+    "status": "ready",
+    "command": "/fill -8 70 4 -6 72 7 minecraft:glass outline",
+    "message": "inclusive topo e base"
+  },
+  {
+    "id": "E36",
+    "edition": "Java",
+    "candidate": "/fill -8 70 4 -6 72 7 stone outline",
+    "status": "ready",
+    "command": "/fill -8 70 4 -6 72 7 minecraft:stone outline",
+    "message": "inclusive topo e base"
+  },
+  {
+    "id": "E37",
+    "edition": "Bedrock",
+    "question": "Revestir a borda da área com vidro, mantendo o interior; primeiro canto: -8 70 4; segundo canto: -6 70 7.",
+    "status": "caution",
+    "fields": ["coordenadas"],
+    "message": "todo bloco pertence à borda"
+  },
+  {
+    "id": "E38",
+    "edition": "Java",
+    "question": "Cubra só a borda da região com pedra; primeiro canto: 0 70 4; segundo canto: 1 73 7.",
+    "status": "caution",
+    "fields": ["coordenadas"],
+    "message": "todo bloco pertence à borda"
+  }
+]
