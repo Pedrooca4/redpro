@@ -1,0 +1,457 @@
+[
+  {
+    "id": "W01",
+    "edition": "Java",
+    "question": "Como parar de chover?",
+    "status": "ready",
+    "command": "/weather clear"
+  },
+  {
+    "id": "W02",
+    "edition": "Bedrock",
+    "question": "Troque o clima para chuva.",
+    "status": "ready",
+    "command": "/weather rain"
+  },
+  {
+    "id": "W03",
+    "edition": "Java",
+    "question": "Quero limpar o clima sem alterar a hora e sem mudar o horário.",
+    "status": "ready",
+    "command": "/weather clear"
+  },
+  {
+    "id": "W04",
+    "edition": "Java",
+    "question": "Eu quero iniciar uma tempestade.",
+    "status": "ready",
+    "command": "/weather thunder",
+    "message": "raios"
+  },
+  {
+    "id": "W05",
+    "edition": "Bedrock",
+    "question": "Consultar o clima, por favor.",
+    "status": "ready",
+    "command": "/weather query"
+  },
+  {
+    "id": "W06",
+    "edition": "Java",
+    "question": "Consultar o clima, por favor.",
+    "status": "invalid",
+    "fields": ["clima"]
+  },
+  {
+    "id": "W07",
+    "edition": "Bedrock",
+    "version": null,
+    "question": "Mudar o clima.",
+    "status": "clarify",
+    "fields": ["versão exata", "clima desejado"]
+  },
+  {
+    "id": "W08",
+    "edition": null,
+    "version": null,
+    "question": "Como fazer chover?",
+    "status": "clarify",
+    "fields": ["edição", "versão exata"]
+  },
+  {
+    "id": "W09",
+    "edition": "Java",
+    "question": "Pare a chuva e avance o relógio.",
+    "status": "outside-scope"
+  },
+  {
+    "id": "W10",
+    "edition": "Java",
+    "question": "Não deixe o céu limpo.",
+    "status": "outside-scope"
+  },
+  {
+    "id": "W11",
+    "edition": "Java",
+    "question": "Como parar de chover por meia hora?",
+    "status": "outside-scope"
+  },
+  {
+    "id": "W12",
+    "edition": "Java",
+    "candidate": "/weather rain .5s",
+    "status": "ready",
+    "command": "/weather rain .5s",
+    "message": "10 ticks"
+  },
+  {
+    "id": "W13",
+    "edition": "Java",
+    "candidate": "/weather clear .5d",
+    "status": "ready",
+    "command": "/weather clear .5d",
+    "message": "12000 ticks"
+  },
+  {
+    "id": "W14",
+    "edition": "Java",
+    "candidate": "/weather thunder 80",
+    "status": "ready",
+    "command": "/weather thunder 80",
+    "message": "80 ticks"
+  },
+  {
+    "id": "W15",
+    "edition": "Java",
+    "candidate": "/weather rain .49t",
+    "status": "invalid",
+    "fields": ["duração"]
+  },
+  {
+    "id": "W16",
+    "edition": "Java",
+    "candidate": "/weather clear 999999999999s",
+    "status": "invalid",
+    "fields": ["duração"]
+  },
+  {
+    "id": "W17",
+    "edition": "Java",
+    "candidate": "/weather thunder 1m",
+    "status": "invalid",
+    "fields": ["duração"]
+  },
+  {
+    "id": "W18",
+    "edition": "Bedrock",
+    "candidate": "/weather clear 0",
+    "status": "ready",
+    "command": "/weather clear 0",
+    "message": "duração padrão aleatória"
+  },
+  {
+    "id": "W19",
+    "edition": "Bedrock",
+    "candidate": "/weather thunder 1000000",
+    "status": "ready",
+    "command": "/weather thunder 1000000",
+    "message": "1000000 ticks"
+  },
+  {
+    "id": "W20",
+    "edition": "Bedrock",
+    "candidate": "/weather query 4",
+    "status": "invalid",
+    "fields": ["duração"]
+  },
+  {
+    "id": "W21",
+    "edition": "Bedrock",
+    "candidate": "/weather rain -1",
+    "status": "invalid",
+    "fields": ["duração"]
+  },
+  {
+    "id": "W22",
+    "edition": "Bedrock",
+    "candidate": "/weather rain 1000001",
+    "status": "invalid",
+    "fields": ["duração"]
+  },
+  {
+    "id": "W23",
+    "edition": "Bedrock",
+    "candidate": "/weather clear 20t",
+    "status": "invalid",
+    "fields": ["duração"]
+  },
+  {
+    "id": "W24",
+    "edition": "Java",
+    "candidate": "/weather",
+    "status": "clarify",
+    "fields": ["clima desejado"]
+  },
+  {
+    "id": "W25",
+    "edition": "Java",
+    "candidate": "/weather\nclear",
+    "status": "invalid",
+    "fields": ["comando"]
+  },
+  { "id": "W26", "edition": "Java", "question": "\"Céu limpo\"", "status": "outside-scope" },
+  {
+    "id": "W27",
+    "edition": "Bedrock",
+    "question": "No Java 1.21.5, quero fazer chover.",
+    "status": "outside-scope"
+  },
+  {
+    "id": "W28",
+    "edition": "Java",
+    "candidate": "/weather clear 12 s",
+    "status": "invalid",
+    "fields": ["parâmetros"]
+  },
+  {
+    "id": "W29",
+    "edition": "Java",
+    "question": "Como deixo o céu sem nuvens?",
+    "status": "ready",
+    "command": "/weather clear"
+  },
+  {
+    "id": "W30",
+    "edition": "Bedrock",
+    "question": "Dá para consultar a condição do tempo agora?",
+    "status": "ready",
+    "command": "/weather query"
+  },
+  {
+    "id": "F01",
+    "edition": "Java",
+    "question": "Preencha o volume com pedregulho; canto inicial: (51, 70, -18); canto final: (55, 70, -13).",
+    "status": "ready",
+    "command": "/fill 51 70 -18 55 70 -13 minecraft:cobblestone replace",
+    "message": "30 posições"
+  },
+  {
+    "id": "F02",
+    "edition": "Bedrock",
+    "question": "Quero preencher a área com tábuas de carvalho; primeiro canto: 51 70 -18.",
+    "status": "clarify",
+    "fields": ["segundo canto XYZ"]
+  },
+  {
+    "id": "F03",
+    "edition": "Bedrock",
+    "question": "Preencha a área; primeiro canto: ; segundo canto: 55 70 -13; bloco: terra.",
+    "status": "clarify",
+    "fields": ["primeiro canto XYZ"]
+  },
+  {
+    "id": "F04",
+    "edition": "Bedrock",
+    "question": "Preencha a área com vidro; primeiro canto: 51 70 -18; segundo canto: 55 70 -13; bloco: ;",
+    "status": "ready",
+    "command": "/fill 51 70 -18 55 70 -13 minecraft:glass replace"
+  },
+  {
+    "id": "F05",
+    "edition": "Bedrock",
+    "question": "Preencha a área; primeiro canto: 51 70 -18; segundo canto: 55 70 -13; bloco: vidro; modo: .",
+    "status": "clarify",
+    "fields": ["modo"]
+  },
+  {
+    "id": "F06",
+    "edition": "Java",
+    "question": "Preencha o espaço com pedra mantendo os blocos existentes; primeiro canto: 51 70 -18; segundo canto: 55 70 -13.",
+    "status": "ready",
+    "command": "/fill 51 70 -18 55 70 -13 minecraft:stone keep"
+  },
+  {
+    "id": "F07",
+    "edition": "Java",
+    "question": "Preencha o espaço mantendo os blocos existentes; primeiro canto: 51 70 -18; segundo canto: 55 70 -13; bloco: vidro; modo: outline.",
+    "status": "caution",
+    "fields": ["modo"]
+  },
+  {
+    "id": "F08",
+    "edition": "Bedrock",
+    "question": "Quero preencher a sala com vidro e proteger a porta do fundo.",
+    "status": "outside-scope"
+  },
+  {
+    "id": "F09",
+    "edition": "Java",
+    "question": "Preencha a região; canto inicial: 51 70 -18; primeiro canto: 52 70 -18.",
+    "status": "outside-scope"
+  },
+  {
+    "id": "F10",
+    "edition": "Bedrock",
+    "candidate": "/fill 55 72 -13 51 70 -18 dirt",
+    "status": "ready",
+    "command": "/fill 55 72 -13 51 70 -18 minecraft:dirt replace",
+    "message": "90 posições"
+  },
+  {
+    "id": "F11",
+    "edition": "Java",
+    "candidate": "/fill 51 70 -18 55 72 -13 glass outline",
+    "status": "ready",
+    "command": "/fill 51 70 -18 55 72 -13 minecraft:glass outline",
+    "message": "preserva o interior"
+  },
+  {
+    "id": "F12",
+    "edition": "Bedrock",
+    "candidate": "/fill 51 70 -18 55 72 -13 glass outline",
+    "status": "ready",
+    "command": "/fill 51 70 -18 55 72 -13 minecraft:glass outline",
+    "message": "preserva o interior"
+  },
+  {
+    "id": "F13",
+    "edition": "Java",
+    "candidate": "/fill 51 70 -18 55 72 -13 glass hollow",
+    "status": "caution",
+    "fields": ["efeito destrutivo"],
+    "message": "esvazia o interior"
+  },
+  {
+    "id": "F14",
+    "edition": "Bedrock",
+    "candidate": "/fill 51 70 -18 55 72 -13 glass hollow",
+    "status": "caution",
+    "fields": ["efeito destrutivo"],
+    "message": "esvazia o interior"
+  },
+  {
+    "id": "F15",
+    "edition": "Bedrock",
+    "candidate": "/fill 51 70 -18 55 72 -13 glass destroy",
+    "status": "caution",
+    "fields": ["efeito destrutivo"],
+    "message": "itens soltos"
+  },
+  {
+    "id": "F16",
+    "edition": "Java",
+    "candidate": "/fill 51 70 -18 55 72 -13 air replace",
+    "status": "caution",
+    "fields": ["efeito destrutivo"],
+    "message": "apagar blocos"
+  },
+  {
+    "id": "F17",
+    "edition": "Bedrock",
+    "candidate": "/fill 51 70 -18 55 72 -13 glass keep",
+    "status": "ready",
+    "command": "/fill 51 70 -18 55 72 -13 minecraft:glass keep",
+    "message": "apenas o ar"
+  },
+  {
+    "id": "F18",
+    "edition": "Java",
+    "candidate": "/fill 51 70 -18 55 72 -13 minecraft:apple",
+    "status": "invalid",
+    "fields": ["ID do bloco de destino"]
+  },
+  {
+    "id": "F19",
+    "edition": "Bedrock",
+    "candidate": "/fill 51 70 -18 55 72 -13 addon:floor",
+    "status": "outside-scope"
+  },
+  {
+    "id": "F20",
+    "edition": "Java",
+    "candidate": "/fill 51 y -18 55 72 -13 glass",
+    "status": "invalid",
+    "fields": ["primeiro canto XYZ"]
+  },
+  {
+    "id": "F21",
+    "edition": "Java",
+    "candidate": "/fill 51 70 -18 55 72",
+    "status": "invalid",
+    "fields": ["parâmetros"]
+  },
+  {
+    "id": "F22",
+    "edition": "Bedrock",
+    "candidate": "/fill 51 70 -18 55 72 -13 stone 0 keep",
+    "status": "invalid",
+    "fields": ["estado de bloco"]
+  },
+  {
+    "id": "F23",
+    "edition": "Bedrock",
+    "candidate": "/fill 51 70 -18 55 72 -13 oak_log [\"pillar_axis\"=\"x\"] keep",
+    "status": "outside-scope"
+  },
+  {
+    "id": "F24",
+    "edition": "Java",
+    "candidate": "/fill 51 70 -18 55 72 -13 oak_log[axis=x] keep",
+    "status": "outside-scope"
+  },
+  {
+    "id": "F25",
+    "edition": "Java",
+    "candidate": "/fill 51 70 -18 55 72 -13 glass replace #minecraft:logs outline",
+    "status": "outside-scope"
+  },
+  {
+    "id": "F26",
+    "edition": "Java",
+    "candidate": "/fill 51 70 -18 55 72 -13 glass strict",
+    "status": "outside-scope"
+  },
+  {
+    "id": "F27",
+    "edition": "Bedrock",
+    "candidate": "/fill 51 70 -18 55 72 -13 glass strict",
+    "status": "invalid",
+    "fields": ["modo"]
+  },
+  {
+    "id": "F28",
+    "edition": "Bedrock",
+    "candidate": "/fill ~ ~-2 ~ ~5 ~ ~7 glass keep",
+    "status": "outside-scope"
+  },
+  {
+    "id": "F29",
+    "edition": "Java",
+    "candidate": "/fill 0 64 0 32 95 31 dirt",
+    "status": "caution",
+    "fields": ["coordenadas"],
+    "message": "32.768 posições"
+  },
+  {
+    "id": "F30",
+    "edition": "Bedrock",
+    "version": "1.21.81",
+    "candidate": "/fill 51 70 -18 55 72 -13 glass",
+    "status": "outside-scope"
+  },
+  {
+    "id": "F31",
+    "edition": "Java",
+    "candidate": "/fill 51 70 -18\n55 72 -13 glass",
+    "status": "invalid",
+    "fields": ["comando"]
+  },
+  {
+    "id": "F32",
+    "edition": "Bedrock",
+    "question": "Quero cobrir a beirada da arena com pedra sem mexer no centro.",
+    "status": "clarify",
+    "fields": ["primeiro canto XYZ", "segundo canto XYZ"]
+  },
+  {
+    "id": "F33",
+    "edition": "Java",
+    "candidate": "/fill 0 64 0 31 95 31 stone",
+    "status": "ready",
+    "command": "/fill 0 64 0 31 95 31 minecraft:stone replace",
+    "message": "32768 posições"
+  },
+  {
+    "id": "F34",
+    "edition": "Bedrock",
+    "candidate": "/fill 51 70 -18 55 72 -13 air destroy",
+    "status": "outside-scope"
+  },
+  {
+    "id": "F35",
+    "edition": "Java",
+    "candidate": "/fill 51 70 -18 55 72 -13 air destroy",
+    "status": "caution",
+    "fields": ["efeito destrutivo"]
+  }
+]

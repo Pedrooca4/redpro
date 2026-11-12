@@ -3,18 +3,21 @@ import { type CommandContext, type CommandResult, validateIntent } from "./valid
 const weatherStates = [
   [
     "clear",
-    /^(?:limp(?:ar|a|e) (?:o )?(?:clima|ceu)|(?:parar|pare|tirar|remover|acabar com) (?:a )?chuva|(?:deixar|deixe) (?:o )?(?:ceu|clima) limpo|ceu limpo|clima limpo|\/weather clear)$/u,
+    /^(?:limp(?:ar|a|e) (?:o )?(?:clima|ceu)|(?:parar|pare|tirar|remover|acabar com) (?:a )?chuva|(?:parar|pare) de chover|(?:deixar|deixe) (?:o )?(?:ceu|clima) limpo|ceu limpo|clima limpo|\/weather clear)$/u,
   ],
-  ["rain", /^(?:fazer chover|colocar chuva|ativar (?:a )?chuva|\/weather rain)$/u],
+  [
+    "rain",
+    /^(?:fazer chover|colocar chuva|ativar (?:a )?chuva|(?:troque|mude|trocar|mudar) o clima para chuva|\/weather rain)$/u,
+  ],
   ["thunder", /^(?:iniciar (?:uma )?tempestade|ativar (?:uma )?tempestade|\/weather thunder)$/u],
   ["query", /^(?:consultar (?:o )?clima|ver (?:o )?clima atual|\/weather query)$/u],
 ] as const;
 const timePreservation =
-  /\b(?:sem|nao quero|nao pode|nao deve)\s+(?:mudar|alterar|mexer n[oa]|resetar)\s*(?:a |o )?(?:horario|hora|relogio|ciclo do dia)\b|\b(?:preservando|mantendo|preserve|mantenha|manter) (?:o )?(?:horario|relogio)\b/gu;
+  /\b(?:e\s+)?(?:(?:sem|nao quero|nao pode|nao deve)\s+(?:mudar|alterar|mexer n[oa]|resetar)\s*(?:a |o )?(?:horario|hora|relogio|ciclo do dia)|(?:preservando|mantendo|preserve|mantenha|manter) (?:o )?(?:horario|relogio))\b/gu;
 const fillRequest =
   /^(?:(?:eu )?quero |como posso |como |preciso |me ajude a )?(?:preencher\b|preenche\b|preencha\b|usar \/fill(?=\s|[?.!;]|$))/u;
 const fillSlots =
-  /\b(primeiro canto|segundo canto|canto inicial|canto final|bloco(?: de destino)?|modo)\s*[:=]\s*([^;?!\n]+)/gu;
+  /\b(primeiro canto|segundo canto|canto inicial|canto final|bloco(?: de destino)?|modo)[\t ]*[:=][\t ]*([^;?!\n]*)/gu;
 const compound =
   /\b(?:depois|em seguida|tambem|ou|alem de|se|compare|comparar|execute|automat\w*|repetir|comando de bloco|plugin|mod|addon|servidores?)\b/u;
 const materials = new Map([
@@ -64,18 +67,25 @@ function fillQuestion(context: CommandContext, text: string): CommandResult {
   if (!request)
     return outside("Operação, condição ou coordenadas em prosa fora dos formatos reconhecidos.");
   if (request[1]) {
-    if (fields.has("block")) return outside("Há mais de um valor para o bloco.");
+    if (fields.get("block")) return outside("Há mais de um valor para o bloco.");
     fields.set("block", materials.get(request[1]) ?? request[1]);
   }
-  const from = fields.get("from");
-  const to = fields.get("to");
-  const block = fields.get("block");
+  const from = fields.get("from") || undefined;
+  const to = fields.get("to") || undefined;
+  const block = fields.get("block") || undefined;
+  if (fields.get("mode") === "" && from && to && block && context.edition && context.version) {
+    return {
+      status: "clarify",
+      fields: ["modo"],
+      message: "Qual modo de preenchimento você quer usar?",
+    };
+  }
   return validateIntent(context, {
     command: "fill",
     from: from === undefined ? undefined : parsePoint(from),
     to: to === undefined ? undefined : parsePoint(to),
     block: block === undefined ? undefined : (materials.get(block) ?? block),
-    mode: fields.get("mode"),
+    mode: fields.get("mode") || undefined,
     preserveExisting,
   });
 }
@@ -87,6 +97,9 @@ export function resolveQuestion(context: CommandContext, question: string): Comm
     .toLowerCase()
     .trim()
     .replace(/[\t ]+/gu, " ");
+  // A format that is recognized must never discard another action or its conditions.
+  if (/^\s*>|[`"“”]/mu.test(text))
+    return outside("Texto citado ou formatado exige revisão da intenção.");
   const mentions = [...text.matchAll(/\/[a-z][a-z0-9_-]*/gu)].map((match) => match[0]);
   if (
     compound.test(text) ||
@@ -135,6 +148,7 @@ export function resolveQuestion(context: CommandContext, question: string): Comm
   if (mentions.includes("/fill") || fillRequest.test(request))
     return fillQuestion(effective, request);
 
+  // Only remove explicit time-preservation clauses. Keep negations and other conditions visible.
   const weather = request
     .replace(timePreservation, "")
     .replace(/[.,?!;]+/gu, " ")
