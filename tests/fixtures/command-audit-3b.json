@@ -1,0 +1,200 @@
+{
+  "schemaVersion": 1,
+  "scope": "diagnostic-regression",
+  "fingerprint": {
+    "dataset": "823fb35681fd70d68f2ab9d1d66effef08559af3096b92c549c894308d01e33a",
+    "gguf": "2ebe6eb67cb92adeffc7073c48dd4e3baf79465ac650793dc751cad2b29cf219"
+  },
+  "base": {
+    "review": {
+      "origin": "assisted"
+    }
+  },
+  "rag": {
+    "review": {
+      "origin": "assisted"
+    }
+  },
+  "cases": [
+    {
+      "caseId": "CMD-J01",
+      "base": {
+        "caseId": "CMD-J01",
+        "answer": {
+          "text": "Não existe um comando de chat padrão no Minecraft Java Edition 1.21.5 que forneça automaticamente três blocos de pedra para você.\n\nPara obter isso, você deve usar o comando `/give` no chat. Como você tem permissão, execute:\n\n`/give @p stone 3`\n\nIsso dará exatamente 3 blocos de pedra para o jogador mais próximo (você)."
+        },
+        "answerSha256": "b500b9993f8e5ea1894c7b49d120702a2d9ced044773218ea86de47fb906d46e",
+        "failure": null,
+        "deterministic": {
+          "exactCommandPresent": false
+        }
+      },
+      "baseReview": {
+        "caseId": "CMD-J01",
+        "answerSha256": "b500b9993f8e5ea1894c7b49d120702a2d9ced044773218ea86de47fb906d46e",
+        "factual": "partial",
+        "note": "Item e quantidade corretos. Usa @p, que seleciona o mais próximo, e se contradiz sobre a existência do comando."
+      },
+      "rag": {
+        "caseId": "CMD-J01",
+        "answer": {
+          "text": "O comando é `/give @s minecraft:stone 3`.\n\nFicha usada: [MP-give-java]"
+        },
+        "answerSha256": "88d4634d0ad1409d4ca172f7500047039d25a935e3a2872d033c1b59c31e92cc",
+        "failure": null,
+        "deterministic": {
+          "exactCommandPresent": false
+        },
+        "retrieval": {
+          "cards": [
+            {
+              "id": "MP-give-java"
+            }
+          ],
+          "cited": ["MP-give-java"]
+        }
+      },
+      "ragReview": {
+        "caseId": "CMD-J01",
+        "answerSha256": "88d4634d0ad1409d4ca172f7500047039d25a935e3a2872d033c1b59c31e92cc",
+        "factual": "correct",
+        "note": "Identificador da pedra, quantidade e alvo @s corretos."
+      }
+    },
+    {
+      "caseId": "CMD-J02",
+      "base": {
+        "caseId": "CMD-J02",
+        "answer": {
+          "text": "No MinePRO (Java 1.21.5), não existe um comando nativo para limpar o clima sem alterar o horário. O comando `/weather clear` (ou `/weather reset`) limpa o clima, mas **reseta automaticamente o horário** para 00:00.\n\nPara limpar o clima mantendo o horário atual, você deve:\n1. Executar `/weather clear`.\n2. Executar `/time set <hora> <minuto>` imediatamente após.\n\n**Detalhes indispensáveis:**\n*   **Comando de limpeza:** `/weather clear`\n*   **Comando de horário:** `/time set <hora> <minuto>` (ex: `/time set 12 30` para 12:30).\n*   **Nota:** O MinePRO não possui um comando único que faça isso automaticamente sem redefinir o tempo."
+        },
+        "answerSha256": "ec633a4e9ff23d2ea997c2bf2f39f3abdb2d0449dcd3cffbb9294b8c016829eb",
+        "failure": null,
+        "deterministic": {
+          "exactCommandPresent": false
+        }
+      },
+      "baseReview": {
+        "caseId": "CMD-J02",
+        "answerSha256": "ec633a4e9ff23d2ea997c2bf2f39f3abdb2d0449dcd3cffbb9294b8c016829eb",
+        "factual": "incorrect",
+        "note": "Inclui /weather clear, mas inventa que ele reseta a hora e manda executar /time set."
+      },
+      "rag": {
+        "caseId": "CMD-J02",
+        "answer": {
+          "text": "Com base na ficha [MP-weather], o comando `/weather clear` limpa o clima no Java, independentemente da hora do dia."
+        },
+        "answerSha256": "d5d7cf361c22aefdd030219626631cbad92ba63b0fff28f5a918aaaabc9595cf",
+        "failure": null,
+        "deterministic": {
+          "exactCommandPresent": false
+        },
+        "retrieval": {
+          "cards": [
+            {
+              "id": "MP-weather"
+            }
+          ],
+          "cited": ["MP-weather"]
+        }
+      },
+      "ragReview": {
+        "caseId": "CMD-J02",
+        "answerSha256": "d5d7cf361c22aefdd030219626631cbad92ba63b0fff28f5a918aaaabc9595cf",
+        "factual": "correct",
+        "note": "Limpa o clima e preserva o horário."
+      }
+    },
+    {
+      "caseId": "CMD-B01",
+      "base": {
+        "caseId": "CMD-B01",
+        "answer": {
+          "text": "No Minecraft Bedrock 1.21.80, não existe um comando único nativo para \"mantener o inventário\" após a morte, pois o jogo desenha o inventário do jogador imediatamente após o respawn.\n\nNo entanto, você pode usar o comando **`/gamerule keepInventory true`** para garantir que o jogador **não perca itens** ao morrer.\n\n**Atenção:**\n*   Esse comando **não impede** o respawn (o jogador ainda voltará para a base).\n*   Ele apenas impede a perda dos itens que o jogador carregava.\n*   Se você quiser que o jogador **não respone** (ficando preso no local da morte), você precisaria de um plugin externo ou um script de comando complexo, pois o comando padrão de respawn (`/gamemode survival`) sempre faz o jogador voltar.\n\n**Resumo:**\nUse `/gamerule keepInventory true` para salvar os itens. Não há forma de impedir o respawn apenas com comandos básicos no modo Survival."
+        },
+        "answerSha256": "11decb50a6a1ce3ec1b3b9f2765612b52b22da974980024cf718cb8ecd21df63",
+        "failure": null,
+        "deterministic": {
+          "exactCommandPresent": false
+        }
+      },
+      "baseReview": {
+        "caseId": "CMD-B01",
+        "answerSha256": "11decb50a6a1ce3ec1b3b9f2765612b52b22da974980024cf718cb8ecd21df63",
+        "factual": "partial",
+        "note": "Identifica a regra e a finalidade, mas se contradiz e atribui funções de respawn a /gamemode survival. Há mistura de português com espanhol."
+      },
+      "rag": {
+        "caseId": "CMD-B01",
+        "answer": {
+          "text": "O comando para manter o inventário ao morrer no Bedrock é `/gamerule keepinventory true`.\n\n[MP-keepinventory]"
+        },
+        "answerSha256": "2f50f0e3c0afe47d29ffc2150120c8fc47befb8233845d2f9cb5b0695ab324cf",
+        "failure": null,
+        "deterministic": {
+          "exactCommandPresent": false
+        },
+        "retrieval": {
+          "cards": [
+            {
+              "id": "MP-keepinventory"
+            }
+          ],
+          "cited": ["MP-keepinventory"]
+        }
+      },
+      "ragReview": {
+        "caseId": "CMD-B01",
+        "answerSha256": "2f50f0e3c0afe47d29ffc2150120c8fc47befb8233845d2f9cb5b0695ab324cf",
+        "factual": "partial",
+        "note": "Comando correto e sem invenções sobre respawn, mas a resposta não explicita o efeito para o mundo inteiro."
+      }
+    },
+    {
+      "caseId": "CMD-B02",
+      "base": {
+        "caseId": "CMD-B02",
+        "answer": {
+          "text": "Para aplicar velocidade máxima (I) por 10 segundos no chat no Minecraft Bedrock 1.21.80, use o comando:\n\n`/gamemode creative` (se necessário para testar) seguido de:\n`/give @p speed 10s`\n\nNo entanto, o comando correto para aplicar um efeito diretamente no chat é:\n\n`/effect give @p speed 10s`\n\nIsso aplicará o efeito de velocidade máxima por 10 segundos."
+        },
+        "answerSha256": "4dbc374d35ff2a0f74349e855b329addf2d112d9dc2797a39e33c49b66267603",
+        "failure": null,
+        "deterministic": {
+          "exactCommandPresent": false
+        }
+      },
+      "baseReview": {
+        "caseId": "CMD-B02",
+        "answerSha256": "4dbc374d35ff2a0f74349e855b329addf2d112d9dc2797a39e33c49b66267603",
+        "factual": "incorrect",
+        "note": "Usa /effect give, sintaxe de outra edição, e inventa /give de efeito."
+      },
+      "rag": {
+        "caseId": "CMD-B02",
+        "answer": {
+          "text": "O comando para aplicar Velocidade I em você por 10 segundos na edição Bedrock é:\n\n`/effect give @s speed 10 0`\n\n*Nota: A duração de 10 segundos foi convertida para 1000 unidades (segundos), conforme a sintaxe da edição Bedrock onde o terceiro parâmetro é o tempo em segundos. O amplificador 0 corresponde ao nível I.*\n\nFicha usada: [MP-effect]"
+        },
+        "answerSha256": "2495c6b283c10bbd7493854c9611fed7a6b1c3760f232326f55b9e30296c5c53",
+        "failure": null,
+        "deterministic": {
+          "exactCommandPresent": false
+        },
+        "retrieval": {
+          "cards": [
+            {
+              "id": "MP-effect"
+            }
+          ],
+          "cited": ["MP-effect"]
+        }
+      },
+      "ragReview": {
+        "caseId": "CMD-B02",
+        "answerSha256": "2495c6b283c10bbd7493854c9611fed7a6b1c3760f232326f55b9e30296c5c53",
+        "factual": "incorrect",
+        "note": "Continua usando a forma Java /effect give e inventa conversão para mil unidades."
+      }
+    }
+  ]
+}
