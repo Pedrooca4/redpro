@@ -1,0 +1,594 @@
+{
+  "schemaVersion": 1,
+  "purpose": "retrieval-development-only",
+  "queries": [
+    {
+      "id": "R01",
+      "topic": "sobrevivencia",
+      "edition": "Java",
+      "version": "1.21.5",
+      "question": "Minha barra de fome tem oito ícones cheios e perdi vida. A regeneração natural já começa com saturação zerada?",
+      "expected": "evidence",
+      "evidence": [
+        {
+          "card": "MP-hunger",
+          "sources": ["wiki-hunger"]
+        }
+      ],
+      "criterion": "Com regeneração habilitada e saturação zerada, oito ícones cheios ficam abaixo dos 18 pontos de fome requeridos."
+    },
+    {
+      "id": "R02",
+      "topic": "sobrevivencia",
+      "edition": "Bedrock",
+      "version": "1.21.80",
+      "question": "No Nether, usei a cama de lã como ponto de descanso. O que acontece ao interagir para dormir?",
+      "expected": "evidence",
+      "evidence": [
+        {
+          "card": "MP-nether-bed",
+          "sources": ["wiki-bed"]
+        }
+      ],
+      "criterion": "A tentativa de dormir numa cama no Nether provoca explosão sob as regras padrão."
+    },
+    {
+      "id": "R03",
+      "topic": "sobrevivencia",
+      "edition": "Java",
+      "version": "1.21.5",
+      "question": "Dá para usar uma âncora carregada na sala do End como ponto de retorno?",
+      "expected": "evidence",
+      "evidence": [
+        {
+          "card": "MP-anchor-dimensions",
+          "sources": ["wiki-anchor"]
+        }
+      ],
+      "criterion": "Uma âncora carregada no End explode ao ser usada sob as regras padrão."
+    },
+    {
+      "id": "R04",
+      "topic": "sobrevivencia",
+      "edition": "Bedrock",
+      "version": "1.21.80",
+      "question": "Com um balde de água e um caldeirão, muda alguma coisa se eu despejar no piso do Nether ou no caldeirão?",
+      "expected": "evidence",
+      "evidence": [
+        {
+          "card": "MP-nether-water",
+          "sources": ["wiki-water"]
+        }
+      ],
+      "criterion": "No chão do Nether a água evapora. O caldeirão é uma interação distinta e pode conter água."
+    },
+    {
+      "id": "R05",
+      "topic": "sobrevivencia",
+      "edition": "Java",
+      "version": "1.21.5",
+      "question": "Como recarregar a âncora? O bloco de pedra luminosa serve e qual é a capacidade da âncora?",
+      "expected": "evidence",
+      "evidence": [
+        {
+          "card": "MP-dev-anchor-charges",
+          "sources": ["mojang-anchor"]
+        }
+      ],
+      "relatedCards": ["MP-anchor-dimensions"],
+      "criterion": "Um bloco de pedra luminosa acrescenta uma carga, até o máximo de quatro."
+    },
+    {
+      "id": "R06",
+      "topic": "sobrevivencia",
+      "edition": "Bedrock",
+      "version": "1.21.80",
+      "question": "Se tenho uma âncora e duas cargas, renascer consome uma? Quero saber quantas cargas sobram.",
+      "expected": "evidence",
+      "evidence": [
+        {
+          "card": "MP-dev-anchor-charges",
+          "sources": ["mojang-anchor"]
+        }
+      ],
+      "relatedCards": ["MP-anchor-dimensions"],
+      "criterion": "Renascer na âncora consome uma carga. Restaria uma de duas."
+    },
+    {
+      "id": "R07",
+      "topic": "sobrevivencia",
+      "edition": "Java",
+      "version": "1.21.5",
+      "question": "Numa farm de ferro, quantos segundos sem detectar um golem de ferro permitem nova tentativa, se o restante estiver atendido?",
+      "expected": "insufficient",
+      "relatedCards": ["MP-iron"],
+      "reference": "wiki-golem",
+      "criterion": "A ficha menciona detecção, mas não informa o intervalo de 30 segundos documentado na página do golem."
+    },
+    {
+      "id": "R08",
+      "topic": "sobrevivencia",
+      "edition": "Bedrock",
+      "version": "1.21.80",
+      "question": "Qual o número mínimo de aldeões de uma fazenda de ferro com regras vanilla?",
+      "expected": "absent",
+      "reference": "wiki-golem",
+      "criterion": "A ficha Java não sustenta os requisitos da vila Bedrock."
+    },
+    {
+      "id": "R09",
+      "topic": "sobrevivencia",
+      "edition": null,
+      "version": "1.21.5",
+      "question": "É possível pôr uma tocha comum na mão esquerda e colocá-la em jogo?",
+      "expected": "clarify",
+      "fields": ["edition"]
+    },
+    {
+      "id": "R10",
+      "topic": "sobrevivencia",
+      "edition": "Java",
+      "version": null,
+      "question": "A barra de fome volta a encher sozinha nesta versão?",
+      "expected": "clarify",
+      "fields": ["version"]
+    },
+    {
+      "id": "R11",
+      "topic": "sobrevivencia",
+      "edition": "Java",
+      "version": "1.21.5",
+      "question": "No Bedrock, como recarregar a âncora que deixei no Nether?",
+      "expected": "clarify",
+      "fields": ["edition"]
+    },
+    {
+      "id": "R12",
+      "topic": "sobrevivencia",
+      "edition": "Java",
+      "version": "1.21.5",
+      "question": "Minha vida não recupera apesar de eu estar com nove coxinhas e saturação zerada. Qual o limite com regeneração ativada?",
+      "expected": "evidence",
+      "evidence": [
+        {
+          "card": "MP-hunger",
+          "sources": ["wiki-hunger"]
+        }
+      ],
+      "criterion": "Com regeneração natural e saturação zerada, o limiar são 18 pontos de fome."
+    },
+    {
+      "id": "R13",
+      "topic": "construcao",
+      "edition": "Java",
+      "version": "1.21.5",
+      "question": "Para meu abrigo de carvalho, quantas tábuas de madeira faço com cada tronco na grade do inventário?",
+      "expected": "evidence",
+      "evidence": [
+        {
+          "card": "MP-planks",
+          "sources": ["mojang-craft"]
+        }
+      ],
+      "criterion": "Um tronco rende quatro tábuas do mesmo tipo na grade do inventário."
+    },
+    {
+      "id": "R14",
+      "topic": "construcao",
+      "edition": "Bedrock",
+      "version": "1.21.80",
+      "question": "Para montar minha oficina, quantas tábuas vão na receita da mesa de trabalho?",
+      "expected": "evidence",
+      "evidence": [
+        {
+          "card": "MP-table",
+          "sources": ["mojang-craft"]
+        }
+      ],
+      "criterion": "A receita da bancada usa quatro tábuas."
+    },
+    {
+      "id": "R15",
+      "topic": "construcao",
+      "edition": "Java",
+      "version": "1.21.5",
+      "question": "Para erguer a fachada, quantos andaimes eu consigo com seis bambus e linha?",
+      "expected": "evidence",
+      "evidence": [
+        {
+          "card": "MP-dev-scaffolding",
+          "sources": ["mojang-scaffolding"]
+        }
+      ],
+      "criterion": "Seis bambus e uma linha rendem seis andaimes."
+    },
+    {
+      "id": "R16",
+      "topic": "construcao",
+      "edition": "Bedrock",
+      "version": "1.21.80",
+      "question": "Para aumentar a torre de andaime, em qual bloco uso o item para acrescentar no topo?",
+      "expected": "evidence",
+      "evidence": [
+        {
+          "card": "MP-dev-scaffolding",
+          "sources": ["mojang-scaffolding"]
+        }
+      ],
+      "criterion": "Usar um andaime na base da coluna acrescenta um no topo."
+    },
+    {
+      "id": "R17",
+      "topic": "construcao",
+      "edition": "Java",
+      "version": "1.21.5",
+      "question": "Quero tijolos de resina para revestir a varanda. Aglomerados de resina viram o quê na fornalha?",
+      "expected": "evidence",
+      "evidence": [
+        {
+          "card": "MP-dev-resin-java",
+          "sources": ["mojang-resin-java"]
+        }
+      ],
+      "relatedCards": ["MP-furnace"],
+      "criterion": "Fundir aglomerados de resina gera itens tijolo de resina, usados nos blocos decorativos."
+    },
+    {
+      "id": "R18",
+      "topic": "construcao",
+      "edition": "Bedrock",
+      "version": "1.21.80",
+      "question": "O tijolo de resina decorativo pode ser feito com os itens que saem ao fundir aglomerados?",
+      "expected": "evidence",
+      "evidence": [
+        {
+          "card": "MP-dev-resin-bedrock",
+          "sources": ["mojang-resin-bedrock", "wiki-resin-brick"]
+        }
+      ],
+      "criterion": "Fundir aglomerados de resina gera itens tijolo de resina, usados nos blocos decorativos."
+    },
+    {
+      "id": "R19",
+      "topic": "construcao",
+      "edition": "Java",
+      "version": "1.21.4",
+      "question": "Já consigo transformar aglomerado de resina em tijolo de resina para a parede na versão inicial do Jardim Pálido?",
+      "expected": "evidence",
+      "evidence": [
+        {
+          "card": "MP-dev-resin-java",
+          "sources": ["mojang-resin-java"]
+        }
+      ],
+      "criterion": "A fabricação está disponível na versão estável Java 1.21.4."
+    },
+    {
+      "id": "R20",
+      "topic": "construcao",
+      "edition": "Bedrock",
+      "version": "1.21.50",
+      "question": "No Jardim Pálido do Bedrock, de onde vem o item tijolo de resina para montar o bloco decorativo?",
+      "expected": "evidence",
+      "evidence": [
+        {
+          "card": "MP-dev-resin-bedrock",
+          "sources": ["mojang-resin-bedrock", "wiki-resin-brick"]
+        }
+      ],
+      "criterion": "A fabricação está disponível na versão estável Bedrock 1.21.50."
+    },
+    {
+      "id": "R21",
+      "topic": "construcao",
+      "edition": "Bedrock",
+      "version": "1.21.80",
+      "question": "Para um projeto aquático, em qual aba escolho Water World ao criar um mundo plano?",
+      "expected": "evidence",
+      "evidence": [
+        {
+          "card": "MP-dev-flat-bedrock",
+          "sources": ["mojang-flat-bedrock"]
+        }
+      ],
+      "criterion": "Na criação do mundo, aba Avançado, habilitar Mundo plano e escolher Water World."
+    },
+    {
+      "id": "R22",
+      "topic": "construcao",
+      "edition": "Bedrock",
+      "version": "1.21.70",
+      "question": "Sem experimentos, a 1.21.70 já oferece a predefinição Water World de mundo plano?",
+      "expected": "incompatible",
+      "reference": "mojang-flat-bedrock",
+      "criterion": "A nota da 1.21.80 documenta a chegada das predefinições estáveis."
+    },
+    {
+      "id": "R23",
+      "topic": "construcao",
+      "edition": "Bedrock",
+      "version": "1.21.80",
+      "question": "Meu menu diz 1.21.70. Em qual aba acho as opções de mundo plano?",
+      "expected": "clarify",
+      "fields": ["version"]
+    },
+    {
+      "id": "R24",
+      "topic": "construcao",
+      "edition": "Bedrock",
+      "version": "1.21.80",
+      "question": "Qual bloco de sustentação uso nessa ponte?",
+      "expected": "clarify-detail",
+      "criterion": "Faltam o projeto ou dimensões e o objetivo estrutural ou estético."
+    },
+    {
+      "id": "R25",
+      "topic": "construcao",
+      "edition": "Java",
+      "version": "1.21.3",
+      "question": "Na 1.21.3, sem recursos experimentais, já existe tijolo de resina para o telhado?",
+      "expected": "incompatible",
+      "reference": "mojang-resin-java",
+      "criterion": "A nota da 1.21.4 é o marco de lançamento estável."
+    },
+    {
+      "id": "R26",
+      "topic": "construcao",
+      "edition": "Bedrock",
+      "version": "1.21.80",
+      "question": "Quanto rende cada tora de bétula se eu transformar direto no inventário?",
+      "expected": "evidence",
+      "evidence": [
+        {
+          "card": "MP-planks",
+          "sources": ["mojang-craft"]
+        }
+      ],
+      "criterion": "Uma tora rende quatro tábuas do mesmo tipo na grade do inventário."
+    },
+    {
+      "id": "R27",
+      "topic": "redstone",
+      "edition": "Java",
+      "version": "1.21.5",
+      "question": "O comparador está no modo subtração. Ele soma as entradas laterais ou usa só a mais forte?",
+      "expected": "evidence",
+      "evidence": [
+        {
+          "card": "MP-comparator",
+          "sources": ["wiki-compare"]
+        }
+      ],
+      "criterion": "Em subtração, sai a entrada traseira menos a maior lateral, com mínimo zero."
+    },
+    {
+      "id": "R28",
+      "topic": "redstone",
+      "edition": "Bedrock",
+      "version": "1.21.80",
+      "question": "O repetidor aumenta a força do sinal que entra por trás ou só conserva a intensidade?",
+      "expected": "evidence",
+      "evidence": [
+        {
+          "card": "MP-bedrock-repeater",
+          "sources": ["learn-red"]
+        }
+      ],
+      "relatedCards": ["MP-repeater-direction"],
+      "criterion": "Em regime estável e sem trava, uma entrada traseira positiva gera saída 15."
+    },
+    {
+      "id": "R29",
+      "topic": "redstone",
+      "edition": "Java",
+      "version": "1.21.5",
+      "question": "Qual o atraso máximo configurável de um repetidor em ticks de jogo?",
+      "expected": "evidence",
+      "evidence": [
+        {
+          "card": "MP-delay",
+          "sources": ["wiki-repeater"]
+        }
+      ],
+      "criterion": "O máximo é quatro ticks de redstone, equivalentes a oito ticks de jogo."
+    },
+    {
+      "id": "R30",
+      "topic": "redstone",
+      "edition": "Bedrock",
+      "version": "1.21.80",
+      "question": "Meu circuito veio do Java. A quasi-conectividade dos pistões funciona aqui no Bedrock?",
+      "expected": "evidence",
+      "evidence": [
+        {
+          "card": "MP-quasi",
+          "sources": ["wiki-qc"]
+        }
+      ],
+      "criterion": "O Bedrock não reproduz a quasi-conectividade de pistões do Java."
+    },
+    {
+      "id": "R31",
+      "topic": "redstone",
+      "edition": "Bedrock",
+      "version": "1.21.80",
+      "question": "Como oriento a direção do repetidor na linha de pó entre a fonte e a porta?",
+      "expected": "evidence",
+      "evidence": [
+        {
+          "card": "MP-repeater-direction",
+          "sources": ["learn-red", "wiki-repeater"]
+        }
+      ],
+      "relatedCards": ["MP-bedrock-repeater"],
+      "criterion": "A entrada do repetidor fica voltada para a fonte. A frente aponta para a porta."
+    },
+    {
+      "id": "R32",
+      "topic": "redstone",
+      "edition": "Java",
+      "version": "1.21.5",
+      "question": "A lâmpada de cobre apaga quando o pulso do botão acaba ou guarda o estado?",
+      "expected": "evidence",
+      "evidence": [
+        {
+          "card": "MP-dev-bulb-java",
+          "sources": ["mojang-bulb-java"]
+        }
+      ],
+      "criterion": "A lâmpada mantém o estado quando o pulso termina."
+    },
+    {
+      "id": "R33",
+      "topic": "redstone",
+      "edition": "Bedrock",
+      "version": "1.21.80",
+      "question": "Quero alternar a luz com um pulso na copper bulb. Sem alimentação ela guarda o último estado?",
+      "expected": "evidence",
+      "evidence": [
+        {
+          "card": "MP-dev-bulb-bedrock",
+          "sources": ["mojang-bulb-bedrock"]
+        }
+      ],
+      "criterion": "A lâmpada mantém o estado quando o pulso termina."
+    },
+    {
+      "id": "R34",
+      "topic": "redstone",
+      "edition": "Java",
+      "version": "1.21.5",
+      "question": "O comparador mede a lotação de um baú atrás dele?",
+      "expected": "insufficient",
+      "relatedCards": ["MP-comparator"],
+      "reference": "wiki-compare",
+      "criterion": "A ficha descreve apenas o modo de subtração."
+    },
+    {
+      "id": "R35",
+      "topic": "redstone",
+      "edition": "Bedrock",
+      "version": "1.21.80",
+      "question": "No repetidor do Bedrock, como ajusto os ticks de atraso?",
+      "expected": "insufficient",
+      "relatedCards": ["MP-bedrock-repeater", "MP-repeater-direction"],
+      "reference": "learn-red",
+      "criterion": "O guia descreve de um a quatro ticks de redstone no repetidor Bedrock. As fichas elegíveis só sustentam força e orientação."
+    },
+    {
+      "id": "R36",
+      "topic": "redstone",
+      "edition": null,
+      "version": null,
+      "question": "A quase-conectividade funciona no meu pistão?",
+      "expected": "clarify",
+      "fields": ["edition", "version"]
+    },
+    {
+      "id": "R37",
+      "topic": "redstone",
+      "edition": "Bedrock",
+      "version": "1.21.80",
+      "question": "Por que este circuito de redstone não liga?",
+      "expected": "clarify-detail",
+      "criterion": "Faltam componentes, ligações e o sintoma observável."
+    },
+    {
+      "id": "R38",
+      "topic": "redstone",
+      "edition": "Java",
+      "version": "1.21.5",
+      "question": "No Bedrock 1.21.80, qual é o atraso de um repetidor?",
+      "expected": "clarify",
+      "fields": ["edition", "version"]
+    },
+    {
+      "id": "R39",
+      "topic": "redstone",
+      "edition": "Bedrock",
+      "version": "1.21.80",
+      "question": "Para acertar a direção do repetidor e saber a força do sinal da saída, o que devo verificar?",
+      "expected": "evidence",
+      "evidence": [
+        {
+          "card": "MP-repeater-direction",
+          "sources": ["learn-red", "wiki-repeater"]
+        },
+        {
+          "card": "MP-bedrock-repeater",
+          "sources": ["learn-red"]
+        }
+      ],
+      "criterion": "A entrada fica atrás. A saída à frente fica em 15 com entrada positiva, em regime estável sem trava."
+    },
+    {
+      "id": "R40",
+      "topic": "redstone",
+      "edition": "Java",
+      "version": "1.21.5",
+      "question": "Dá para subtrair o sinal lateral mais forte e somar atraso usando repetidor e comparador? Quero saber as duas mecânicas.",
+      "expected": "evidence",
+      "evidence": [
+        {
+          "card": "MP-comparator",
+          "sources": ["wiki-compare"]
+        },
+        {
+          "card": "MP-delay",
+          "sources": ["wiki-repeater"]
+        }
+      ],
+      "criterion": "A maior entrada lateral é subtraída no comparador. O atraso é ajustável no repetidor."
+    },
+    {
+      "id": "R41",
+      "topic": "redstone",
+      "edition": "Java",
+      "version": "1.21.5",
+      "question": "A quasi-conectividade de pistões muda entre Java 1.21.5 e Bedrock 1.21.80?",
+      "expected": "clarify",
+      "criterion": "A busca aceita um contexto de cada vez. A comparação exige dois alvos e busca separada.",
+      "fields": ["edition", "version"]
+    },
+    {
+      "id": "R42",
+      "topic": "sobrevivencia",
+      "edition": "Java",
+      "version": "1.21.5",
+      "question": "No Bedrock, uma âncora carregada funciona no End? Estou no Bedrock.",
+      "expected": "clarify",
+      "criterion": "Repetir o nome de uma edição no texto não resolve o conflito com a edição selecionada.",
+      "fields": ["edition"]
+    },
+    {
+      "id": "R43",
+      "topic": "redstone",
+      "edition": "Bedrock",
+      "version": "1.21.80",
+      "question": "Na linha de pó vou instalar uma lâmpada de cobre. Quando o pulso do botão acaba, a luz fica acesa?",
+      "expected": "evidence",
+      "evidence": [
+        {
+          "card": "MP-dev-bulb-bedrock",
+          "sources": ["mojang-bulb-bedrock"]
+        }
+      ],
+      "criterion": "A lâmpada mantém o estado após o fim do pulso. A ficha de direção do repetidor é irrelevante."
+    },
+    {
+      "id": "R44",
+      "topic": "redstone",
+      "edition": "Bedrock",
+      "version": "1.21.80",
+      "question": "Na linha de pó, um repetidor vai alimentar minha lâmpada de cobre. Quando tiro a alimentação, a lâmpada continua acesa?",
+      "expected": "evidence",
+      "evidence": [
+        {
+          "card": "MP-dev-bulb-bedrock",
+          "sources": ["mojang-bulb-bedrock"]
+        }
+      ],
+      "criterion": "A pergunta pede a memória da lâmpada, embora mencione o repetidor e sua ligação."
+    }
+  ]
+}

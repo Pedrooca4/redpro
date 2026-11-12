@@ -1,0 +1,185 @@
+{
+  "schemaVersion": 1,
+  "purpose": "retrieval-development-candidates",
+  "sources": {
+    "mojang-anchor": {
+      "title": "Renascimento e morte no Minecraft",
+      "url": "https://www.minecraft.net/en-us/article/spawning-and-dying",
+      "license": "Mojang/Microsoft, sem licença aberta identificada para o texto",
+      "conditions": "Referência factual por link. Fatos e exemplos em redação própria."
+    },
+    "mojang-scaffolding": {
+      "title": "Bloco da semana: andaime",
+      "url": "https://www.minecraft.net/pt-br/article/block-week--scaffolding",
+      "license": "Mojang/Microsoft, sem licença aberta identificada para o texto",
+      "conditions": "Referência factual por link. Fatos e exemplos em redação própria."
+    },
+    "mojang-resin-java": {
+      "title": "Java 1.21.4 — The Garden Awakens",
+      "url": "https://feedback.minecraft.net/hc/en-us/articles/32385811139085-Minecraft-Java-Edition-1-21-4-The-Garden-Awakens",
+      "license": "Mojang/Microsoft, sem licença aberta identificada para o texto",
+      "conditions": "Referência factual por link. Fatos e exemplos em redação própria."
+    },
+    "mojang-resin-bedrock": {
+      "title": "Bedrock 1.21.50 — The Garden Awakens",
+      "url": "https://feedback.minecraft.net/hc/en-us/articles/32344904160397-Minecraft-Bedrock-Edition-1-21-50-The-Garden-Awakens",
+      "license": "Mojang/Microsoft, sem licença aberta identificada para o texto",
+      "conditions": "Referência factual por link. Fatos e exemplos em redação própria."
+    },
+    "mojang-flat-bedrock": {
+      "title": "Bedrock 1.21.80 — notas de lançamento",
+      "url": "https://feedback.minecraft.net/hc/en-us/articles/36236281562637-Minecraft-1-21-80-Bedrock",
+      "license": "Mojang/Microsoft, sem licença aberta identificada para o texto",
+      "conditions": "Referência factual por link. Fatos e exemplos em redação própria."
+    },
+    "mojang-bulb-java": {
+      "title": "Java 1.21 — Tricky Trials",
+      "url": "https://feedback.minecraft.net/hc/en-us/articles/27547857163917-Minecraft-Java-Edition-1-21-Tricky-Trials",
+      "license": "Mojang/Microsoft, sem licença aberta identificada para o texto",
+      "conditions": "Referência factual por link. Fatos e exemplos em redação própria."
+    },
+    "mojang-bulb-bedrock": {
+      "title": "Bedrock 1.21 — Tricky Trials",
+      "url": "https://feedback.minecraft.net/hc/en-us/articles/27451789924237-Minecraft-Bedrock-Edition-1-21-Tricky-Trials",
+      "license": "Mojang/Microsoft, sem licença aberta identificada para o texto",
+      "conditions": "Referência factual por link. Fatos e exemplos em redação própria."
+    },
+    "wiki-resin-brick": {
+      "title": "Tijolo de resina — história e fabricação",
+      "url": "https://minecraft.wiki/w/Resin_Brick",
+      "license": "CC BY-NC-SA 3.0 para o texto da Minecraft Wiki, salvo exceções",
+      "conditions": "Referência factual por link. Fatos e exemplos em redação própria."
+    }
+  },
+  "cards": [
+    {
+      "id": "MP-dev-anchor-charges",
+      "topic": "sobrevivencia",
+      "title": "Cargas da âncora de renascimento",
+      "versions": {
+        "Java": ["1.21.5"],
+        "Bedrock": ["1.21.80"]
+      },
+      "keywords": [
+        "recarregar âncora",
+        "carregar âncora",
+        "cargas âncora",
+        "carga âncora",
+        "bloco de pedra luminosa",
+        "brilho da âncora",
+        "capacidade da âncora",
+        "quantas cargas"
+      ],
+      "fact": "No Nether, use um bloco de pedra luminosa na âncora para acrescentar uma carga, até quatro. Renascer nela consome uma carga.",
+      "example": "Uma âncora com duas cargas fica com uma após servir para um renascimento.",
+      "sourceIds": ["mojang-anchor"],
+      "verifiedOn": "2026-11-12",
+      "confidence": "documented"
+    },
+    {
+      "id": "MP-dev-scaffolding",
+      "topic": "crafting",
+      "title": "Andaime para construção",
+      "versions": {
+        "Java": ["1.21.5"],
+        "Bedrock": ["1.21.80"]
+      },
+      "keywords": ["andaime", "andaimes", "bambu linha", "torre de andaime", "receita andaime"],
+      "fact": "Seis bambus e uma linha fabricam seis andaimes. Usar um andaime na base de uma coluna existente acrescenta um bloco no topo da coluna.",
+      "example": "Para aumentar a torre, use o item andaime no bloco de base.",
+      "sourceIds": ["mojang-scaffolding"],
+      "verifiedOn": "2026-11-12",
+      "confidence": "documented"
+    },
+    {
+      "id": "MP-dev-resin-java",
+      "topic": "crafting",
+      "title": "Tijolos de resina no Java",
+      "versions": {
+        "Java": ["1.21.4", "1.21.5"]
+      },
+      "keywords": [
+        "tijolo de resina",
+        "tijolos de resina",
+        "resina na fornalha",
+        "aglomerado de resina",
+        "resina bloco decorativo"
+      ],
+      "fact": "No Java, a partir da 1.21.4, fundir aglomerados de resina produz itens tijolo de resina. Eles servem para fabricar blocos de tijolos de resina.",
+      "example": "Passe os aglomerados pela fornalha antes de montar os blocos decorativos.",
+      "sourceIds": ["mojang-resin-java"],
+      "verifiedOn": "2026-11-12",
+      "confidence": "documented"
+    },
+    {
+      "id": "MP-dev-resin-bedrock",
+      "topic": "crafting",
+      "title": "Tijolos de resina no Bedrock",
+      "versions": {
+        "Bedrock": ["1.21.50", "1.21.80"]
+      },
+      "keywords": [
+        "tijolo de resina",
+        "tijolos de resina",
+        "resina na fornalha",
+        "aglomerado de resina",
+        "resina bloco decorativo"
+      ],
+      "fact": "No Bedrock, a partir da 1.21.50, fundir aglomerados de resina produz itens tijolo de resina. Eles servem para fabricar blocos de tijolos de resina.",
+      "example": "Passe os aglomerados pela fornalha antes de montar os blocos decorativos.",
+      "sourceIds": ["mojang-resin-bedrock", "wiki-resin-brick"],
+      "verifiedOn": "2026-11-12",
+      "confidence": "documented"
+    },
+    {
+      "id": "MP-dev-flat-bedrock",
+      "topic": "versoes",
+      "title": "Modelos de mundo plano no Bedrock",
+      "versions": {
+        "Bedrock": ["1.21.80"]
+      },
+      "keywords": [
+        "mundo plano",
+        "terreno plano",
+        "mundo superplano",
+        "modelo plano",
+        "predefinicao plana",
+        "mundo aquático",
+        "water world"
+      ],
+      "fact": "Ao criar um mundo no Bedrock 1.21.80, ative Mundo plano na aba Avançado para escolher uma predefinição. Entre as opções estão Classic Flat e Water World.",
+      "example": "Escolha uma predefinição antes de criar o mundo para testar sua construção.",
+      "sourceIds": ["mojang-flat-bedrock"],
+      "verifiedOn": "2026-11-12",
+      "confidence": "documented"
+    },
+    {
+      "id": "MP-dev-bulb-java",
+      "topic": "redstone",
+      "title": "Memória da lâmpada de cobre no Java",
+      "versions": {
+        "Java": ["1.21.5"]
+      },
+      "keywords": ["lampada de cobre", "bulbo de cobre", "copper bulb"],
+      "fact": "Quando está sem alimentação, a lâmpada de cobre alterna seu estado de luz ao receber um pulso de redstone. Remover o sinal não apaga a luz. Um novo pulso alterna o estado novamente.",
+      "example": "Um botão pode alternar a luz com dois acionamentos separados.",
+      "sourceIds": ["mojang-bulb-java"],
+      "verifiedOn": "2026-11-12",
+      "confidence": "documented"
+    },
+    {
+      "id": "MP-dev-bulb-bedrock",
+      "topic": "redstone",
+      "title": "Memória da lâmpada de cobre no Bedrock",
+      "versions": {
+        "Bedrock": ["1.21.80"]
+      },
+      "keywords": ["lampada de cobre", "bulbo de cobre", "copper bulb"],
+      "fact": "Quando está sem alimentação, a lâmpada de cobre alterna seu estado de luz ao receber um pulso de redstone. Remover o sinal não apaga a luz. Um novo pulso alterna o estado novamente.",
+      "example": "Um botão pode alternar a luz com dois acionamentos separados.",
+      "sourceIds": ["mojang-bulb-bedrock"],
+      "verifiedOn": "2026-11-12",
+      "confidence": "documented"
+    }
+  ]
+}
