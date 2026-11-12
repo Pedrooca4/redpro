@@ -27,6 +27,8 @@ O relatório tem registros `raw` e `delivered` com texto, hash SHA-256, procedê
 
 As heurísticas cobrem as apresentações usuais em Markdown e marcadores explícitos em PT-BR. A comparação conserva maiúsculas, namespace e tokens. Formas equivalentes com grafia ou argumentos diferentes exigem inspeção. A adequação à intenção depende da explicação e dos efeitos de todos os comandos da resposta. O leitor não testa gramática geral, permissões, efeitos dentro do jogo nem contradições arbitrárias na prosa.
 
+Um rótulo explícito de exemplo vale mesmo quando a frase contém um imperativo. Um novo rótulo de comando correto define seu próprio contexto. Se um bloco contém um único comando, um aviso direto na linha de texto seguinte pode desaconselhá-lo. Em prosa, dois-pontos, travessões e certos parênteses explicativos delimitam o comando. Em código, esses caracteres continuam no texto examinado.
+
 ## Evidência arquivada da 3B
 
 | Saída bruta                      | Métrica histórica | Referência textual | Parâmetros da referência | Referência apresentada |

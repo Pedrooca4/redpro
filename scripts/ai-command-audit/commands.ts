@@ -5,16 +5,29 @@ const commandStart = /(?:^|(?<=[\s(["“'‘:*]))\/[a-z][a-z0-9_-]*(?=\s|[.,;!?\
 const inlineCode = /(`+)([^`]+)\1/g;
 const fenceMarker = /^\s*(?:>\s*)?(`{3,}|~{3,})(.*)$/u;
 const proseBoundary =
-  /[.,;!?](?=\s|$)|["”’)]|\*\*|\s+(?=(?:para|pois|porque|quando|se|no|na|com|sem|e|ou)\b|(?:é|está|seria)\s|não (?:funciona\b|deve\s|é\s)|\((?:incorreto|errado|inválido)\b)/iu;
+  /[.,:;!?](?=\s|$)|["”’)]|\*\*|\s+(?=[–—](?:\s|$)|(?:para|pois|porque|quando|se|no|na|com|sem|e|ou)\b|(?:é|está|seria)\s|não (?:funciona\b|deve\s|é\s)|\((?:incorreto|errado|inválido|sem|com)\b)/iu;
 const action = "usar|use|executar|execute|digitar|digite|rodar|rode|utilizar|utilize";
 const negativeLabel = "incorret[oa]|errad[oa]|inválid[oa]";
+const labels = [
+  {
+    kind: "discouraged" as const,
+    pattern: new RegExp(
+      `\\b(?:(?:exemplos?|comando|sintaxe|forma|uso|instrução)\\s+(?:${negativeLabel}|a evitar|do que não fazer)|${negativeLabel})\\s*:`,
+      "giu",
+    ),
+  },
+  {
+    kind: "presented" as const,
+    pattern: /\b(?:comando|sintaxe|forma|uso|instrução)\s+(?:corret[oa]|válid[oa])\s*:/giu,
+  },
+  { kind: "example" as const, pattern: /\bexemplos?(?:\s+de\s+[\p{L} ]+)?\s*:/giu },
+];
 const discouraged = new RegExp(
   [
     `\\bnão\\s+(?:(?:se\\s+)?deve\\s+|(?:é\\s+(?:para|necessário))\\s+)?(?:${action}|recomend\\w*|faça)\\b`,
     "\\bnão é(?:\\s+o comando (?:certo|correto))?(?=\\s|:|$)",
     `\\b(?:evite|evitar|nunca|em vez de|ao invés de)(?:\\s+(?:${action}))?\\b`,
-    `\\b(?:exemplo|comando|sintaxe|forma|uso)\\s+(?:${negativeLabel}|a evitar|do que não fazer)\\b(?::\\s*(?:${action})\\b)?`,
-    `\\b(?:${negativeLabel})(?=\\s*:)`,
+    `\\b(?:exemplo|comando|sintaxe|forma|uso)\\s+(?:${negativeLabel}|a evitar|do que não fazer)\\b`,
   ].join("|"),
   "giu",
 );
@@ -22,6 +35,8 @@ const presented = /\b(?:use|usar|execute|executar|digite|digitar|rode|rodar|util
 const example = /\b(?:exemplos?|ilustraç(?:ão|ões)|hipotétic[oa]s?)\b/giu;
 const trailingDiscouragement =
   /^[\s*`_]*(?:(?:é|está|seria|\(|[–—:])\s*(?:incorreto|errado|inválido)\b|não\s+(?:funciona|deve ser (?:usado|executado)|é o comando certo)\b)/iu;
+const afterBlockWarning =
+  /^\s*(?:não\s+(?:use|execute|rode|digite|utilize)|evite(?:\s+usar)?)\s+(?:esse|este)\s+(?:comando|exemplo)\s*[.!]?\s*$/iu;
 const standalonePrefix = /^\s*(?:(?:[-+*>]+|\d+[.)])\s*)?[*_]*$/u;
 const commandLabel =
   /\b(?:comando|sintaxe)(?:\s+(?:é|corret[oa]|[^.!?;]{0,120}\s+é))?\s*[:*_\s]*$/iu;
@@ -33,26 +48,29 @@ type Mention = {
   presentation: Presentation;
 };
 
-function lastCue(prefix: string) {
-  const clause = prefix.split(/[.!?;](?=\s|$)/u).at(-1) ?? "";
-  const cues = [
-    { kind: "discouraged" as const, matches: clause.matchAll(discouraged) },
-    { kind: "presented" as const, matches: clause.matchAll(presented) },
-    { kind: "example" as const, matches: clause.matchAll(example) },
-  ];
+function latestCue(clause: string, cues: { kind: Presentation; pattern: RegExp }[]) {
   // Use the end of the cue so the "use" inside "não use" does not win.
-  let latest = -1;
-  let result: Presentation = "uncertain";
-  for (const { kind, matches } of cues) {
-    for (const match of matches) {
+  let result: { kind: Presentation; end: number } = { kind: "uncertain", end: -1 };
+  for (const { kind, pattern } of cues) {
+    for (const match of clause.matchAll(pattern)) {
       const end = match.index + match[0].length;
-      if (end > latest) {
-        latest = end;
-        result = kind;
-      }
+      if (end > result.end) result = { kind, end };
     }
   }
   return result;
+}
+
+function lastCue(prefix: string) {
+  const clause = prefix.split(/[.!?;](?=\s|$)/u).at(-1) ?? "";
+  const label = latestCue(clause, labels);
+  // An imperative inside a labelled example belongs to that example.
+  if (label.kind === "discouraged" || label.kind === "example") return label.kind;
+  const directive = latestCue(clause.slice(Math.max(0, label.end)), [
+    { kind: "discouraged", pattern: discouraged },
+    { kind: "presented", pattern: presented },
+    { kind: "example", pattern: example },
+  ]);
+  return directive.kind === "uncertain" ? label.kind : directive.kind;
 }
 
 function classify(prefix: string, suffix: string, fallback: Presentation): Presentation {
@@ -68,11 +86,16 @@ function classifyLine(prefix: string, suffix: string, lead: string): Presentatio
 
 function extract(text: string): Mention[] {
   const mentions: Mention[] = [];
-  let fence: { marker: string; presentation: Presentation } | null = null;
+  let fence: { marker: string; presentation: Presentation; firstMention: number } | null = null;
+  let closedCommand: Mention | undefined;
   let lead = "";
   for (const [index, raw] of text.split(/\r?\n/u).entries()) {
     const line = index + 1;
     const marker = fenceMarker.exec(raw);
+    if (closedCommand && raw.trim()) {
+      if (afterBlockWarning.test(raw)) closedCommand.presentation = "discouraged";
+      closedCommand = undefined;
+    }
     if (fence) {
       if (
         marker &&
@@ -80,6 +103,8 @@ function extract(text: string): Mention[] {
         marker[1].length >= fence.marker.length &&
         !marker[2].trim()
       ) {
+        if (mentions.length === fence.firstMention + 1)
+          closedCommand = mentions[fence.firstMention];
         fence = null;
         lead = "";
       } else {
@@ -91,7 +116,11 @@ function extract(text: string): Mention[] {
       continue;
     }
     if (marker) {
-      fence = { marker: marker[1], presentation: classify(lead, "", "presented") };
+      fence = {
+        marker: marker[1],
+        presentation: classify(lead, "", "presented"),
+        firstMention: mentions.length,
+      };
       continue;
     }
 
