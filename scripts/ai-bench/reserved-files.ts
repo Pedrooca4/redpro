@@ -1,9 +1,12 @@
 import { randomUUID } from "node:crypto";
-import { constants } from "node:fs";
-import { link, lstat, open, realpath, unlink } from "node:fs/promises";
+import { constants, type Stats } from "node:fs";
+import { link, lstat, open, readdir, realpath, unlink } from "node:fs/promises";
 import { dirname, isAbsolute, resolve } from "node:path";
 
 import { BenchError } from "./local.ts";
+
+const PENDING_FILE =
+  /^\.pending-[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
 
 export async function privateDirectory(path: string) {
   if (!process.getuid || !isAbsolute(path) || (await realpath(path)) !== resolve(path)) {
@@ -24,18 +27,43 @@ export async function privateDirectory(path: string) {
   }
 }
 
-export async function readPrivateFile(path: string, limit: number) {
+async function hasPendingLink(path: string, info: Stats) {
+  const directory = dirname(path);
+  for (const name of await readdir(directory)) {
+    if (!PENDING_FILE.test(name)) continue;
+    const pending = await lstat(resolve(directory, name)).catch((error: NodeJS.ErrnoException) => {
+      if (error.code === "ENOENT") return null;
+      throw error;
+    });
+    if (pending?.isFile() && pending.dev === info.dev && pending.ino === info.ino) return true;
+  }
+  return false;
+}
+
+export async function readPrivateFile(
+  path: string,
+  limit: number,
+  { recoverPublishedFile = false } = {},
+) {
   const file = await open(path, constants.O_RDONLY | constants.O_NOFOLLOW | constants.O_NONBLOCK);
   try {
     const info = await file.stat();
     if (
       !info.isFile() ||
-      info.nlink !== 1 ||
       info.uid !== process.getuid?.() ||
       (info.mode & 0o777) !== 0o600 ||
       info.size > limit
     ) {
       throw new BenchError("Arquivo privado deve ser regular, próprio, 0600 e respeitar o limite.");
+    }
+    if (info.nlink !== 1) {
+      // The writer can crash after linking the result and before unlinking the staging name.
+      const pending =
+        recoverPublishedFile && info.nlink === 2 && (await hasPendingLink(path, info));
+      const { nlink } = await file.stat();
+      if (!recoverPublishedFile || (nlink !== 1 && !(pending && nlink === 2))) {
+        throw new BenchError("Arquivo privado contém um hardlink não autorizado.");
+      }
     }
     // Read a bounded snapshot from the same descriptor used for checks and hashing.
     const buffer = Buffer.alloc(limit + 1);

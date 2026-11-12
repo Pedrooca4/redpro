@@ -26,6 +26,7 @@ import {
 } from "./reserved-results.ts";
 import {
   boundedText,
+  canonicalHash,
   loadReservedSuite,
   parsePrivateJSON,
   RESERVED_COUNT,
@@ -36,6 +37,7 @@ import { loadManifest, readJSON, sha256File, startLocalServer } from "./runtime.
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
 const MAX_PRIVATE_RESULT_BYTES = 4 * 1024 * 1024;
+const MAX_BLIND_PACK_BYTES = 16 * 1024 * 1024;
 type Suite = Awaited<ReturnType<typeof loadReservedSuite>>;
 
 export function validateReferenceReview(suite: Pick<Suite, "cases">, value: unknown) {
@@ -73,7 +75,9 @@ export function validateReferenceReview(suite: Pick<Suite, "cases">, value: unkn
 }
 
 async function readResult(path: string) {
-  return parsePrivateJSON(await readPrivateFile(path, MAX_PRIVATE_RESULT_BYTES));
+  return parsePrivateJSON(
+    await readPrivateFile(path, MAX_PRIVATE_RESULT_BYTES, { recoverPublishedFile: true }),
+  );
 }
 
 async function readCheckpoints(suite: Suite, runId: string) {
@@ -91,11 +95,10 @@ async function readCheckpoints(suite: Suite, runId: string) {
   for (const item of suite.cases) {
     const checkpoint = await readResult(join(directory, `case-${item.id}.json`)).catch(
       (error: NodeJS.ErrnoException) => {
-        if (error.code === "ENOENT") return null;
-        throw error;
+        if (error.code !== "ENOENT") throw error;
       },
     );
-    if (checkpoint === null) continue;
+    if (checkpoint === undefined) continue;
     const record = asObject(checkpoint);
     if (
       record.schemaVersion !== 1 ||
@@ -355,9 +358,24 @@ export async function reservedCommand(command: string, args: string[]) {
     join(run.directory, "ratings.json"),
     MAX_PRIVATE_RESULT_BYTES,
   );
+  const packBytes = await readPrivateFile(
+    join(run.directory, "blind-pack.json"),
+    MAX_BLIND_PACK_BYTES,
+    {
+      recoverPublishedFile: true,
+    },
+  ).catch((error: NodeJS.ErrnoException) => {
+    if (error.code !== "ENOENT") throw error;
+    throw new BenchError("Gere e preserve o pacote cego da execução antes de importar as notas.");
+  });
+  const pack = asObject(parsePrivateJSON(packBytes));
+  if (canonicalHash(asObject(pack.sources)) !== canonicalHash(suite.sources)) {
+    throw new BenchError("As fontes do pacote cego divergem da bateria congelada.");
+  }
   const reportName = `scored-${randomUUID()}.json`;
   await writePrivateJSON(join(run.directory, reportName), {
-    ...scoreReserved(runId, run.cases, parsePrivateJSON(ratings), RESERVED_COUNT),
+    ...scoreReserved(runId, suite.cases, run.cases, pack, parsePrivateJSON(ratings)),
+    blindPackSha256: sha256(packBytes),
     ratingsSha256: sha256(ratings),
   });
   process.stdout.write(`Notas gravadas em ${reportName}.\n`);

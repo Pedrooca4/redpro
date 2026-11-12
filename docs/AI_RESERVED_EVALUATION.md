@@ -74,7 +74,7 @@ O arquivo `blind-pack.json` inclui critérios e um ID opaco por resposta. O aval
 }
 ```
 
-Use 2 para acerto integral, 1 para parcial e 0 para erro ou falha crítica. Registre a origem real como `human` ou `assisted`. Respostas sem nota ficam pendentes. Rode `pnpm ai:bench reserved-score --private-dir "$private_dir" --run-id "$run_id"` para validar os vínculos e produzir uma revisão com totais separados para A, B e C. O arquivo `scored-*.json` é novo a cada importação. Preserve as notas originais de cada avaliador e, se houver mais de um, faça a adjudicação em uma revisão adicional.
+Use 2 para acerto integral, 1 para parcial e 0 para erro ou falha crítica. Registre a origem real como `human` ou `assisted`. Respostas do pacote sem nota ficam pendentes. Rode `pnpm ai:bench reserved-score --private-dir "$private_dir" --run-id "$run_id"` com o `blind-pack.json` original no diretório da execução. O comando confere as respostas e os critérios do pacote com os checkpoints e a bateria, e só importa notas de respostas presentes nesse pacote. Cada `scored-*.json` registra os hashes do pacote e das notas e traz totais para A, B e C. Preserve as notas originais de cada avaliador e, se houver mais de um, faça a adjudicação em uma revisão adicional.
 
 ## Armazenamento e recuperação
 
@@ -88,4 +88,4 @@ rsync -a --ignore-existing --exclude='.pending-*' \
   "$private_dir/$run_id/" "$backup_dir/$run_id/"
 ```
 
-Preserve também a bateria congelada e a revisão de referências, em arquivos separados, em armazenamento privado persistente. A nota e o pacote cego podem ser processados a partir dos checkpoints concluídos mesmo se faltar `status.json`. Uma queda durante um caso pode perder esse caso. Uma nova execução recebe outro ID. Não combine checkpoints de execuções diferentes.
+Preserve também a bateria congelada e a revisão de referências, em arquivos separados, em armazenamento privado persistente. Gere o pacote cego depois que o processo terminar, mesmo se faltar `status.json`. Um pacote parcial cobre somente as respostas que estavam disponíveis na sua criação. O leitor recupera um checkpoint publicado mesmo se a queda deixou seu link temporário no mesmo diretório privado. Uma queda durante um caso pode perder esse caso. Uma nova execução recebe outro ID. Não combine checkpoints de execuções diferentes.

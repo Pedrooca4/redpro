@@ -173,6 +173,28 @@ test("caminho reservado exige diretório e arquivo privados com nome e hash fixo
   }
 });
 
+test("recupera a publicação interrompida de um checkpoint e recusa hardlinks externos", async () => {
+  const directory = await testDirectory();
+  try {
+    const pending = join(directory, ".pending-00000000-0000-4000-8000-000000000001");
+    const checkpoint = join(directory, "case-fixture.json");
+    const unexpected = join(directory, "outro-link.json");
+    await writeFile(pending, "{}\n", { mode: 0o600 });
+    await link(pending, checkpoint);
+    const options = { recoverPublishedFile: true };
+    assert.equal((await readPrivateFile(checkpoint, 100, options)).toString(), "{}\n");
+    await assert.rejects(readPrivateFile(checkpoint, 100), /hardlink/);
+    await link(checkpoint, unexpected);
+    await assert.rejects(readPrivateFile(checkpoint, 100, options), /hardlink/);
+    await rm(pending);
+    await assert.rejects(readPrivateFile(checkpoint, 100, options), /hardlink/);
+    await rm(unexpected);
+    assert.equal((await readPrivateFile(checkpoint, 100, options)).toString(), "{}\n");
+  } finally {
+    await rm(directory, { recursive: true, force: true });
+  }
+});
+
 test("o executor simulado faz duas gerações por caso e registra A, B e C independentemente", async () => {
   const { cases } = parseReservedSuite(fixture());
   const corpus = JSON.parse(
@@ -240,7 +262,7 @@ test("o executor simulado faz duas gerações por caso e registra A, B e C indep
       reviewer: "fixture",
       ratings: [score(row.A.answer!, 0), score(row.B.answer!, 1), score(row.C.answer!, 2)],
     };
-    const report = scoreReserved("run", results, input, 72);
+    const report = scoreReserved("run", cases, results, pack, input);
     assert.deepEqual(
       [report.summary.A.points, report.summary.B.points, report.summary.C.points],
       [0, 1, 2],
@@ -249,23 +271,37 @@ test("o executor simulado faz duas gerações por caso e registra A, B e C indep
     assert.equal(report.review.declaredOrigin, "assisted");
     assert.throws(
       () =>
-        scoreReserved(
-          "run",
-          results,
-          { ...input, ratings: [{ ...input.ratings[2], answerSha256: row.B.answer!.sha256 }] },
-          72,
-        ),
+        scoreReserved("run", cases, results, pack, {
+          ...input,
+          ratings: [{ ...input.ratings[2], answerSha256: row.B.answer!.sha256 }],
+        }),
       /Nota inválida/,
     );
     assert.throws(
       () =>
-        scoreReserved(
-          "run",
-          results,
-          { ...input, ratings: [{ ...input.ratings[2], criticalError: true }] },
-          72,
-        ),
+        scoreReserved("run", cases, results, pack, {
+          ...input,
+          ratings: [{ ...input.ratings[2], criticalError: true }],
+        }),
       /Nota inválida/,
+    );
+    const partialPack = blindReviewPack("run", cases, [row]);
+    assert.equal(scoreReserved("run", cases, results, partialPack, input).summary.A.answered, 1);
+    const absent = results.find((result) => result.caseId !== target.id)!;
+    assert.throws(
+      () =>
+        scoreReserved("run", cases, results, partialPack, {
+          ...input,
+          ratings: [score(absent.A.answer!, 2)],
+        }),
+      /Nota inválida/,
+    );
+    assert.throws(() => scoreReserved("run", cases, results, undefined, input), /Pacote cego/);
+    const alteredPack = structuredClone(partialPack);
+    alteredPack.cases[0].answers[0].text = "Texto alterado";
+    assert.throws(
+      () => scoreReserved("run", cases, results, alteredPack, input),
+      /não confere com o checkpoint/,
     );
     const duplicateText = results.find((result) => result.C.answer?.origin === "rag-passthrough")!;
     assert.equal(duplicateText.C.answer?.sha256, duplicateText.B.answer?.sha256);

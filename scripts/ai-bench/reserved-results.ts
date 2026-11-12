@@ -5,7 +5,7 @@ import { groundAnswer } from "./grounding.ts";
 import { createKnowledgeSearch, evidenceFor, withKnowledge } from "./knowledge.ts";
 import { asObject, BenchError, type ChatMessage, type Completion } from "./local.ts";
 import { evaluateCase } from "./report.ts";
-import { boundedText, sha256, type ReservedCase } from "./reserved-suite.ts";
+import { boundedText, canonicalHash, sha256, type ReservedCase } from "./reserved-suite.ts";
 
 export const MODES = ["A", "B", "C"] as const;
 type Mode = (typeof MODES)[number];
@@ -22,6 +22,7 @@ type Answer = {
   origin: Origin;
   rating: null;
 };
+type CheckpointAnswer = { caseId: string; mode: Mode; answer: Answer };
 type Generation = {
   answer: Answer | null;
   telemetry: Omit<Completion, "text"> | null;
@@ -109,7 +110,7 @@ export async function collectReserved(
 }
 
 function responses(results: CaseCheckpoint[]) {
-  const byId = new Map<string, { caseId: string; mode: Mode; answer: Answer }>();
+  const byId = new Map<string, CheckpointAnswer>();
   for (const result of results) {
     for (const mode of MODES) {
       const row = asObject(asObject(result)[mode]);
@@ -150,6 +151,19 @@ function responses(results: CaseCheckpoint[]) {
   return byId;
 }
 
+function blindCase(item: ReservedCase) {
+  return {
+    caseId: item.id,
+    edition: item.edition,
+    version: item.version,
+    question: item.question,
+    reference: item.reference,
+    criteria: item.rubric,
+    criticalError: item.criticalError,
+    sourceIds: item.sourceIds,
+  };
+}
+
 export function blindReviewPack(runId: string, cases: ReservedCase[], results: CaseCheckpoint[]) {
   const byId = responses(results);
   return {
@@ -168,30 +182,66 @@ export function blindReviewPack(runId: string, cases: ReservedCase[], results: C
           const j = randomInt(i + 1);
           [answers[i], answers[j]] = [answers[j], answers[i]];
         }
-        return {
-          caseId: item.id,
-          edition: item.edition,
-          version: item.version,
-          question: item.question,
-          reference: item.reference,
-          criteria: item.rubric,
-          criticalError: item.criticalError,
-          sourceIds: item.sourceIds,
-          answers,
-        };
+        return { ...blindCase(item), answers };
       })
       .filter((item) => item.answers.length > 0),
   };
 }
 
+function packagedResponses(
+  runId: string,
+  cases: ReservedCase[],
+  results: CaseCheckpoint[],
+  value: unknown,
+) {
+  const pack = asObject(value);
+  if (pack.schemaVersion !== 1 || pack.runId !== runId || !Array.isArray(pack.cases)) {
+    throw new BenchError("Pacote cego não corresponde à execução selecionada.");
+  }
+  const byId = responses(results);
+  const caseById = new Map(cases.map((item) => [item.id, blindCase(item)]));
+  const packaged = new Map<string, CheckpointAnswer>();
+  for (const entry of pack.cases) {
+    const { answers, ...metadata } = asObject(entry);
+    const expected =
+      typeof metadata.caseId === "string" ? caseById.get(metadata.caseId) : undefined;
+    if (
+      !expected ||
+      canonicalHash(metadata) !== canonicalHash(expected) ||
+      !Array.isArray(answers) ||
+      answers.length === 0
+    ) {
+      throw new BenchError("Caso inválido, duplicado ou alterado no pacote cego.");
+    }
+    caseById.delete(expected.caseId);
+    for (const value of answers) {
+      const { id, text, sha256: digest, ...extra } = asObject(value);
+      const row = typeof id === "string" ? byId.get(id) : undefined;
+      if (
+        !row ||
+        Object.keys(extra).length > 0 ||
+        row.caseId !== expected.caseId ||
+        packaged.has(row.answer.id) ||
+        row.answer.text !== text ||
+        row.answer.sha256 !== digest
+      ) {
+        throw new BenchError("Resposta do pacote cego não confere com o checkpoint.");
+      }
+      packaged.set(row.answer.id, row);
+    }
+  }
+  return packaged;
+}
+
 export function scoreReserved(
   runId: string,
+  cases: ReservedCase[],
   results: CaseCheckpoint[],
+  blindPack: unknown,
   input: unknown,
-  caseCount: number,
 ) {
   const review = asObject(input);
-  const byId = responses(results);
+  const byId = packagedResponses(runId, cases, results, blindPack);
   if (
     review.schemaVersion !== 1 ||
     review.runId !== runId ||
@@ -278,12 +328,12 @@ export function scoreReserved(
           mode,
           {
             answered: rows.length,
-            missing: caseCount - rows.length,
+            missing: cases.length - rows.length,
             rated: classified.length,
             pending: rows.length - classified.length,
             points: classified.length ? classified.reduce((sum, row) => sum + row.points, 0) : null,
             maxPointsForRated: classified.length * 2,
-            maxPointsForSuite: caseCount * 2,
+            maxPointsForSuite: cases.length * 2,
             full: classified.filter((row) => row.points === 2).length,
             criticalErrors: classified.filter((row) => row.criticalError).length,
           },
