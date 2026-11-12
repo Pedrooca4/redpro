@@ -1,0 +1,27 @@
+{
+  "caseId": "AMB-B01",
+  "base": {
+    "caseId": "AMB-B01",
+    "answer": {
+      "text": "Para preencher uma sala com `/fill`, você precisa definir as coordenadas do canto inferior esquerdo e do canto superior direito. Como ainda não mediu, aqui está o comando padrão para uma sala de **10x10 blocos** com **3 blocos de altura** (chão, paredes e teto), usando o bloco de **terra** (`stone` ou `dirt` dependendo do seu gosto):\n\n```bash\n/fill ~ ~-3 ~ ~ ~3 ~3 ~ ~10 ~3 ~ ~10 ~3 ~ ~10 ~3 ~ ~10 ~3 ~ ~10 ~3 ~ ~10 ~3 ~ ~10 ~3 ~ ~10 ~3 ~ ~10 ~3 ~ ~10 ~3 ~ ~10 ~3 ~ ~10 ~3 ~ ~10 ~3 ~ ~10 ~3 ~ ~10 ~3 ~ ~10 ~3 ~ ~10 ~3 ~ ~10 ~3 ~ ~10 ~3 ~ ~10 ~3 ~ ~10 ~3 ~ ~10 ~3 ~ ~10 ~3 ~ ~10 ~3 ~ ~10 ~3 ~ ~1"
+    },
+    "answerSha256": "76a29763667e1eee8da94c231cb55900892f4fbd1243f5692dd2c624323eaa2b"
+  },
+  "baseReview": {
+    "caseId": "AMB-B01",
+    "answerSha256": "76a29763667e1eee8da94c231cb55900892f4fbd1243f5692dd2c624323eaa2b",
+    "factual": "incorrect"
+  },
+  "rag": {
+    "caseId": "AMB-B01",
+    "answer": {
+      "text": "Para gerar o comando `/fill` exato, preciso que você forneça as coordenadas dos dois pontos opostos que definem a sala (formato `x y z`) e o bloco que deseja colocar (ex: `stone`).\n\nSem esses dados, não posso criar o comando específico.\n\n[MP-fill]"
+    },
+    "answerSha256": "135097a3ec29acee5e190776941e481be418afececb20a3d4842872c8096d949"
+  },
+  "ragReview": {
+    "caseId": "AMB-B01",
+    "answerSha256": "135097a3ec29acee5e190776941e481be418afececb20a3d4842872c8096d949",
+    "factual": "correct"
+  }
+}
