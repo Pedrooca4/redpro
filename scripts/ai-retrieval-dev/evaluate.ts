@@ -1,9 +1,18 @@
+import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { createKnowledgeSearch, type Retrieval } from "../ai-bench/knowledge.ts";
 import { searchWithContext, type ContextField, type Query } from "./context.ts";
+
+const fixtures = {
+  "3fa": "./cases.json",
+  "3fb": "./cases-3fb.json",
+} as const;
+type Suite = keyof typeof fixtures;
+type SourceLinks = Record<string, { url: string }>;
+const PHASE_3FB_SHA256 = "ec95340e3cd44bed598b82d98a8c896f30ffc7f13985776807589df9faa585c8";
 
 type Card = {
   id: string;
@@ -14,7 +23,7 @@ type Card = {
 type Corpus = {
   schemaVersion: number;
   purpose: string;
-  sources: Record<string, { url: string }>;
+  sources: SourceLinks;
   cards: Card[];
 };
 type Expectation =
@@ -34,16 +43,27 @@ type Example = Query & {
 const read = async <T>(path: string): Promise<T> =>
   JSON.parse(await readFile(new URL(path, import.meta.url), "utf8")) as T;
 
-export async function loadDevelopment() {
-  const [base, candidates, fixture, regression] = await Promise.all([
+export async function loadDevelopment(suite: Suite = "3fa") {
+  const [base, candidates, fixtureBytes, regression] = await Promise.all([
     read<Corpus>("../ai-bench/knowledge.json"),
     read<Corpus>("./candidates.json"),
-    read<{ purpose: string; queries: Example[] }>("./cases.json"),
+    readFile(new URL(fixtures[suite], import.meta.url)),
     read<{ queries: (Query & { id: string; expectedTop: string | null })[] }>(
       "../ai-bench/retrieval-dev.json",
     ),
   ]);
+  const sha256 = createHash("sha256").update(fixtureBytes).digest("hex");
+  if (suite === "3fb" && sha256 !== PHASE_3FB_SHA256) {
+    throw new Error("As perguntas ou os critérios da Fase 3F-B foram alterados.");
+  }
+  const fixture = JSON.parse(fixtureBytes.toString("utf8")) as {
+    schemaVersion: number;
+    purpose: string;
+    queries: Example[];
+    references?: SourceLinks;
+  };
   if (
+    fixture.schemaVersion !== 1 ||
     fixture.purpose !== "retrieval-development-only" ||
     candidates.purpose !== "retrieval-development-candidates"
   ) {
@@ -57,6 +77,13 @@ export async function loadDevelopment() {
     sources: { ...base.sources, ...candidates.sources },
     cards: [...base.cards, ...candidates.cards],
   };
+  const referenceOnly = fixture.references ?? {};
+  for (const [id, { url }] of Object.entries(referenceOnly)) {
+    if (Object.hasOwn(expanded.sources, id) || new URL(url).protocol !== "https:") {
+      throw new Error(`Referência externa inválida: ${id}`);
+    }
+  }
+  const references = { ...expanded.sources, ...referenceOnly };
   const catalog = new Map(expanded.cards.map((card) => [card.id, card]));
   const ids = new Set<string>();
   for (const example of fixture.queries) {
@@ -83,12 +110,12 @@ export async function loadDevelopment() {
     }
     if (
       example.relatedCards?.some((id) => !catalog.has(id)) ||
-      (example.reference && !Object.hasOwn(expanded.sources, example.reference))
+      (example.reference && !Object.hasOwn(references, example.reference))
     ) {
       throw new Error(`Referência desconhecida em ${example.id}`);
     }
   }
-  return { base, candidates, expanded, regression, queries: fixture.queries };
+  return { base, candidates, expanded, regression, queries: fixture.queries, references, sha256 };
 }
 
 function assess(
@@ -96,7 +123,7 @@ function assess(
   corpus: Corpus,
   search: ReturnType<typeof createKnowledgeSearch>,
   guard: boolean,
-  references: Corpus["sources"],
+  references: SourceLinks,
 ) {
   const response: { retrieval?: Retrieval; clarification?: ContextField[] } = guard
     ? searchWithContext(search, example)
@@ -147,6 +174,7 @@ function assess(
       : evidence.flatMap(({ sources }) => sources)
     ).map((id) => ({ id, url: references[id].url })),
     criterion: example.criterion ?? null,
+    expectedFields: example.fields ?? [],
     reason: response.clarification
       ? "clarification"
       : (response.retrieval?.reason ?? "missing-edition"),
@@ -177,6 +205,9 @@ function totals(rows: Row[]) {
     evidenceCases: count((row) => row.expected === "evidence"),
     evidenceCorrect: count((row) => row.expected === "evidence" && row.correct),
     covered: count((row) => row.retrieved.length > 0),
+    abstentions: count((row) => row.status === "no-evidence"),
+    adequateAbstentions: count((row) => row.status === "no-evidence" && row.correct),
+    clarifications: count((row) => row.status === "clarification"),
     relevantTop: count((row) => row.relevantTop),
     allRelevant: count((row) => row.allRelevant),
     sourcesCorrect: count((row) => row.sourcesCorrect),
@@ -216,20 +247,23 @@ function summarize(rows: Row[]) {
   };
 }
 
-export async function evaluateRetrieval() {
-  const { base, candidates, expanded, queries, regression } = await loadDevelopment();
+export async function evaluateRetrieval(suite: Suite = "3fa") {
+  const { base, candidates, expanded, queries, regression, references, sha256 } =
+    await loadDevelopment(suite);
   const baseSearch = createKnowledgeSearch(base);
   const expandedSearch = createKnowledgeSearch(expanded);
   const baseline = summarize(
-    queries.map((query) => assess(query, base, baseSearch, false, expanded.sources)),
+    queries.map((query) => assess(query, base, baseSearch, false, references)),
   );
   const context = summarize(
-    queries.map((query) => assess(query, base, baseSearch, true, expanded.sources)),
+    queries.map((query) => assess(query, base, baseSearch, true, references)),
   );
   const proposed = summarize(
-    queries.map((query) => assess(query, expanded, expandedSearch, true, expanded.sources)),
+    queries.map((query) => assess(query, expanded, expandedSearch, true, references)),
   );
   return {
+    suite,
+    sha256,
     cards: {
       baseline: base.cards.length,
       candidate: candidates.cards.length,
@@ -263,5 +297,7 @@ export async function evaluateRetrieval() {
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
-  process.stdout.write(`${JSON.stringify(await evaluateRetrieval(), null, 2)}\n`);
+  const suite = process.argv[2] ?? "3fa";
+  if (suite !== "3fa" && suite !== "3fb") throw new Error("Use o conjunto 3fa ou 3fb.");
+  process.stdout.write(`${JSON.stringify(await evaluateRetrieval(suite), null, 2)}\n`);
 }

@@ -1,0 +1,554 @@
+{
+  "schemaVersion": 1,
+  "purpose": "retrieval-development-only",
+  "queries": [
+    {
+      "id": "B01",
+      "topic": "redstone",
+      "edition": "Java",
+      "version": "1.21.5",
+      "question": "Tenho uma lâmpada de cobre apagada. Acionei e soltei o botão três vezes, com uma pausa entre os toques. Em que estado ela termina?",
+      "expected": "evidence",
+      "criterion": "Cada pulso alterna a luz, que termina acesa após três pulsos.",
+      "evidence": [
+        {
+          "card": "MP-dev-bulb-java",
+          "sources": ["mojang-bulb-java"]
+        }
+      ]
+    },
+    {
+      "id": "B02",
+      "topic": "redstone",
+      "edition": "Bedrock",
+      "version": "1.21.80",
+      "question": "Coloquei um comparador para ler a lâmpada de cobre. Depois de dois pulsos separados, partindo de apagada, qual é o estado da luz?",
+      "expected": "evidence",
+      "criterion": "A pergunta pede o estado da luz após duas alternâncias: apagada.",
+      "evidence": [
+        {
+          "card": "MP-dev-bulb-bedrock",
+          "sources": ["mojang-bulb-bedrock"]
+        }
+      ]
+    },
+    {
+      "id": "B03",
+      "topic": "redstone",
+      "edition": "Bedrock",
+      "version": "1.21.80",
+      "question": "Tem um comparador e um repetidor na linha de pó antes da lâmpada de cobre. Se eu tirar a alimentação depois de acendê-la, a luz continua ligada?",
+      "expected": "evidence",
+      "criterion": "A lâmpada mantém o estado ao perder a alimentação; os outros componentes só descrevem o circuito.",
+      "evidence": [
+        {
+          "card": "MP-dev-bulb-bedrock",
+          "sources": ["mojang-bulb-bedrock"]
+        }
+      ]
+    },
+    {
+      "id": "B04",
+      "topic": "redstone",
+      "edition": "Java",
+      "version": "1.21.5",
+      "question": "Na entrada traseira do comparador tenho 7, nas laterais tenho 4 e 9. Há uma lâmpada de cobre na montagem, mas qual sinal o comparador manda em subtração?",
+      "expected": "evidence",
+      "criterion": "A diferença entre 7 e a maior lateral, 9, é limitada a zero.",
+      "evidence": [
+        {
+          "card": "MP-comparator",
+          "sources": ["wiki-compare"]
+        }
+      ]
+    },
+    {
+      "id": "B05",
+      "topic": "redstone",
+      "edition": "Bedrock",
+      "version": "1.21.80",
+      "question": "A fonte está atrás de um repetidor destravado e entrega sinal 2 constante. A lâmpada de cobre é só o destino. Qual a intensidade estável na saída frontal do repetidor?",
+      "expected": "evidence",
+      "criterion": "O repetidor regenera o sinal positivo para 15; o destino não muda a pergunta.",
+      "evidence": [
+        {
+          "card": "MP-bedrock-repeater",
+          "sources": ["learn-red"]
+        }
+      ],
+      "relatedCards": ["MP-repeater-direction"]
+    },
+    {
+      "id": "B06",
+      "topic": "redstone",
+      "edition": "Bedrock",
+      "version": "1.21.80",
+      "question": "Tenho um botão e um repetidor entre o botão e a porta. Para que lado fica a frente do repetidor se quero que a porta receba o pulso?",
+      "expected": "evidence",
+      "criterion": "A frente aponta para o destino. A entrada fica voltada para a fonte.",
+      "evidence": [
+        {
+          "card": "MP-repeater-direction",
+          "sources": ["learn-red", "wiki-repeater"]
+        }
+      ],
+      "relatedCards": ["MP-bedrock-repeater"]
+    },
+    {
+      "id": "B07",
+      "topic": "redstone",
+      "edition": "Java",
+      "version": "1.21.5",
+      "question": "Coloquei dois repetidores em série na configuração mínima. Quantos ticks de jogo os atrasos desses dois componentes somam?",
+      "expected": "evidence",
+      "criterion": "Cada repetidor na configuração mínima acrescenta um tick de redstone, ou dois de jogo. Total de quatro ticks de jogo.",
+      "evidence": [
+        {
+          "card": "MP-delay",
+          "sources": ["wiki-repeater"]
+        }
+      ]
+    },
+    {
+      "id": "B08",
+      "topic": "redstone",
+      "edition": "Bedrock",
+      "version": "1.21.80",
+      "question": "No repetidor, a intensidade na entrada de trás caiu de 12 para zero e a linha já estabilizou. Que força do sinal sai agora e de que lado sai?",
+      "expected": "evidence",
+      "criterion": "A saída estável é zero com entrada traseira zero; a face de saída é a frente.",
+      "evidence": [
+        {
+          "card": "MP-bedrock-repeater",
+          "sources": ["learn-red"]
+        },
+        {
+          "card": "MP-repeater-direction",
+          "sources": ["learn-red", "wiki-repeater"]
+        }
+      ]
+    },
+    {
+      "id": "B09",
+      "topic": "redstone",
+      "edition": "Java",
+      "version": "1.21.5",
+      "question": "Uma lâmpada de cobre está acesa. Qual força de redstone o comparador que lê a lâmpada deve emitir?",
+      "expected": "insufficient",
+      "criterion": "A nota Java informa 15. As fichas cobrem alternância da lâmpada e subtração, sem leitura do estado luminoso.",
+      "relatedCards": ["MP-comparator", "MP-dev-bulb-java"],
+      "reference": "mojang-bulb-java"
+    },
+    {
+      "id": "B10",
+      "topic": "redstone",
+      "edition": "Bedrock",
+      "version": "1.21.80",
+      "question": "Meu repetidor está no ajuste inicial. Quantas interações são necessárias para chegar ao quarto ajuste de atraso sem completar a volta?",
+      "expected": "insufficient",
+      "criterion": "O atraso ajustável vai de um a quatro ticks de redstone; o quarto ajuste fica a três interações do primeiro.",
+      "relatedCards": ["MP-bedrock-repeater", "MP-repeater-direction"],
+      "reference": "learn-red"
+    },
+    {
+      "id": "B11",
+      "topic": "redstone",
+      "edition": "Java",
+      "version": "1.21.5",
+      "question": "Um repetidor aponta de lado para outro. Em que condições ele trava o repetidor principal?",
+      "expected": "insufficient",
+      "criterion": "A ficha de atraso não descreve travamento. A referência descreve o repetidor lateral energizado.",
+      "relatedCards": ["MP-delay"],
+      "reference": "wiki-repeater"
+    },
+    {
+      "id": "B12",
+      "topic": "redstone",
+      "edition": "Bedrock",
+      "version": "1.21.80",
+      "question": "Liguei uma porta de pistões feita para computador. Aquela alimentação indireta chamada quasi-conectividade existe na edição do meu console?",
+      "expected": "evidence",
+      "criterion": "O Bedrock não reproduz a quasi-conectividade do Java.",
+      "evidence": [
+        {
+          "card": "MP-quasi",
+          "sources": ["wiki-qc"]
+        }
+      ]
+    },
+    {
+      "id": "B13",
+      "topic": "redstone",
+      "edition": "Java",
+      "version": "1.21.5",
+      "question": "A saída do comparador em modo subtração deveria ser maior se eu baixasse só a menor das duas entradas laterais?",
+      "expected": "evidence",
+      "criterion": "A saída depende da maior lateral. Reduzir apenas a menor não muda o resultado.",
+      "evidence": [
+        {
+          "card": "MP-comparator",
+          "sources": ["wiki-compare"]
+        }
+      ]
+    },
+    {
+      "id": "B14",
+      "topic": "redstone",
+      "edition": "Bedrock",
+      "version": "1.21.80",
+      "question": "Usei um comparador atrás de um barril. O sinal fica zero quando esvazio todos os compartimentos?",
+      "expected": "absent",
+      "criterion": "A referência de comparador documenta sinal zero para recipiente vazio; falta ficha Bedrock para leitura de inventário.",
+      "reference": "wiki-compare"
+    },
+    {
+      "id": "B15",
+      "topic": "redstone",
+      "edition": "Bedrock",
+      "version": "1.21.80",
+      "question": "Meu portão de redstone volta sozinho depois que aperto o botão. Que peça está fazendo isso?",
+      "expected": "clarify-detail",
+      "criterion": "Pedir componentes, conexões e sequência observada antes de diagnosticar a causa."
+    },
+    {
+      "id": "B16",
+      "topic": "redstone",
+      "edition": null,
+      "version": null,
+      "question": "A entrada lateral do comparador vence a de trás. Ele corta a saída nesse modo?",
+      "expected": "clarify",
+      "criterion": "Pedir edição e versão antes de consultar uma ficha.",
+      "fields": ["edition", "version"]
+    },
+    {
+      "id": "B17",
+      "topic": "redstone",
+      "edition": "Java",
+      "version": "1.21.5",
+      "question": "Meu mundo é Java. Consigo usar o mesmo circuito de quasi-conectividade no Bedrock?",
+      "expected": "clarify",
+      "criterion": "O contexto selecionado é Java, mas o destino pedido é Bedrock. Confirmar edição alvo.",
+      "fields": ["edition"]
+    },
+    {
+      "id": "B18",
+      "topic": "redstone",
+      "edition": "Bedrock",
+      "version": "1.20.80",
+      "question": "No Bedrock 1.20.80 estável com experimentos desligados, já havia lâmpada de cobre?",
+      "expected": "incompatible",
+      "criterion": "A lâmpada foi disponibilizada em versão estável com Tricky Trials no Bedrock 1.21.",
+      "reference": "mojang-bulb-bedrock"
+    },
+    {
+      "id": "B19",
+      "topic": "sobrevivencia",
+      "edition": "Java",
+      "version": "1.21.5",
+      "question": "Minha farm de ferro fica perto de uma vila. Um golem ficou vivo perto da plataforma e a farm parou. Que fatores de invocação vale conferir primeiro?",
+      "expected": "evidence",
+      "criterion": "Conferir sono dos aldeões, detecção de golems e lugares válidos de surgimento.",
+      "evidence": [
+        {
+          "card": "MP-iron",
+          "sources": ["wiki-golem"]
+        }
+      ]
+    },
+    {
+      "id": "B20",
+      "topic": "sobrevivencia",
+      "edition": "Java",
+      "version": "1.21.5",
+      "question": "Os aldeões da farm de ferro estão presos longe das camas. Quanto tempo eles podem ficar sem dormir antes de perder a condição de invocar?",
+      "expected": "insufficient",
+      "criterion": "A referência descreve sono nos últimos 20 minutos; a ficha só menciona sono recente.",
+      "relatedCards": ["MP-iron"],
+      "reference": "wiki-golem"
+    },
+    {
+      "id": "B21",
+      "topic": "sobrevivencia",
+      "edition": "Bedrock",
+      "version": "1.21.80",
+      "question": "Preparei 10 aldeões e 20 camas na farm de ferro, mas deixei todos sem bancadas de profissão. Só camas e população garantem o aparecimento do golem?",
+      "expected": "absent",
+      "criterion": "A vila também precisa cumprir condições de trabalho e vínculo com camas. Falta ficha Bedrock de farm de ferro.",
+      "reference": "wiki-golem"
+    },
+    {
+      "id": "B22",
+      "topic": "sobrevivencia",
+      "edition": "Bedrock",
+      "version": "1.21.80",
+      "question": "Tenho dez aldeões numa farm de ferro e um golem natural ainda está dentro da vila. Quantos aldeões a vila precisa para admitir um segundo golem natural?",
+      "expected": "absent",
+      "criterion": "A cota é de um golem para cada dez aldeões. Um segundo exige pelo menos vinte, além das demais condições.",
+      "reference": "wiki-golem"
+    },
+    {
+      "id": "B23",
+      "topic": "sobrevivencia",
+      "edition": "Java",
+      "version": "1.21.5",
+      "question": "Quero reaparecer perto da fortaleza. Se encher a âncora com blocos de pedra luminosa, para quantos renascimentos dá antes de precisar de novo combustível?",
+      "expected": "evidence",
+      "criterion": "A âncora comporta quatro cargas e cada renascimento consome uma.",
+      "evidence": [
+        {
+          "card": "MP-dev-anchor-charges",
+          "sources": ["mojang-anchor"]
+        }
+      ],
+      "relatedCards": ["MP-anchor-dimensions"]
+    },
+    {
+      "id": "B24",
+      "topic": "sobrevivencia",
+      "edition": "Bedrock",
+      "version": "1.21.80",
+      "question": "Usei uma âncora carregada para marcar o ponto de retorno no mundo normal, longe do portal. É seguro confirmar o ponto ali?",
+      "expected": "evidence",
+      "criterion": "A âncora carregada explode no Overworld sob as regras padrão.",
+      "evidence": [
+        {
+          "card": "MP-anchor-dimensions",
+          "sources": ["wiki-anchor"]
+        }
+      ]
+    },
+    {
+      "id": "B25",
+      "topic": "sobrevivencia",
+      "edition": "Java",
+      "version": "1.21.5",
+      "question": "Estou fazendo uma trilha em cavernas e quero iluminar com a tocha comum na outra mão, com a picareta na principal. Dá para colocar a tocha assim?",
+      "expected": "evidence",
+      "criterion": "O Java permite colocar tocha comum da mão secundária ao apontar para uma posição válida.",
+      "evidence": [
+        {
+          "card": "MP-offhand",
+          "sources": ["wiki-offhand"]
+        }
+      ]
+    },
+    {
+      "id": "B26",
+      "topic": "sobrevivencia",
+      "edition": "Bedrock",
+      "version": "1.21.80",
+      "question": "Minha barra de comida mostra nove ícones cheios e perdi vida. Com regeneração natural e sem efeitos, em qual nível de fome volto a recuperar corações no Bedrock?",
+      "expected": "absent",
+      "criterion": "A referência de fome documenta 18 pontos de 20. A ficha de limiar atual é Java.",
+      "reference": "wiki-hunger"
+    },
+    {
+      "id": "B27",
+      "topic": "sobrevivencia",
+      "edition": null,
+      "version": "1.21.80",
+      "question": "Minha farm de ferro com villagers parou depois que mudei a plataforma de lugar. Qual edição você precisa saber para orientar o diagnóstico?",
+      "expected": "clarify",
+      "criterion": "Confirmar a edição em campo próprio antes de aplicar regras de vila.",
+      "fields": ["edition"]
+    },
+    {
+      "id": "B28",
+      "topic": "sobrevivencia",
+      "edition": "Java",
+      "version": "1.21.5",
+      "question": "Na edição Bedrock, quando tento dormir numa cama no Nether, marco o ponto de retorno ou acontece outra coisa?",
+      "expected": "clarify",
+      "criterion": "A edição do texto diverge da edição selecionada.",
+      "fields": ["edition"]
+    },
+    {
+      "id": "B29",
+      "topic": "sobrevivencia",
+      "edition": "Java",
+      "version": "1.21.5",
+      "question": "Meu golem não apareceu. Estou usando uma farm de ferro, mas ainda não informei o desenho nem o estado dos aldeões. O que você precisa saber para achar a causa?",
+      "expected": "clarify-detail",
+      "criterion": "Pedir o desenho da farm, acesso dos aldeões às camas e posição da plataforma ou golems, conforme o diagnóstico."
+    },
+    {
+      "id": "B30",
+      "topic": "construcao",
+      "edition": "Java",
+      "version": "1.21.5",
+      "question": "Para subir o andaime junto à fachada, montei uma coluna estreita. Consigo acrescentar altura ficando no chão e clicando no bloco de base com outro andaime?",
+      "expected": "evidence",
+      "criterion": "Usar um andaime na base acrescenta uma peça no topo.",
+      "evidence": [
+        {
+          "card": "MP-dev-scaffolding",
+          "sources": ["mojang-scaffolding"]
+        }
+      ]
+    },
+    {
+      "id": "B31",
+      "topic": "construcao",
+      "edition": "Bedrock",
+      "version": "1.21.80",
+      "question": "Tenho doze bambus e duas linhas para uma obra. Quantas peças de andaime fabrico fazendo a receita duas vezes?",
+      "expected": "evidence",
+      "criterion": "Seis bambus e uma linha produzem seis andaimes. Duas receitas produzem doze.",
+      "evidence": [
+        {
+          "card": "MP-dev-scaffolding",
+          "sources": ["mojang-scaffolding"]
+        }
+      ]
+    },
+    {
+      "id": "B32",
+      "topic": "construcao",
+      "edition": "Java",
+      "version": "1.21.5",
+      "question": "Quero madeira para o assoalho. Cada tora comum de pinheiro vira quantas ripas se eu usar a grade pessoal?",
+      "expected": "evidence",
+      "criterion": "Um tronco rende quatro tábuas do mesmo tipo na grade pessoal.",
+      "evidence": [
+        {
+          "card": "MP-planks",
+          "sources": ["mojang-craft"]
+        }
+      ]
+    },
+    {
+      "id": "B33",
+      "topic": "construcao",
+      "edition": "Bedrock",
+      "version": "1.21.80",
+      "question": "Para o galpão, tenho oito tábuas e quero fazer duas bancadas. Quais células da grade de fabricação pessoal ocupo em cada receita?",
+      "expected": "evidence",
+      "criterion": "Cada bancada ocupa as quatro células da grade 2×2, com uma tábua por célula.",
+      "evidence": [
+        {
+          "card": "MP-table",
+          "sources": ["mojang-craft"]
+        }
+      ]
+    },
+    {
+      "id": "B34",
+      "topic": "construcao",
+      "edition": "Java",
+      "version": "1.21.4",
+      "question": "Peguei aglomerados de resina para decorar uma torre. O material para montar os blocos da fachada sai direto dos aglomerados ou passa pela fornalha?",
+      "expected": "evidence",
+      "criterion": "Fundir aglomerados dá os itens tijolo usados para montar os blocos de tijolos.",
+      "evidence": [
+        {
+          "card": "MP-dev-resin-java",
+          "sources": ["mojang-resin-java"]
+        }
+      ],
+      "relatedCards": ["MP-furnace"]
+    },
+    {
+      "id": "B35",
+      "topic": "construcao",
+      "edition": "Bedrock",
+      "version": "1.21.50",
+      "question": "Para um mosaico no Jardim Pálido, preciso dos tijolos de resina em item. Que transformação da resina produz esses tijolos?",
+      "expected": "evidence",
+      "criterion": "A fundição de aglomerados produz itens tijolo de resina.",
+      "evidence": [
+        {
+          "card": "MP-dev-resin-bedrock",
+          "sources": ["mojang-resin-bedrock", "wiki-resin-brick"]
+        }
+      ]
+    },
+    {
+      "id": "B36",
+      "topic": "construcao",
+      "edition": "Bedrock",
+      "version": "1.21.80",
+      "question": "Preciso de um chão uniforme para ensaiar um portão. Na criação de um mundo plano, em qual aba ficam as predefinições?",
+      "expected": "evidence",
+      "criterion": "A aba Avançado permite ativar Mundo plano e escolher a predefinição.",
+      "evidence": [
+        {
+          "card": "MP-dev-flat-bedrock",
+          "sources": ["mojang-flat-bedrock"]
+        }
+      ]
+    },
+    {
+      "id": "B37",
+      "topic": "construcao",
+      "edition": "Bedrock",
+      "version": "1.21.60",
+      "question": "Sem ativar experimentos, consigo selecionar Snowy Kingdom como predefinição estável de mundo plano na 1.21.60?",
+      "expected": "incompatible",
+      "criterion": "As predefinições estáveis de mundo plano chegaram na 1.21.80.",
+      "reference": "mojang-flat-bedrock"
+    },
+    {
+      "id": "B38",
+      "topic": "construcao",
+      "edition": "Java",
+      "version": "1.21.5",
+      "question": "Quero fazer uma escadaria com pedra. O cortador de pedras rende uma escada por bloco para esse material?",
+      "expected": "absent",
+      "criterion": "A referência de escadas documenta uma escada por bloco de material aceito pelo cortador.",
+      "reference": "wiki-stairs"
+    },
+    {
+      "id": "B39",
+      "topic": "construcao",
+      "edition": "Bedrock",
+      "version": "1.21.80",
+      "question": "Tenho andaimes, mas quero escolher a altura certa da fachada. Qual altura fica proporcional?",
+      "expected": "clarify-detail",
+      "criterion": "Pedir largura, número de andares ou escala visual do projeto; a receita de andaime não resolve o pedido."
+    },
+    {
+      "id": "B40",
+      "topic": "construcao",
+      "edition": "Java",
+      "version": null,
+      "question": "Quero usar tijolos de resina numa muralha, mas não sei qual versão do Java está instalada. O que falta para verificar se o material está disponível?",
+      "expected": "clarify",
+      "criterion": "Confirmar a versão selecionada.",
+      "fields": ["version"]
+    },
+    {
+      "id": "B41",
+      "topic": "construcao",
+      "edition": "Bedrock",
+      "version": "1.21.80",
+      "question": "No meu projeto eu preciso fabricar a bancada e o andaime. Quais materiais entram em cada receita?",
+      "expected": "evidence",
+      "criterion": "Bancada: quatro tábuas. Andaime: seis bambus e uma linha.",
+      "evidence": [
+        {
+          "card": "MP-table",
+          "sources": ["mojang-craft"]
+        },
+        {
+          "card": "MP-dev-scaffolding",
+          "sources": ["mojang-scaffolding"]
+        }
+      ]
+    },
+    {
+      "id": "B42",
+      "topic": "construcao",
+      "edition": "Bedrock",
+      "version": "1.21.80",
+      "question": "O painel está marcado como Bedrock 1.21.80, mas quero escolher o terreno plano no Bedrock 1.21.70. Onde ajusto isso?",
+      "expected": "clarify",
+      "criterion": "Confirmar a versão do mundo antes de sugerir um menu.",
+      "fields": ["version"]
+    }
+  ],
+  "references": {
+    "wiki-stairs": {
+      "url": "https://minecraft.wiki/w/Stairs#Stonecutting"
+    }
+  }
+}
