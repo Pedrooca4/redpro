@@ -31,7 +31,7 @@ export function AppSidebar({
       <nav aria-label="Navegação do assistente">
         <Link href="/chat" aria-current="page" onClick={onNavigate}>
           <MessageSquare size={18} aria-hidden="true" />
-          Assistente<span className="nav-badge">DEMO</span>
+          Assistente<span className="nav-badge">GUIADO</span>
         </Link>
         <Link href="/projetos" onClick={onNavigate}>
           <BookOpen size={18} aria-hidden="true" />
@@ -47,13 +47,12 @@ export function AppSidebar({
           <History size={14} aria-hidden="true" />
           CONVERSAS
         </p>
-        <p>Suas conversas aparecerão aqui quando o histórico estiver disponível.</p>
-        <span>Somente nesta página, por enquanto.</span>
+        <p>O histórico desta conversa fica disponível enquanto a página estiver aberta.</p>
       </div>
       <div className="sidebar-bottom">
         <button type="button" onClick={onSettings}>
           <Settings2 size={17} aria-hidden="true" />
-          Configurações da demonstração
+          Configurações do assistente
         </button>
         <Link href="/status" onClick={onNavigate}>
           Estado do MinePRO
@@ -61,7 +60,7 @@ export function AppSidebar({
         </Link>
         <p>
           <span className="status-dot" />
-          Protótipo em desenvolvimento
+          Assistência guiada
         </p>
       </div>
     </div>

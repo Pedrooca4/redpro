@@ -1,7 +1,11 @@
-import type { ReactNode } from "react";
+import Link from "next/link";
+import type { ReactNode, Ref } from "react";
 import { CircleDashed, FileText } from "lucide-react";
+import type { AssistantReply, StructuredAnswerContent } from "../assistant/contracts";
 import { EDITIONS } from "./config";
 import type { LocalMessage } from "./state";
+
+export type { StructuredAnswerContent } from "../assistant/contracts";
 
 export function ToolResultPanel({
   title,
@@ -28,14 +32,6 @@ export function ToolResultPanel({
     </section>
   );
 }
-// Presentation only. A future server adapter must validate evidence before supplying it.
-export type StructuredAnswerContent = {
-  text: string;
-  steps?: readonly string[];
-  materials?: readonly { name: string; quantity: number; unit: string; estimated: boolean }[];
-  compatibility?: string;
-  warnings?: readonly string[];
-};
 export function StructuredAnswer({
   answer,
   evidence,
@@ -49,8 +45,17 @@ export function StructuredAnswer({
     <div className="structured-answer">
       <p>{answer.text}</p>
       {media ? <section aria-label="Imagens e diagramas">{media}</section> : null}
-      {evidence ? <section aria-label="Fontes e evidências">{evidence}</section> : null}
       {answer.compatibility ? <p>{answer.compatibility}</p> : null}
+      {answer.prerequisites?.length ? (
+        <section>
+          <h4>Pré-requisitos</h4>
+          <ul>
+            {answer.prerequisites.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
       {answer.steps?.length ? (
         <section>
           <h4>Passos</h4>
@@ -86,6 +91,12 @@ export function StructuredAnswer({
           </table>
         </div>
       ) : null}
+      {answer.verification ? (
+        <section>
+          <h4>Como verificar no jogo</h4>
+          <p>{answer.verification}</p>
+        </section>
+      ) : null}
       {answer.warnings?.length ? (
         <ul aria-label="Limitações">
           {answer.warnings.map((warning, i) => (
@@ -93,6 +104,7 @@ export function StructuredAnswer({
           ))}
         </ul>
       ) : null}
+      {evidence ? <section aria-label="Fontes e evidências">{evidence}</section> : null}
     </div>
   );
 }
@@ -101,13 +113,78 @@ export function ChatMessage({ message }: { message: LocalMessage }) {
     <article className="local-message">
       <p className="message-meta">
         <FileText size={15} aria-hidden="true" />
-        Você · mensagem local · {EDITIONS[message.context.edition].label} ·{" "}
+        Você · {EDITIONS[message.context.edition].label} ·{" "}
         {message.context.game_version ?? "Versão não informada"} · {message.context.mode}
       </p>
       <p className="message-body">{message.text}</p>
-      <p className="message-disclosure">
-        Demonstração: esta mensagem não foi enviada a um provedor de IA.
+    </article>
+  );
+}
+
+const replyLabels: Record<AssistantReply["type"], string> = {
+  ANSWER: "Orientação guiada",
+  CLARIFICATION: "Pergunta de esclarecimento",
+  UNSUPPORTED: "Sem orientação validada",
+};
+
+export function AssistantMessage({
+  reply,
+  replyRef,
+  onReuseQuestion,
+}: {
+  reply: AssistantReply;
+  replyRef?: Ref<HTMLElement>;
+  onReuseQuestion?: () => void;
+}) {
+  const label = replyLabels[reply.type];
+  const { edition, game_version, mode } = reply.context;
+  return (
+    <article
+      ref={replyRef}
+      className="assistant-message"
+      aria-label={label}
+      data-reply-type={reply.type}
+    >
+      <p className="assistant-meta">
+        MinePRO · {EDITIONS[edition].label} · {game_version ?? "Versão não informada"} · {mode}
       </p>
+      <h3>{label}</h3>
+      {reply.type === "ANSWER" ? (
+        <>
+          <p className="assistant-meta">
+            {reply.verification === "CALCULATED"
+              ? "Cálculo geométrico"
+              : "Procedimento com referência técnica"}
+          </p>
+          <StructuredAnswer
+            answer={reply.answer}
+            evidence={
+              reply.sources.length ? (
+                <>
+                  <h4>Referências</h4>
+                  <ul>
+                    {reply.sources.map(({ title, url }) => (
+                      <li key={url}>
+                        <a href={url}>{title}</a>
+                      </li>
+                    ))}
+                  </ul>
+                </>
+              ) : null
+            }
+          />
+          {reply.procedureId === "builder-base-21" ? (
+            <Link href="/ferramentas/materiais">Conferir na calculadora de materiais</Link>
+          ) : null}
+        </>
+      ) : (
+        <p>{reply.text}</p>
+      )}
+      {reply.type === "CLARIFICATION" && reply.needsVersion && onReuseQuestion ? (
+        <button type="button" className="button assistant-reuse" onClick={onReuseQuestion}>
+          Reusar pergunta no rascunho
+        </button>
+      ) : null}
     </article>
   );
 }

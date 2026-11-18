@@ -1,15 +1,32 @@
-import { isGameVersion, type MinecraftContext, type Edition, type Mode } from "./config.ts";
+import { sameContext, type AssistantReply, type FollowUp } from "../assistant/contracts.ts";
+import {
+  isGameVersion,
+  MESSAGE_LIMIT,
+  type MinecraftContext,
+  type Edition,
+  type Mode,
+} from "./config.ts";
 
-export const MESSAGE_LIMIT = 4000;
-export type LocalMessage = { id: number; text: string; context: MinecraftContext };
+export { MESSAGE_LIMIT } from "./config.ts";
+type PlayerMessage = { id: number; text: string; context: MinecraftContext };
+export type LocalMessage = PlayerMessage & { reply: AssistantReply };
+type PendingMessage = PlayerMessage & { followUp?: FollowUp; simulateFailure: boolean };
+
+const replyNotice: Record<AssistantReply["type"], string> = {
+  ANSWER: "Orientação guiada.",
+  CLARIFICATION: "Pergunta de esclarecimento.",
+  UNSUPPORTED: "Pedido fora do limite do catálogo.",
+};
+
 export type ChatState = {
   context: MinecraftContext;
   draft: string;
   messages: LocalMessage[];
-  pending: Omit<LocalMessage, "id"> | null;
-  phase: "idle" | "previewing" | "error";
+  pending: PendingMessage | null;
+  nextRequestId: number;
+  phase: "idle" | "sending" | "error";
   versionError: string | null;
-  composerError: { kind: "message" | "preview"; text: string } | null;
+  composerError: { kind: "message" | "request"; text: string } | null;
   notice: string;
 };
 export function initialChatState(): ChatState {
@@ -18,6 +35,7 @@ export function initialChatState(): ChatState {
     draft: "",
     messages: [],
     pending: null,
+    nextRequestId: 1,
     phase: "idle",
     versionError: null,
     composerError: null,
@@ -30,9 +48,9 @@ export type ChatAction =
   | { type: "version"; value: string | null }
   | { type: "mode"; value: Mode }
   | { type: "prepare"; text: string; mode: Mode }
-  | { type: "submit" }
-  | { type: "complete" }
-  | { type: "fail" }
+  | { type: "submit"; simulateFailure?: boolean }
+  | { type: "complete"; id: number; reply: AssistantReply }
+  | { type: "fail"; id: number }
   | { type: "new" };
 
 export function chatReducer(state: ChatState, action: ChatAction): ChatState {
@@ -40,9 +58,10 @@ export function chatReducer(state: ChatState, action: ChatAction): ChatState {
     return {
       ...initialChatState(),
       context: state.context,
+      nextRequestId: state.nextRequestId,
       notice: "Nova conversa local. As preferências de edição, versão e modo foram mantidas.",
     };
-  if (state.phase === "previewing" && action.type !== "complete" && action.type !== "fail")
+  if (state.phase === "sending" && action.type !== "complete" && action.type !== "fail")
     return state;
   switch (action.type) {
     case "draft":
@@ -103,32 +122,48 @@ export function chatReducer(state: ChatState, action: ChatAction): ChatState {
           },
           phase: "error",
         };
+      const last = state.messages.at(-1)?.reply;
+      const followUp =
+        last?.type === "CLARIFICATION" && sameContext(last.context, state.context)
+          ? last.followUp
+          : undefined;
       return {
         ...state,
-        pending: { text, context: { ...state.context } },
+        pending: {
+          id: state.nextRequestId,
+          text,
+          context: { ...state.context },
+          followUp,
+          simulateFailure: action.simulateFailure ?? false,
+        },
+        nextRequestId: state.nextRequestId + 1,
         composerError: null,
-        phase: "previewing",
+        phase: "sending",
       };
     }
-    case "complete":
-      if (!state.pending) return state;
+    case "complete": {
+      if (state.pending?.id !== action.id) return state;
+      const { id, text, context } = state.pending;
       return {
         ...state,
-        messages: [...state.messages, { ...state.pending, id: state.messages.length + 1 }],
+        messages: [...state.messages, { id, text, context, reply: action.reply }],
         pending: null,
         draft: "",
         phase: "idle",
-        notice:
-          "Mensagem exibida apenas nesta página. Nenhuma pergunta foi enviada a uma IA ou salva no servidor.",
+        notice: `Resposta ${state.messages.length + 1}. ${replyNotice[action.reply.type]}`,
       };
+    }
     case "fail":
+      if (state.pending?.id !== action.id) return state;
       return {
         ...state,
         pending: null,
         phase: "error",
         composerError: {
-          kind: "preview",
-          text: "Falha de demonstração: não foi possível concluir agora. Sua mensagem foi preservada. Tente novamente.",
+          kind: "request",
+          text: state.pending.simulateFailure
+            ? "Falha simulada: sua mensagem foi preservada. Tente novamente."
+            : "Não foi possível consultar o assistente. Sua mensagem foi preservada. Tente novamente.",
         },
       };
   }

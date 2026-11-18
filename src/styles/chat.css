@@ -126,12 +126,6 @@ summary:focus-visible {
   font-size: var(--text-sm);
   margin-top: 20px;
 }
-.conversation-history > span {
-  display: block;
-  font-size: var(--text-xs);
-  color: var(--color-secondary);
-  margin-top: 12px;
-}
 .sidebar-bottom {
   margin-top: auto;
   padding-top: 26px;
@@ -615,7 +609,13 @@ summary:focus-visible {
   display: grid;
   gap: 22px;
 }
-.local-message {
+.chat-turn {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+}
+.local-message,
+.assistant-message {
   padding: 20px;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
@@ -635,14 +635,25 @@ summary:focus-visible {
   overflow-wrap: anywhere;
   padding-block: 16px;
 }
-.message-disclosure,
-.no-ai-answer {
+.assistant-message {
+  border-inline-start: 2px solid var(--color-action);
+  overflow-wrap: anywhere;
+}
+.assistant-message h3 {
+  margin-block: 6px;
+}
+.assistant-message a {
+  color: var(--color-action);
+  text-decoration: underline;
+}
+.assistant-message > a,
+.assistant-reuse {
+  display: inline-block;
+  margin-top: 12px;
+}
+.assistant-meta {
   color: var(--color-secondary);
   font-size: var(--text-xs);
-}
-.no-ai-answer {
-  border-left: 2px solid var(--color-action);
-  padding: 10px 16px;
 }
 .icon-button {
   border: 1px solid var(--color-border);
@@ -743,6 +754,21 @@ summary:focus-visible {
 }
 .structured-answer section {
   margin-top: 20px;
+}
+.structured-answer > p + p,
+.structured-answer > ul,
+.structured-answer > .table-scroll {
+  margin-top: 12px;
+}
+.structured-answer ul,
+.structured-answer ol {
+  padding-inline-start: 20px;
+}
+.structured-answer ul {
+  list-style: disc;
+}
+.structured-answer ol {
+  list-style: decimal;
 }
 .planned-page {
   min-height: 60vh;

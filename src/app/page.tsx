@@ -84,9 +84,9 @@ export default function Home() {
             <div className="hero-note">
               <CircleDashed size={16} aria-hidden="true" />
               <p>
-                Experimente a interface do assistente.
+                Use o assistente guiado para assuntos selecionados.
                 <br />
-                <span>IA real, biblioteca e comunidade ainda em desenvolvimento.</span>
+                <span>IA conversacional, biblioteca e comunidade em desenvolvimento.</span>
               </p>
             </div>
           </div>
@@ -121,7 +121,7 @@ export default function Home() {
         <section className="home-specialties shell" aria-labelledby="specialties-title">
           <p className="eyebrow">ESCOLHA SEU PRÓXIMO DESAFIO</p>
           <h2 id="specialties-title">Seis modos. Seu mundo inteiro.</h2>
-          <p>Explore as especialidades na demonstração do assistente.</p>
+          <p>Explore as especialidades do assistente guiado.</p>
           <div className="home-mode-grid">
             {MODES.map((mode) => {
               const Icon = MODE_ICONS[mode.id];
@@ -204,7 +204,7 @@ export default function Home() {
               <div>
                 <span className="step-kicker">ETAPA ATUAL</span>
                 <h3>Interface do MinePRO</h3>
-                <p>Chat demonstrativo, seis modos e seletores de edição e versão.</p>
+                <p>Chat guiado, seis modos e seletores de edição e versão.</p>
               </div>
               <span className="current-badge">Agora</span>
             </li>

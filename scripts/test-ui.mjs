@@ -13,6 +13,9 @@ const messageErrorText =
   "Escreva uma mensagem de 1 a 4000 caracteres. Seu rascunho foi preservado.";
 
 const base = process.env.SMOKE_BASE_URL || "http://127.0.0.1:3000";
+const assistantUrl = new URL("/api/assistant", base).href;
+const networkErrorText =
+  "Não foi possível consultar o assistente. Sua mensagem foi preservada. Tente novamente.";
 const artifactDir = process.env.UI_ARTIFACT_DIR || "coverage/ui";
 await mkdir(artifactDir, { recursive: true });
 const launchOptions = {
@@ -30,6 +33,204 @@ const launchOptions = {
       }
     : {}),
 };
+async function holdAssistantReply(page) {
+  const gate = Promise.withResolvers();
+  const finished = Promise.withResolvers();
+  let received = false;
+  await page.route(
+    assistantUrl,
+    async (route) => {
+      try {
+        const response = await route.fetch();
+        received = true;
+        await gate.promise;
+        await route.fulfill({ response }).catch(() => {
+          // Starting a new conversation may abort the original browser request.
+        });
+      } finally {
+        finished.resolve();
+      }
+    },
+    { times: 1 },
+  );
+  return {
+    waitForResponse: () => uiExpect.poll(() => received).toBe(true),
+    async release() {
+      gate.resolve();
+      await finished.promise;
+    },
+  };
+}
+
+async function checkGuidedConversation(page, requests) {
+  await page.goto(new URL("/chat", base).href);
+  const draft = page.getByLabel(/^Sua mensagem/);
+  const version = page.getByLabel("Versão do Minecraft", { exact: true });
+  const replies = page.locator(".assistant-message");
+  const playerMessages = page.locator(".local-message");
+  const status = page.locator(".composer-area").getByRole("status");
+  const question = "Planeje uma base 21 × 21";
+  await draft.fill(question);
+  await draft.press("Enter");
+  await uiExpect(replies.last()).toHaveAttribute("data-reply-type", "CLARIFICATION");
+  await uiExpect(replies.last()).toContainText("Qual versão do Minecraft você usa?");
+  await version.selectOption("1.21.1");
+  await page.getByRole("button", { name: "Reusar pergunta no rascunho" }).click();
+  await uiExpect(draft).toHaveValue(question);
+  await uiExpect(draft).toBeFocused();
+  await page.route(assistantUrl, (route) => route.abort("failed"), { times: 1 });
+  await draft.press("Enter");
+  await uiExpect(page.locator(".composer-area").getByRole("alert")).toHaveText(networkErrorText);
+  await uiExpect(draft).toHaveValue(question);
+  await uiExpect(draft).not.toHaveAttribute("aria-invalid");
+  await uiExpect(replies).toHaveCount(1);
+  await uiExpect(playerMessages).toHaveCount(1);
+
+  const retry = await holdAssistantReply(page);
+  const beforeRetry = requests.length;
+  await draft.press("Enter");
+  await retry.waitForResponse();
+  await uiExpect(page.locator(".chat-composer")).toHaveAttribute("aria-busy", "true");
+  await uiExpect(page.getByRole("button", { name: "Aguardando orientação" })).toBeDisabled();
+  await draft.press("Enter");
+  await draft.press("Enter");
+  assert.equal(requests.length, beforeRetry + 1);
+  await retry.release();
+  await uiExpect(replies).toHaveCount(2);
+  await uiExpect(playerMessages).toHaveCount(2);
+  await uiExpect(replies.last()).toHaveAttribute("data-reply-type", "ANSWER");
+  await uiExpect(replies.last()).toContainText("441");
+  await uiExpect(
+    replies.last().getByRole("link", { name: "Conferir na calculadora de materiais" }),
+  ).toHaveAttribute("href", "/ferramentas/materiais");
+  await uiExpect(page.locator(".composer-area").getByRole("alert")).toHaveCount(0);
+  await uiExpect(draft).toHaveValue("");
+  await uiExpect(draft).toBeFocused();
+  await uiExpect(status).toHaveText("Resposta 2. Orientação guiada.");
+  const retryAnnouncement = await status.ariaSnapshot();
+  await page.screenshot({ path: `${artifactDir}/assistant-builder-390.png` });
+
+  await draft.fill("Quero minerar diamantes");
+  await draft.press("Enter");
+  await uiExpect(replies).toHaveCount(3);
+  await uiExpect(replies.last()).toContainText("Que picareta você tem hoje?");
+  await draft.fill("Ferro");
+  await draft.press("Enter");
+  await uiExpect(replies).toHaveCount(4);
+  await uiExpect(replies.last()).toContainText("atende ao requisito para obter diamante");
+  assert.equal(requests.at(-1).followUp.field, "pickaxe");
+  assert.equal(requests.at(-1).followUp.details.resource, "diamond");
+
+  const stale = await holdAssistantReply(page);
+  await draft.fill("Quero montar uma farm de ferro");
+  await draft.press("Enter");
+  await stale.waitForResponse();
+  await page.getByRole("button", { name: "Abrir navegação" }).click();
+  await page
+    .getByRole("dialog", { name: "Navegação MinePRO" })
+    .getByRole("button", { name: "Nova conversa" })
+    .click();
+  await uiExpect(replies).toHaveCount(0);
+  await uiExpect(playerMessages).toHaveCount(0);
+  await uiExpect(version).toHaveValue("1.21.1");
+  await uiExpect(status).toContainText("Nova conversa local.");
+  const newConversationAnnouncement = await status.ariaSnapshot();
+  await draft.fill("Como uso /help?");
+  await draft.press("Enter");
+  await uiExpect(replies).toHaveCount(1);
+  await uiExpect(replies.last()).toContainText("use /help");
+  await uiExpect(status).toHaveText("Resposta 1. Orientação guiada.");
+  const newReplyAnnouncement = await status.ariaSnapshot();
+  await stale.release();
+  await uiExpect(replies).toHaveCount(1);
+  await uiExpect(playerMessages).toHaveCount(1);
+  await uiExpect(playerMessages).toContainText("Como uso /help?");
+  await uiExpect(page.locator(".composer-area").getByRole("alert")).toHaveCount(0);
+  assert.equal(await status.ariaSnapshot(), newReplyAnnouncement);
+  return { retryAnnouncement, newConversationAnnouncement, newReplyAnnouncement };
+}
+
+async function checkContextAnnouncements(page) {
+  await page.goto(new URL("/chat", base).href);
+  const version = page.getByLabel("Versão do Minecraft", { exact: true });
+  const draft = page.getByLabel(/^Sua mensagem/);
+  const replies = page.locator(".assistant-message");
+  const status = page.locator(".composer-area").getByRole("status");
+  await version.selectOption("1.21.1");
+  await uiExpect(status).toHaveAttribute("aria-live", "polite");
+  await uiExpect(status).toHaveAttribute("aria-atomic", "true");
+  await uiExpect(page.locator(".composer-area").getByRole("status")).toHaveCount(1);
+
+  const observation = await status.evaluateHandle((node) => {
+    const changes = [];
+    new MutationObserver(() => changes.push(node.textContent)).observe(node, {
+      subtree: true,
+      childList: true,
+      characterData: true,
+    });
+    return { node, changes };
+  });
+  const read = () =>
+    status.evaluate(
+      (node, observed) => ({ stable: node === observed.node, changes: observed.changes }),
+      observation,
+    );
+
+  const evidence = [];
+  for (const [message, category, selected] of [
+    ["Quero montar uma farm de ferro para Minecraft Bedrock 1.21.0.", "CLARIFICATION", "JAVA"],
+    ["Meu pistão comum não estende em Java 1.20.1. Como testo?", "CLARIFICATION", "JAVA"],
+    ["Meu pistão comum não estende no Minecraft Java 1.21.1. Como testo?", "ANSWER", "JAVA"],
+    ["Como uso /help no Minecraft Java 1.21.1?", "ANSWER", "JAVA"],
+    [
+      "Meu pistão comum não estende no Minecraft Java 1.21.1. Como testo?",
+      "CLARIFICATION",
+      "BEDROCK",
+    ],
+  ]) {
+    if (selected === "BEDROCK") {
+      await page.getByRole("button", { name: "BedMine", exact: true }).click();
+      await version.selectOption("1.21.0");
+    }
+    const before = (await read()).changes.length;
+    const responsePromise = page.waitForResponse(
+      (response) => response.url() === assistantUrl && response.request().method() === "POST",
+    );
+    await draft.fill(message);
+    await draft.press("Enter");
+    const response = await responsePromise;
+    assert.equal(response.status(), 200);
+    const reply = await response.json();
+    assert.equal(reply.type, category);
+    assert.equal(reply.context.edition, selected);
+    if (category === "CLARIFICATION") {
+      assert.match(reply.text, /difere da seleção/);
+      assert.equal("answer" in reply, false);
+    }
+    const number = evidence.length + 1;
+    await uiExpect(replies).toHaveCount(number);
+    await uiExpect(replies.last()).toHaveAttribute("data-reply-type", category);
+    const label = category === "ANSWER" ? "Orientação guiada." : "Pergunta de esclarecimento.";
+    const announcement = `Resposta ${number}. ${label}`;
+    await uiExpect(status).toHaveText(announcement);
+    await uiExpect(draft).toBeFocused();
+    const { stable, changes } = await read();
+    assert.equal(stable, true, "The status region stays mounted");
+    const updates = changes.slice(before);
+    assert.deepEqual(updates, [announcement], "One status announcement per completed turn");
+    evidence.push({
+      message,
+      context: reply.context,
+      category,
+      updates,
+      accessibility: await status.ariaSnapshot(),
+    });
+  }
+  await observation.dispose();
+  await page.screenshot({ path: `${artifactDir}/chat-c-r1-anuncios-390.png` });
+  return evidence;
+}
+
 let browser;
 const results = [];
 try {
@@ -42,9 +243,16 @@ try {
     const page = await context.newPage();
     const errors = [];
     const forbiddenRequests = [];
+    const assistantRequests = [];
     page.on("pageerror", (error) => errors.push(error.message));
     page.on("request", (request) => {
-      if (/\/api\/(chat|tools|conversations)/.test(request.url()))
+      const url = new URL(request.url());
+      if (url.href === assistantUrl && request.method() === "POST")
+        assistantRequests.push(request.postDataJSON());
+      else if (
+        url.origin !== new URL(base).origin ||
+        (url.pathname.startsWith("/api/") && url.pathname !== "/api/health")
+      )
         forbiddenRequests.push(request.url());
     });
     for (const path of ["/", "/status", "/projetos", "/comunidade", "/chat"]) {
@@ -161,14 +369,19 @@ try {
         });
     }
     await page.screenshot({ path: `${artifactDir}/chat-${width}-bedmine.png`, fullPage: true });
-    await draft.fill("Mensagem local segura");
+    const miningQuestion = "Quero minerar diamantes e uso picareta de pedra";
+    await draft.fill(miningQuestion);
     await draft.press("Shift+Enter");
-    assert.equal(await draft.inputValue(), "Mensagem local segura\n");
+    assert.equal(await draft.inputValue(), `${miningQuestion}\n`);
     await draft.press("Enter");
-    await page
-      .getByText("Protótipo: respostas de IA ainda não estão disponíveis.", { exact: true })
-      .waitFor();
-    assert.equal(await page.locator(".local-message").count(), 1);
+    const firstAnswer = page.getByRole("article", { name: "Orientação guiada", exact: true });
+    await uiExpect(firstAnswer).toContainText("prepare uma picareta de ferro");
+    await uiExpect(firstAnswer).toContainText(/BedMine.*1\.21\.0.*SURVIVAL/);
+    await uiExpect(page.locator(".local-message")).toHaveCount(1);
+    assert.deepEqual(assistantRequests.at(-1), {
+      message: miningQuestion,
+      context: { edition: "BEDROCK", game_version: "1.21.0", mode: "SURVIVAL" },
+    });
     await checkShortcut();
     const sentContext = page.locator(".message-meta");
     await uiExpect(sentContext).toHaveText(/BedMine.*1\.21\.0.*SURVIVAL/);
@@ -179,6 +392,7 @@ try {
     assert.match(await page.getByRole("status").innerText(), /perder validade/);
     await uiExpect(version).toHaveValue("");
     await uiExpect(sentContext).toHaveText(/BedMine.*1\.21\.0.*SURVIVAL/);
+    await uiExpect(firstAnswer).toContainText(/BedMine.*1\.21\.0.*SURVIVAL/);
 
     if (width <= 800) {
       const trigger = page.getByRole("button", { name: "Abrir navegação" });
@@ -195,18 +409,18 @@ try {
     assert.equal(await page.locator(".local-message").count(), 0);
     if (width <= 800) await page.getByRole("button", { name: "Abrir navegação" }).click();
     await page
-      .getByRole("button", { name: "Configurações da demonstração", exact: true })
+      .getByRole("button", { name: "Configurações do assistente", exact: true })
       .filter({ visible: true })
       .click();
-    await page.getByLabel("Simular falha na próxima mensagem local").check();
+    await page.getByLabel("Simular falha na próxima pergunta").check();
     await page.keyboard.press("Escape");
     await draft.fill("Meu rascunho após falha");
     await draft.press("Enter");
     await uiExpect(composerError).toHaveText(
-      "Falha de demonstração: não foi possível concluir agora. Sua mensagem foi preservada. Tente novamente.",
+      "Falha simulada: sua mensagem foi preservada. Tente novamente.",
     );
     await uiExpect(draft).not.toHaveAttribute("aria-invalid");
-    await uiExpect(draft).not.toHaveAccessibleDescription(/Falha de demonstração/);
+    await uiExpect(draft).not.toHaveAccessibleDescription(/Falha simulada/);
     await uiExpect(version).not.toHaveAttribute("aria-invalid");
     await uiExpect(versionError).toHaveCount(0);
     assert.equal(await draft.inputValue(), "Meu rascunho após falha");
@@ -214,6 +428,9 @@ try {
     await draft.press("Enter");
     await page.locator(".local-message").waitFor();
     assert.equal(await page.locator(".local-message").count(), 1);
+    await uiExpect(page.getByRole("article", { name: "Sem orientação validada" })).toContainText(
+      "Ainda não há orientação validada",
+    );
     await uiExpect(composerError).toHaveCount(0);
     for (const invalidDraft of ["", "x".repeat(4001)]) {
       await draft.fill(invalidDraft);
@@ -450,11 +667,25 @@ try {
     console.log(
       `PASS materiais ${width}px: rota, geometria, stacks, edição, remoção, cópia e overflow`,
     );
+    if (width === 390) {
+      const recovery = await checkGuidedConversation(page, assistantRequests);
+      const consecutive = await checkContextAnnouncements(page);
+      await writeFile(
+        `${artifactDir}/chat-c-r1-anuncios.json`,
+        JSON.stringify({ recovery, consecutive }, null, 2) + "\n",
+      );
+      console.log(
+        "PASS assistente 390px: esclarecimento, resposta, falha de rede, reenvio, duplicação e nova conversa",
+      );
+      console.log(
+        "PASS C-R1 390px: conflitos de contexto e anúncios consecutivos na região estável",
+      );
+    }
     assert.deepEqual(errors, [], `Browser errors at ${width}`);
     assert.deepEqual(
       forbiddenRequests,
       [],
-      "Prototype must never call real chat or tools endpoints",
+      "The guided chat must only call its own assistant endpoint",
     );
     results.push({
       width,
@@ -468,6 +699,8 @@ try {
       sameVersionRecovery: "PASS",
       consoleErrors: 0,
       aiRequests: 0,
+      assistantRequests: assistantRequests.length,
+      ...(width === 390 ? { guidedConversation: "PASS", contextAnnouncements: "PASS" } : {}),
     });
     console.log(
       `PASS UI ${width}px: routes, editions, modes, context, retry, tools, keyboard and text scaling`,
@@ -508,8 +741,9 @@ try {
   await page.getByRole("button", { name: "Guia de mineração Y-Level", exact: true }).click();
   await page.getByRole("dialog", { name: "Guia de mineração Y-Level", exact: true }).waitFor();
   await page.keyboard.press("Escape");
-  await page.getByRole("button", { name: "Enviar mensagem de demonstração" }).click();
+  await page.getByRole("button", { name: "Enviar pergunta" }).click();
   await page.locator(".local-message").waitFor();
+  await uiExpect(page.getByRole("article", { name: "Sem orientação validada" })).toBeVisible();
   await page.getByRole("button", { name: "Abrir navegação" }).click();
   await page.getByRole("dialog", { name: "Navegação MinePRO" }).waitFor();
   await page.keyboard.press("Escape");
