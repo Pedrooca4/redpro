@@ -21,7 +21,7 @@ export default function StatusPage() {
           <span className="text-green">do MinePRO.</span>
         </h1>
         <p className="status-lead">
-          A interface demonstrativa permite escolher edição, versão e especialidade. IA real,
+          O assistente guiado cobre assuntos selecionados por edição e versão. IA conversacional,
           contas, biblioteca e comunidade continuam em desenvolvimento.
         </p>
         <div className="status-grid">
@@ -33,7 +33,7 @@ export default function StatusPage() {
             <ul>
               <li>Página inicial e navegação responsiva.</li>
               <li>Identidade visual MinePRO em obsidiana e esmeralda.</li>
-              <li>Chat local, JavaMine/BedMine, versão e seis modos.</li>
+              <li>Assistência guiada em seis modos, com contexto JavaMine ou BedMine.</li>
               <li>
                 <Link className="inline-link" href="/ferramentas/materiais">
                   Calculadora de materiais
@@ -59,7 +59,7 @@ export default function StatusPage() {
             <h2>As próximas construções</h2>
             <ul>
               <li>Cadastro, login e perfis.</li>
-              <li>Chat com IA e consulta a fontes.</li>
+              <li>IA conversacional e consulta dinâmica a fontes.</li>
               <li>Biblioteca de projetos de Minecraft.</li>
               <li>Publicações e interações da comunidade.</li>
             </ul>
@@ -71,7 +71,7 @@ export default function StatusPage() {
         </div>
         <div className="status-footnote">
           <span>MinePRO</span>
-          <p>Interface demonstrativa. Esta versão não representa a conclusão do MVP.</p>
+          <p>Assistência guiada em desenvolvimento.</p>
         </div>
       </main>
       <SiteFooter />

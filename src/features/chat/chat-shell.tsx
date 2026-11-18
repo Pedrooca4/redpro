@@ -11,11 +11,12 @@ import {
   ShieldCheck,
   Wrench,
 } from "lucide-react";
+import { isAssistantReply, sameContext } from "../assistant/contracts";
 import { EDITIONS, MODES, TOOLS, suggestionsFor } from "./config";
 import { chatReducer, initialChatState, MESSAGE_LIMIT } from "./state";
 import { AppSidebar } from "./app-sidebar";
 import { EditionSwitcher, SpecialtyModePicker, VersionSelect } from "./chat-controls";
-import { ChatMessage, ToolResultPanel } from "./chat-presentation";
+import { AssistantMessage, ChatMessage, ToolResultPanel } from "./chat-presentation";
 import { PrototypeDialog } from "./prototype-dialog";
 import { MODE_ICONS } from "./icons";
 
@@ -30,22 +31,47 @@ export function ChatShell() {
   > | null>(null);
   const textarea = useRef<HTMLTextAreaElement>(null);
   const messages = useRef<HTMLDivElement>(null);
-  const busy = state.phase === "previewing";
+  const latestReply = useRef<HTMLElement>(null);
+  const pending = state.pending;
+  const busy = state.phase === "sending";
   const invalidMessage = state.composerError?.kind === "message";
   const mode = MODES.find((entry) => entry.id === state.context.mode)!;
   const Icon = MODE_ICONS[mode.id];
   useEffect(() => {
-    if (!busy) return;
-    // Local preview only: this timer never calls an API or generates an AI answer.
-    const timer = window.setTimeout(() => {
-      dispatch({ type: failNext ? "fail" : "complete" });
-      setFailNext(false);
-    }, 300);
-    return () => window.clearTimeout(timer);
-  }, [busy, failNext]);
+    if (!pending) return;
+    const controller = new AbortController();
+    const turn = pending;
+    async function send() {
+      try {
+        if (turn.simulateFailure) throw new Error("Falha simulada");
+        const response = await fetch("/api/assistant", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          cache: "no-store",
+          signal: AbortSignal.any([controller.signal, AbortSignal.timeout(15_000)]),
+          body: JSON.stringify({
+            message: turn.text,
+            context: turn.context,
+            followUp: turn.followUp,
+          }),
+        });
+        if (!response.ok) throw new Error("Falha na resposta");
+        const reply: unknown = await response.json();
+        if (!isAssistantReply(reply) || !sameContext(reply.context, turn.context))
+          throw new Error("Resposta inválida");
+        if (!controller.signal.aborted) dispatch({ type: "complete", id: turn.id, reply });
+      } catch {
+        if (!controller.signal.aborted) dispatch({ type: "fail", id: turn.id });
+      }
+    }
+    void send();
+    return () => controller.abort();
+  }, [pending]);
   useEffect(() => {
-    if (state.messages.length)
-      messages.current?.scrollTo({ top: messages.current.scrollHeight, behavior: "instant" });
+    const area = messages.current;
+    const answer = latestReply.current;
+    if (state.messages.length && area && answer)
+      area.scrollTop += answer.getBoundingClientRect().top - area.getBoundingClientRect().top;
   }, [state.messages.length]);
   function newConversation() {
     dispatch({ type: "new" });
@@ -76,7 +102,7 @@ export function ChatShell() {
             <div>
               <p>SEU ESPAÇO DE IDEIAS</p>
               <h1>
-                Assistente MinePRO <span className="prototype-pill">Protótipo</span>
+                Assistente MinePRO <span className="prototype-pill">Guiado</span>
               </h1>
             </div>
           </div>
@@ -98,7 +124,8 @@ export function ChatShell() {
           <div className="prototype-notice">
             <ShieldCheck size={17} aria-hidden="true" />
             <p>
-              Esta é uma demonstração da interface; a IA real será conectada em uma etapa futura.
+              Assistência guiada disponível para assuntos selecionados de Minecraft. A IA
+              conversacional ainda está em desenvolvimento.
             </p>
           </div>
           <Link
@@ -152,13 +179,17 @@ export function ChatShell() {
                   </div>
                 </section>
               ) : (
-                <section className="message-list" aria-label="Mensagens locais">
-                  {state.messages.map((message) => (
-                    <ChatMessage key={message.id} message={message} />
+                <section className="message-list" aria-label="Conversa nesta página">
+                  {state.messages.map((message, index) => (
+                    <div className="chat-turn" key={message.id}>
+                      <ChatMessage message={message} />
+                      <AssistantMessage
+                        reply={message.reply}
+                        replyRef={index === state.messages.length - 1 ? latestReply : undefined}
+                        onReuseQuestion={busy ? undefined : () => prepare(message.text)}
+                      />
+                    </div>
                   ))}
-                  <p className="no-ai-answer">
-                    Protótipo: respostas de IA ainda não estão disponíveis.
-                  </p>
                 </section>
               )}
               <section className="tools-section" aria-labelledby="tools-title">
@@ -207,7 +238,12 @@ export function ChatShell() {
             </div>
           </div>
           <div className="composer-area">
-            <div className="context-announcement" role="status" aria-live="polite">
+            <div
+              className="context-announcement"
+              role="status"
+              aria-live="polite"
+              aria-atomic="true"
+            >
               {state.notice}
             </div>
             {state.composerError ? (
@@ -220,7 +256,11 @@ export function ChatShell() {
               className="chat-composer"
               onSubmit={(event) => {
                 event.preventDefault();
-                dispatch({ type: "submit" });
+                if (busy) return;
+                const text = state.draft.trim();
+                const simulateFailure = failNext && text.length > 0 && text.length <= MESSAGE_LIMIT;
+                dispatch({ type: "submit", simulateFailure });
+                if (simulateFailure) setFailNext(false);
               }}
             >
               <SpecialtyModePicker mode={state.context.mode} dispatch={dispatch} disabled={busy} />
@@ -257,14 +297,14 @@ export function ChatShell() {
                   type="submit"
                   className="send-button"
                   disabled={busy || !state.draft.trim()}
-                  aria-label={busy ? "Exibindo mensagem local" : "Enviar mensagem de demonstração"}
+                  aria-label={busy ? "Aguardando orientação" : "Enviar pergunta"}
                 >
                   <ArrowUp size={21} aria-hidden="true" />
                 </button>
               </div>
               <div className="composer-bottom">
                 <p id="composer-help" aria-live="polite">
-                  {busy ? "Exibindo mensagem local…" : "Enter envia · Shift+Enter quebra linha"}
+                  {busy ? "Consultando o assistente…" : "Enter envia · Shift+Enter quebra linha"}
                 </p>
                 <span id="composer-count">
                   {state.draft.length}/{MESSAGE_LIMIT}
@@ -275,7 +315,7 @@ export function ChatShell() {
               {EDITIONS[state.context.edition].description} ·{" "}
               {state.context.game_version ?? "Versão não informada"}
               <br />
-              Mensagens locais e temporárias. Não envie dados pessoais.
+              Histórico temporário nesta página. Não envie dados pessoais.
             </p>
           </div>
         </main>
@@ -298,7 +338,7 @@ export function ChatShell() {
       <PrototypeDialog
         open={settings}
         onClose={() => setSettings(false)}
-        title="Configurações da demonstração"
+        title="Configurações do assistente"
       >
         <p>
           As escolhas de edição, versão e modo permanecem apenas enquanto esta página estiver
@@ -311,11 +351,10 @@ export function ChatShell() {
             disabled={busy}
             onChange={(event) => setFailNext(event.target.checked)}
           />
-          Simular falha na próxima mensagem local
+          Simular falha na próxima pergunta
         </label>
         <p className="small-note">
-          Teste de interface: a falha mantém seu rascunho e permite tentar novamente. Nenhum serviço
-          externo será chamado.
+          A falha simulada mantém seu rascunho e permite tentar novamente.
         </p>
       </PrototypeDialog>
       <PrototypeDialog

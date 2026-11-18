@@ -2,7 +2,7 @@
 
 Plataforma em desenvolvimento para ajudar jogadores de Minecraft Java Edition e Bedrock Edition. O lote S1 adiciona a identidade MinePRO, chat demonstrativo, JavaMine/BedMine, versão e seis modos de especialidade na aplicação Next.js existente.
 
-As mensagens desta etapa são locais e temporárias. Não há provedor de IA, histórico por conta, ferramentas reais, biblioteca publicada ou comunidade operacional. O site público não consome banco; a infraestrutura e as migrações anteriores foram preservadas.
+O assistente guiado cobre assuntos selecionados em Java 1.21.1 e Bedrock 1.21.0. As perguntas são processadas pelo próprio aplicativo e o histórico fica em memória na página. A calculadora de materiais está disponível. IA conversacional, contas, biblioteca e comunidade continuam em desenvolvimento.
 
 Veja [a entrega S1](docs/MINEPRO_S1.md) e o [System Prompt oficial](docs/AI_SYSTEM_PROMPT.md). Os relatórios RED anteriores permanecem como histórico técnico.
 
@@ -16,6 +16,8 @@ pnpm dev
 ```
 
 Abra `http://127.0.0.1:3000`. A base pública deve iniciar sem credenciais externas.
+
+Em `/chat`, selecione JavaMine 1.21.1 ou BedMine 1.21.0 e teste, por exemplo, “Planeje uma base 21 × 21”. O catálogo também inclui pistões, farm de ferro, `/help`, triagem de mods e add-ons e mineração inicial.
 
 Para executar a compilação de produção:
 
@@ -57,14 +59,17 @@ Execute `pnpm smoke` com o servidor local iniciado. Resultados e limitações da
 - `src/components`: componentes visuais compartilhados.
 - `docs`: escopo da entrega e preparação para publicação.
 
-| Rota          | Função atual                                                                   |
-| ------------- | ------------------------------------------------------------------------------ |
-| `/`           | Apresentação inicial e escopo da plataforma.                                   |
-| `/chat`       | Interface demonstrativa com seletores, seis modos e ferramentas em preparação. |
-| `/projetos`   | Estado vazio da futura biblioteca.                                             |
-| `/comunidade` | Estado vazio da futura comunidade.                                             |
-| `/status`     | Estado atual da implementação.                                                 |
-| `/api/health` | Resposta de saúde do processo web. Não verifica Supabase, banco ou IA.         |
+| Rota                  | Função atual                                                                               |
+| --------------------- | ------------------------------------------------------------------------------------------ |
+| `/`                   | Apresentação inicial e escopo da plataforma.                                               |
+| `/chat`               | Assistência guiada com seletores, seis modos e histórico temporário.                       |
+| `POST /api/assistant` | Valida a pergunta e retorna orientação do catálogo, esclarecimento ou limite de cobertura. |
+| `/projetos`           | Estado vazio da futura biblioteca.                                                         |
+| `/comunidade`         | Estado vazio da futura comunidade.                                                         |
+| `/status`             | Estado atual da implementação.                                                             |
+| `/api/health`         | Resposta de saúde do processo web. Não verifica Supabase, banco ou IA.                     |
+
+No endpoint `POST /api/assistant`, `followUp` é entrada não confiável e representa apenas o estado de esclarecimento declarado pelo cliente. O servidor valida os campos e as enumerações, sem confirmar que emitiu o esclarecimento anterior. O campo serve à seleção de orientações públicas do catálogo e não comprova sessão, identidade ou autorização.
 
 ## Stack e decisões
 

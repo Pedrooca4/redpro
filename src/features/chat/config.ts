@@ -1,3 +1,5 @@
+export const MESSAGE_LIMIT = 4000;
+
 export const EDITIONS = {
   JAVA: {
     label: "JavaMine",
@@ -17,7 +19,7 @@ export const MODES = [
     id: "RED",
     title: "Redstone e engenharia",
     description: "Da primeira alavanca aos seus circuitos mais complexos.",
-    question: "Por que meu pistão se comporta de forma diferente entre edições?",
+    question: "Meu pistão não estende. Como testo a alimentação?",
   },
   {
     id: "FARM",
@@ -35,19 +37,19 @@ export const MODES = [
     id: "COMMAND",
     title: "Comandos e datapacks",
     description: "Entenda a sintaxe e o contexto de cada comando.",
-    question: "Explique um comando para minha edição e suas permissões.",
+    question: "Como uso /help para conferir a sintaxe e as permissões?",
   },
   {
     id: "MODS",
     title: "Mods e add-ons",
     description: "Organize versões, dependências e evidências de erros.",
-    question: "Como identificar um conflito entre mods no meu crash report?",
+    question: "Meu jogo fecha ao iniciar com mods Fabric. Como investigo?",
   },
   {
     id: "SURVIVAL",
     title: "Sobrevivência e exploração",
     description: "Seu próximo passo na mineração, exploração e progressão.",
-    question: "Como planejar minha busca por diamantes nesta versão?",
+    question: "Quero minerar diamantes e uso picareta de pedra. Como me preparo?",
   },
 ] as const;
 export type Mode = (typeof MODES)[number]["id"];
@@ -59,8 +61,7 @@ export const TOOLS = [
     name: "Doutor de crash logs",
     mode: "MODS",
     description: "Organizar evidências, loader, dependências e possíveis conflitos.",
-    limit:
-      "Antes de enviar, remova nomes, caminhos pessoais e tokens do relatório. Não cole logs privados neste protótipo.",
+    limit: "Descreva o sintoma sem copiar nomes, caminhos pessoais, tokens ou logs privados.",
     question: "Quais informações devo remover de um crash report antes de pedir ajuda?",
   },
   {
@@ -110,18 +111,27 @@ export const TOOLS = [
   mode: Mode;
 } & ({ href: string } | { description: string; limit: string; question: string }))[];
 
+const alternativeQuestions: Record<Mode, string> = {
+  RED: "Meu pistão não retrai. Como isolo a falha?",
+  FARM: "Minha farm de ferro parou e nenhum golem aparece. Como verifico?",
+  BUILDER: "Quantos blocos preciso para o piso de uma base 21 × 21?",
+  COMMAND: "Como listar os comandos disponíveis no meu mundo?",
+  MODS: "Um mod Fabric indica erro de dependência. Como verifico?",
+  SURVIVAL: "Como minerar ferro com uma picareta de pedra?",
+};
+
 export function suggestionsFor(context: MinecraftContext): string[] {
   const edition = EDITIONS[context.edition].label;
   const version = context.game_version
     ? `versão ${context.game_version}`
     : "versão ainda não informada";
   const mode = MODES.find((entry) => entry.id === context.mode)!;
-  return [
-    `${mode.question} Uso ${edition}, ${version}.`,
-    context.mode === "MODS" && context.edition === "BEDROCK"
-      ? "Como organizar a compatibilidade dos meus add-ons Bedrock?"
-      : `Quais informações preciso reunir para começar com ${mode.title.toLowerCase()} em ${edition}?`,
-  ];
+  const bedrockMods = context.mode === "MODS" && context.edition === "BEDROCK";
+  const primary = bedrockMods ? "Um add-on de mundo não ativa. Como investigo?" : mode.question;
+  const secondary = bedrockMods
+    ? "Como diagnosticar conflito entre pacotes de comportamento?"
+    : alternativeQuestions[context.mode];
+  return [`${primary} Uso ${edition}, ${version}.`, secondary];
 }
 
 // Reference choices are examples, never a claim about the latest Minecraft release.

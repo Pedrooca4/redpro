@@ -11,7 +11,24 @@ import {
   chatReducer as reduce,
   initialChatState,
   MESSAGE_LIMIT,
+  type ChatState,
 } from "../src/features/chat/state.ts";
+import { guide } from "../src/features/assistant/guide.ts";
+
+function receipt(state: ChatState) {
+  const turn = state.pending;
+  assert.ok(turn);
+  return {
+    type: "complete",
+    id: turn.id,
+    reply: guide({ message: turn.text, context: turn.context, followUp: turn.followUp }),
+  } as const;
+}
+
+function send(state: ChatState) {
+  const pending = reduce(state, { type: "submit" });
+  return reduce(pending, receipt(pending));
+}
 
 test("context starts with explicit unknown version and distinct edition labels", () => {
   assert.deepEqual(initialChatState().context, {
@@ -45,7 +62,7 @@ test("all six specialties have edition-aware suggestions without fabricated answ
 test("switching edition resets version while preserving draft and prior message context", () => {
   let state = reduce(initialChatState(), { type: "version", value: "1.20.1" });
   state = reduce(state, { type: "draft", value: "Uma pergunta de teste" });
-  state = reduce(reduce(state, { type: "submit" }), { type: "complete" });
+  state = send(state);
   state = reduce(state, { type: "draft", value: "Meu rascunho" });
   state = reduce(state, { type: "version", value: "bad" });
   assert.ok(state.versionError);
@@ -70,7 +87,7 @@ test("R1-001: reapplying the same valid version preserves the conversation", () 
   let state = reduce(initialChatState(), { type: "version", value: "1.21.1" });
   state = reduce(state, { type: "mode", value: "BUILDER" });
   state = reduce(state, { type: "draft", value: "Mensagem anterior" });
-  state = reduce(reduce(state, { type: "submit" }), { type: "complete" });
+  state = send(state);
   const previous = reduce(state, { type: "draft", value: "Rascunho mantido" });
 
   const invalid = reduce(previous, { type: "version", value: "bad" });
@@ -101,9 +118,9 @@ test("R2: rejecting a version removes the earlier success notice and preserves t
 test("R2: a new notice is cleared even when the version error already exists", () => {
   let state = reduce(initialChatState(), { type: "version", value: "bad" });
   state = reduce(state, { type: "draft", value: "Mensagem local" });
-  const sent = reduce(reduce(state, { type: "submit" }), { type: "complete" });
+  const sent = send(state);
   assert.ok(sent.versionError);
-  assert.match(sent.notice, /Mensagem exibida apenas nesta página/);
+  assert.match(sent.notice, /limite do catálogo/);
 
   const rejected = reduce(sent, { type: "version", value: "bad" });
   assert.deepEqual(rejected, { ...sent, notice: "" });
@@ -113,7 +130,7 @@ test("R2: a new notice is cleared even when the version error already exists", (
 test("R1-002/R1-008: correcting to another version preserves the sent context and draft", () => {
   let state = reduce(initialChatState(), { type: "version", value: "1.21.1" });
   state = reduce(state, { type: "draft", value: "Mensagem anterior" });
-  state = reduce(reduce(state, { type: "submit" }), { type: "complete" });
+  state = send(state);
   state = reduce(state, { type: "draft", value: "Próxima mensagem" });
   state = reduce(state, { type: "version", value: "bad" });
   assert.equal(state.context.game_version, "1.21.1");
@@ -123,6 +140,7 @@ test("R1-002/R1-008: correcting to another version preserves the sent context an
   assert.equal(state.versionError, null);
   assert.equal(state.context.game_version, "1.20.2");
   assert.equal(state.messages[0]!.context.game_version, "1.21.1");
+  assert.equal(state.messages[0]!.reply.context.game_version, "1.21.1");
   assert.equal(state.draft, "Próxima mensagem");
   assert.match(state.notice, /perder validade/);
 });
@@ -156,31 +174,60 @@ test("empty or oversized messages fail locally without deleting drafts", () => {
     assert.equal(state.messages.length, 0);
   }
 });
-test("failed local preview preserves draft and retry appends once with captured context", () => {
+test("failed request preserves draft and retry appends one reply with captured context", () => {
   let state = reduce(initialChatState(), { type: "draft", value: "Olá" });
   state = reduce(state, { type: "submit" });
-  assert.equal(state.phase, "previewing");
+  assert.equal(state.phase, "sending");
   assert.equal(reduce(state, { type: "submit" }), state);
   assert.equal(reduce(state, { type: "mode", value: "MODS" }), state);
-  state = reduce(state, { type: "fail" });
-  assert.equal(state.composerError?.kind, "preview");
+  state = reduce(state, { type: "fail", id: state.pending!.id });
+  assert.equal(state.composerError?.kind, "request");
   assert.equal(state.versionError, null);
   assert.equal(state.draft, "Olá");
   assert.equal(state.messages.length, 0);
-  state = reduce(reduce(state, { type: "submit" }), { type: "complete" });
-  state = reduce(state, { type: "complete" });
+  state = reduce(state, { type: "submit" });
+  const completed = receipt(state);
+  state = reduce(state, completed);
+  state = reduce(state, completed);
   assert.equal(state.messages.length, 1);
   assert.equal(state.draft, "");
-  assert.match(state.notice, /Nenhuma pergunta foi enviada/);
+  assert.match(state.notice, /limite do catálogo/);
 });
-test("new conversation cancels pending preview, clears messages and retains preferences", () => {
+test("new conversation discards delayed success and failure, including during a new request", () => {
   let state = reduce(initialChatState(), { type: "mode", value: "FARM" });
   state = reduce(state, { type: "draft", value: "Não deve aparecer" });
-  state = reduce(reduce(state, { type: "submit" }), { type: "new" });
-  state = reduce(state, { type: "complete" });
+  state = reduce(state, { type: "submit" });
+  const stale = receipt(state);
+  state = reduce(state, { type: "new" });
+  state = reduce(state, stale);
   assert.equal(state.context.mode, "FARM");
   assert.equal(state.messages.length, 0);
   assert.equal(state.draft, "");
+  state = reduce(state, { type: "draft", value: "Nova pergunta" });
+  state = reduce(state, { type: "submit" });
+  assert.notEqual(state.pending?.id, stale.id);
+  assert.equal(reduce(state, stale), state);
+  assert.equal(reduce(state, { type: "fail", id: stale.id }), state);
+  state = reduce(state, receipt(state));
+  assert.deepEqual(
+    state.messages.map(({ text }) => text),
+    ["Nova pergunta"],
+  );
+});
+test("follow-up stays in the conversation and uses only the matching context", () => {
+  let state = reduce(initialChatState(), { type: "version", value: "1.21.1" });
+  state = reduce(state, { type: "draft", value: "Quero minerar diamantes" });
+  const asked = send(state);
+  assert.equal(asked.messages[0]!.reply.type, "CLARIFICATION");
+  const next = reduce(asked, { type: "draft", value: "Ferro" });
+  const pending = reduce(next, { type: "submit" });
+  assert.equal(pending.pending?.followUp?.field, "pickaxe");
+  const completed = reduce(pending, receipt(pending));
+  assert.equal(completed.messages[1]!.reply.type, "ANSWER");
+  const newMode = reduce(next, { type: "mode", value: "SURVIVAL" });
+  assert.equal(reduce(newMode, { type: "submit" }).pending?.followUp, undefined);
+  const newVersion = reduce(next, { type: "version", value: "1.20.1" });
+  assert.equal(reduce(newVersion, { type: "submit" }).pending?.followUp, undefined);
 });
 test("the calculator links to its route and the other five tools prepare preview questions", () => {
   assert.equal(TOOLS.length, 6);
@@ -201,3 +248,21 @@ test("the calculator links to its route and the other five tools prepare preview
     assert.equal(state.messages.length, 0);
   }
 });
+
+for (const [message, kind] of [
+  ["Planeje uma base 21 × 21.", "ANSWER"],
+  ["Meu pistão não funciona como esperado.", "CLARIFICATION"],
+] as const) {
+  test("C-DEF-002: successive " + kind + " turns publish distinguishable notices", () => {
+    const initial = reduce(initialChatState(), { type: "version", value: "1.21.1" });
+    const first = send(reduce(initial, { type: "draft", value: message }));
+    const second = send(reduce(first, { type: "draft", value: message }));
+    assert.deepEqual(
+      second.messages.map(({ reply }) => reply.type),
+      [kind, kind],
+    );
+    assert.notEqual(first.notice, second.notice);
+    assert.match(first.notice, /^Resposta 1\./);
+    assert.match(second.notice, /^Resposta 2\./);
+  });
+}
