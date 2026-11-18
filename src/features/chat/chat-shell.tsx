@@ -31,6 +31,7 @@ export function ChatShell() {
   const textarea = useRef<HTMLTextAreaElement>(null);
   const messages = useRef<HTMLDivElement>(null);
   const busy = state.phase === "previewing";
+  const invalidMessage = state.composerError?.kind === "message";
   const mode = MODES.find((entry) => entry.id === state.context.mode)!;
   const Icon = MODE_ICONS[mode.id];
   useEffect(() => {
@@ -89,6 +90,7 @@ export function ChatShell() {
               context={state.context}
               dispatch={dispatch}
               disabled={busy}
+              error={state.versionError}
             />
           </div>
         </header>
@@ -208,9 +210,9 @@ export function ChatShell() {
             <div className="context-announcement" role="status" aria-live="polite">
               {state.notice}
             </div>
-            {state.error ? (
-              <p className="composer-error" role="alert">
-                {state.error}
+            {state.composerError ? (
+              <p id="composer-error" className="composer-error" role="alert">
+                {state.composerError.text}
               </p>
             ) : null}
             <form
@@ -232,8 +234,12 @@ export function ChatShell() {
                   rows={2}
                   value={state.draft}
                   readOnly={busy}
-                  aria-invalid={!!state.error}
-                  aria-describedby="composer-help composer-count"
+                  aria-invalid={invalidMessage || undefined}
+                  aria-describedby={
+                    invalidMessage
+                      ? "composer-help composer-count composer-error"
+                      : "composer-help composer-count"
+                  }
                   placeholder={`O que você quer explorar com ${EDITIONS[state.context.edition].label}?`}
                   onChange={(event) => dispatch({ type: "draft", value: event.target.value })}
                   onKeyDown={(event) => {
