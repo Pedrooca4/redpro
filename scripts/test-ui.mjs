@@ -7,6 +7,10 @@ import { expect } from "playwright/test";
 // or repeat a failed action to manufacture a pass.
 const uiExpect = expect.configure({ timeout: 30_000 });
 const versionRounds = 20;
+const versionErrorText =
+  "Informe uma versão numérica, como 1.21.1, ou deixe a versão não informada.";
+const messageErrorText =
+  "Escreva uma mensagem de 1 a 4000 caracteres. Seu rascunho foi preservado.";
 
 const base = process.env.SMOKE_BASE_URL || "http://127.0.0.1:3000";
 const artifactDir = process.env.UI_ARTIFACT_DIR || "coverage/ui";
@@ -128,15 +132,23 @@ try {
     await page.getByRole("link", { name: "Explorar o assistente" }).click();
     await page.waitForURL(new URL("/chat", base).href);
     const draft = page.getByLabel(/^Sua mensagem/);
+    const version = page.getByLabel("Versão do Minecraft", { exact: true });
+    const customVersion = page.getByLabel("Outra versão (ex.: 1.21.1)");
+    const applyVersion = page.getByRole("button", { name: "Aplicar", exact: true });
+    const versionError = page.locator(".version-control").getByRole("alert");
+    const composerError = page.locator(".composer-area").getByRole("alert");
+    const contextNotice = page.locator(".context-announcement");
+    const footnote = page.locator(".composer-footnote");
     const edition = (name) => page.getByRole("button", { name, exact: true });
     const mode = (name) => page.getByRole("button", { name, exact: true });
     await draft.fill("Rascunho preservado");
-    await page.getByLabel("Versão do Minecraft", { exact: true }).selectOption("1.21.1");
+    await version.selectOption("1.21.1");
+    await uiExpect(contextNotice).toHaveText("Versão atualizada; seu rascunho foi mantido.");
     await edition("BedMine").click();
     assert.equal(await edition("BedMine").getAttribute("aria-pressed"), "true");
     assert.equal(await draft.inputValue(), "Rascunho preservado");
-    assert.equal(await page.getByLabel("Versão do Minecraft", { exact: true }).inputValue(), "");
-    await page.getByLabel("Versão do Minecraft", { exact: true }).selectOption("1.21.0");
+    await uiExpect(version).toHaveValue("");
+    await version.selectOption("1.21.0");
     for (const name of ["RED", "FARM", "BUILDER", "COMMAND", "MODS", "SURVIVAL"]) {
       await mode(name).click();
       assert.equal(await mode(name).getAttribute("aria-pressed"), "true");
@@ -158,10 +170,15 @@ try {
       .waitFor();
     assert.equal(await page.locator(".local-message").count(), 1);
     await checkShortcut();
-    assert.match(await page.locator(".message-meta").innerText(), /BedMine.*1.21.0.*SURVIVAL/);
+    const sentContext = page.locator(".message-meta");
+    await uiExpect(sentContext).toHaveText(/BedMine.*1\.21\.0.*SURVIVAL/);
+    await version.selectOption("1.20.80");
+    await uiExpect(footnote).toContainText("1.20.80");
+    await uiExpect(sentContext).toHaveText(/BedMine.*1\.21\.0.*SURVIVAL/);
     await edition("JavaMine").click();
     assert.match(await page.getByRole("status").innerText(), /perder validade/);
-    assert.match(await page.locator(".message-meta").innerText(), /BedMine/);
+    await uiExpect(version).toHaveValue("");
+    await uiExpect(sentContext).toHaveText(/BedMine.*1\.21\.0.*SURVIVAL/);
 
     if (width <= 800) {
       const trigger = page.getByRole("button", { name: "Abrir navegação" });
@@ -185,16 +202,30 @@ try {
     await page.keyboard.press("Escape");
     await draft.fill("Meu rascunho após falha");
     await draft.press("Enter");
-    await page.locator(".composer-error").waitFor();
+    await uiExpect(composerError).toHaveText(
+      "Falha de demonstração: não foi possível concluir agora. Sua mensagem foi preservada. Tente novamente.",
+    );
+    await uiExpect(draft).not.toHaveAttribute("aria-invalid");
+    await uiExpect(draft).not.toHaveAccessibleDescription(/Falha de demonstração/);
+    await uiExpect(version).not.toHaveAttribute("aria-invalid");
+    await uiExpect(versionError).toHaveCount(0);
     assert.equal(await draft.inputValue(), "Meu rascunho após falha");
     assert.equal(await page.locator(".local-message").count(), 0);
     await draft.press("Enter");
     await page.locator(".local-message").waitFor();
     assert.equal(await page.locator(".local-message").count(), 1);
-    await draft.fill("x".repeat(4001));
-    await draft.press("Enter");
-    await page.locator(".composer-error").waitFor();
-    assert.equal((await draft.inputValue()).length, 4001);
+    await uiExpect(composerError).toHaveCount(0);
+    for (const invalidDraft of ["", "x".repeat(4001)]) {
+      await draft.fill(invalidDraft);
+      await draft.press("Enter");
+      await uiExpect(composerError).toHaveText(messageErrorText);
+      await uiExpect(draft).toHaveAttribute("aria-invalid", "true");
+      await uiExpect(draft).toHaveAccessibleDescription(new RegExp(messageErrorText));
+      await uiExpect(draft).toHaveValue(invalidDraft);
+      await uiExpect(versionError).toHaveCount(0);
+      await uiExpect(version).not.toHaveAttribute("aria-invalid");
+      await uiExpect(page.locator(".local-message")).toHaveCount(1);
+    }
     for (const name of [
       "Doutor de crash logs",
       "Java ↔ Bedrock",
@@ -210,30 +241,54 @@ try {
     }
     await page.getByRole("button", { name: "Assistente de seeds", exact: true }).click();
     await page.getByRole("button", { name: "Preparar pergunta", exact: true }).click();
-    assert.match(await draft.inputValue(), /verificar uma seed/);
+    const preparedDraft = await draft.inputValue();
+    assert.match(preparedDraft, /verificar uma seed/);
     assert.equal(await mode("SURVIVAL").getAttribute("aria-pressed"), "true");
-    const version = page.getByLabel("Versão do Minecraft", { exact: true });
-    const customVersion = page.getByLabel("Outra versão (ex.: 1.21.1)");
-    const applyVersion = page.getByRole("button", { name: "Aplicar", exact: true });
-    const composerError = page.locator(".composer-error");
-    const footnote = page.locator(".composer-footnote");
+    await version.selectOption("1.21.1");
+    await uiExpect(contextNotice).toContainText("Contexto alterado");
+    await version.selectOption("custom");
+    await customVersion.fill("invalid");
+    await customVersion.press("Tab");
+    await uiExpect(applyVersion).toBeFocused();
+    await page.keyboard.press("Enter");
+    await uiExpect(versionError).toHaveText(versionErrorText);
+    await uiExpect(contextNotice).toBeEmpty();
+    await uiExpect(customVersion).toHaveAttribute("aria-invalid", "true");
+    await uiExpect(customVersion).toHaveAccessibleDescription(versionErrorText);
+    await uiExpect(draft).not.toHaveAttribute("aria-invalid");
+    await customVersion.fill("1.21.1");
+    await customVersion.press("Enter");
+    await uiExpect(customVersion).toBeFocused();
+    await uiExpect(versionError).toHaveCount(0);
+    await uiExpect(customVersion).not.toHaveAttribute("aria-invalid");
+    await uiExpect(customVersion).not.toHaveAttribute("aria-describedby");
+    await uiExpect(footnote).toContainText("1.21.1");
+    await uiExpect(draft).toHaveValue(preparedDraft);
+    await uiExpect(mode("SURVIVAL")).toHaveAttribute("aria-pressed", "true");
+    await version.selectOption("");
+
     for (let round = 0; round < versionRounds; round++) {
       try {
         await version.selectOption("custom");
-        await uiExpect(composerError).toBeHidden();
+        await uiExpect(versionError).toHaveCount(0);
         await customVersion.fill("invalid");
         await uiExpect(customVersion).toHaveValue("invalid");
         await applyVersion.click();
-        await uiExpect(composerError).toHaveText(
-          "Informe uma versão numérica, como 1.21.1, ou deixe a versão não informada.",
-        );
-        await uiExpect(composerError).toBeVisible();
+        await uiExpect(versionError).toHaveText(versionErrorText);
+        await uiExpect(contextNotice).toBeEmpty();
+        await uiExpect(versionError).toBeVisible();
+        await uiExpect(customVersion).toHaveAttribute("aria-invalid", "true");
+        await uiExpect(customVersion).toHaveAccessibleDescription(versionErrorText);
+        await uiExpect(draft).not.toHaveAttribute("aria-invalid");
+        await uiExpect(composerError).toHaveCount(0);
         await uiExpect(footnote).toContainText("Versão não informada");
         await customVersion.fill("1.20.2");
         await uiExpect(customVersion).toHaveValue("1.20.2");
         await applyVersion.click();
         await uiExpect(footnote).toContainText("1.20.2");
-        await uiExpect(composerError).toBeHidden();
+        await uiExpect(versionError).toHaveCount(0);
+        await uiExpect(customVersion).not.toHaveAttribute("aria-invalid");
+        await uiExpect(draft).toHaveValue(preparedDraft);
         if (round < versionRounds - 1) {
           await version.selectOption("");
           await uiExpect(footnote).toContainText("Versão não informada");
@@ -244,7 +299,8 @@ try {
             input: document.querySelector("#custom-version")?.value ?? null,
             busy: document.querySelector(".chat-composer")?.getAttribute("aria-busy"),
             version: document.querySelector("#game-version")?.value ?? null,
-            errorVisible: !!document.querySelector(".composer-error")?.getClientRects().length,
+            errorVisible: !!document.querySelector("#version-error")?.getClientRects().length,
+            versionInvalid: document.querySelector("#custom-version")?.getAttribute("aria-invalid"),
             openDialogs: document.querySelectorAll("dialog[open]").length,
           }))
           .catch(() => ({ unavailable: true }));
@@ -409,6 +465,7 @@ try {
       tools: 6,
       materialsCalculator: "PASS",
       versionValidationCycles: versionRounds,
+      sameVersionRecovery: "PASS",
       consoleErrors: 0,
       aiRequests: 0,
     });
@@ -456,14 +513,40 @@ try {
   await page.getByRole("button", { name: "Abrir navegação" }).click();
   await page.getByRole("dialog", { name: "Navegação MinePRO" }).waitFor();
   await page.keyboard.press("Escape");
-  assert.deepEqual(compactErrors, []);
   await page.screenshot({ path: `${artifactDir}/chat-320x360.png`, fullPage: true });
+  const compactVersion = page.getByLabel("Versão do Minecraft", { exact: true });
+  const compactCustom = page.getByLabel("Outra versão (ex.: 1.21.1)");
+  const compactVersionError = page.locator(".version-control").getByRole("alert");
+  await compactVersion.selectOption("custom");
+  await compactCustom.fill("invalid");
+  await compactCustom.press("Enter");
+  await uiExpect(compactVersionError).toBeVisible();
+  await uiExpect(compactCustom).toHaveAccessibleDescription(versionErrorText);
+  await uiExpect(draft).not.toHaveAttribute("aria-invalid");
+  await page.screenshot({ path: `${artifactDir}/version-error-320x360.png`, fullPage: true });
+  const messageHeightWithVersionError = await page
+    .locator(".chat-scroll")
+    .evaluate((element) => element.getBoundingClientRect().height);
+  assert.ok(
+    messageHeightWithVersionError >= 44,
+    `Message region height with custom version error: ${messageHeightWithVersionError}px`,
+  );
+  assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
+  await compactCustom.fill("1.21.0");
+  await compactCustom.press("Enter");
+  await uiExpect(compactVersionError).toHaveCount(0);
+  await uiExpect(compactCustom).not.toHaveAttribute("aria-invalid");
+  await uiExpect(page.locator(".message-meta")).toHaveText(/BedMine.*1\.21\.0/);
+  await draft.focus();
+  await uiExpect(draft).toBeInViewport();
+  assert.deepEqual(compactErrors, []);
   results.push({
     width: 320,
     height: 360,
     scenario: "short-viewport",
     result: "PASS",
     ...geometry,
+    messageHeightWithVersionError,
   });
   console.log(
     "PASS UI 320x360px: composer does not cover tools; draft, send and mobile menu remain usable",

@@ -34,10 +34,12 @@ export function VersionSelect({
   context,
   dispatch,
   disabled,
+  error,
 }: {
   context: MinecraftContext;
   dispatch: Dispatch<ChatAction>;
   disabled: boolean;
+  error: string | null;
 }) {
   const [custom, setCustom] = useState(false);
   const [input, setInput] = useState("");
@@ -78,6 +80,8 @@ export function VersionSelect({
             value={input}
             maxLength={12}
             disabled={disabled}
+            aria-invalid={error ? true : undefined}
+            aria-describedby={error ? "version-error" : undefined}
             onChange={(event) => setInput(event.target.value)}
             onKeyDown={(event) => {
               if (event.key === "Enter") {
@@ -95,6 +99,11 @@ export function VersionSelect({
           >
             Aplicar
           </button>
+          {error ? (
+            <p id="version-error" className="version-error" role="alert">
+              {error}
+            </p>
+          ) : null}
         </div>
       ) : null}
     </div>

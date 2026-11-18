@@ -8,7 +8,8 @@ export type ChatState = {
   messages: LocalMessage[];
   pending: Omit<LocalMessage, "id"> | null;
   phase: "idle" | "previewing" | "error";
-  error: string | null;
+  versionError: string | null;
+  composerError: { kind: "message" | "preview"; text: string } | null;
   notice: string;
 };
 export function initialChatState(): ChatState {
@@ -18,7 +19,8 @@ export function initialChatState(): ChatState {
     messages: [],
     pending: null,
     phase: "idle",
-    error: null,
+    versionError: null,
+    composerError: null,
     notice: "",
   };
 }
@@ -44,36 +46,43 @@ export function chatReducer(state: ChatState, action: ChatAction): ChatState {
     return state;
   switch (action.type) {
     case "draft":
-      return { ...state, draft: action.value, error: null, phase: "idle" };
+      return { ...state, draft: action.value, composerError: null, phase: "idle" };
     case "prepare":
       return {
         ...state,
         draft: action.text,
         context: { ...state.context, mode: action.mode },
-        error: null,
+        composerError: null,
         phase: "idle",
       };
     case "edition":
     case "version": {
+      if (action.type === "version" && action.value !== null && !isGameVersion(action.value)) {
+        if (state.versionError && !state.notice) return state;
+        return {
+          ...state,
+          versionError:
+            state.versionError ??
+            "Informe uma versão numérica, como 1.21.1, ou deixe a versão não informada.",
+          notice: "",
+        };
+      }
       const changed =
         action.type === "edition"
           ? state.context.edition !== action.value
           : state.context.game_version !== action.value;
-      if (!changed) return state;
-      if (action.type === "version" && action.value !== null && !isGameVersion(action.value))
-        return {
-          ...state,
-          error: "Informe uma versão numérica, como 1.21.1, ou deixe a versão não informada.",
-          phase: "error",
-        };
+      if (!changed) {
+        if (action.type === "version" && state.versionError)
+          return { ...state, versionError: null };
+        return state;
+      }
       return {
         ...state,
         context:
           action.type === "edition"
             ? { ...state.context, edition: action.value, game_version: null }
             : { ...state.context, game_version: action.value },
-        error: null,
-        phase: "idle",
+        versionError: null,
         notice: state.messages.length
           ? "Contexto alterado: orientações anteriores podem perder validade. As mensagens locais mantêm a edição e a versão de envio."
           : action.type === "edition"
@@ -88,13 +97,16 @@ export function chatReducer(state: ChatState, action: ChatAction): ChatState {
       if (!text || text.length > MESSAGE_LIMIT)
         return {
           ...state,
-          error: `Escreva uma mensagem de 1 a ${MESSAGE_LIMIT} caracteres. Seu rascunho foi preservado.`,
+          composerError: {
+            kind: "message",
+            text: `Escreva uma mensagem de 1 a ${MESSAGE_LIMIT} caracteres. Seu rascunho foi preservado.`,
+          },
           phase: "error",
         };
       return {
         ...state,
         pending: { text, context: { ...state.context } },
-        error: null,
+        composerError: null,
         phase: "previewing",
       };
     }
@@ -114,8 +126,10 @@ export function chatReducer(state: ChatState, action: ChatAction): ChatState {
         ...state,
         pending: null,
         phase: "error",
-        error:
-          "Falha de demonstração: não foi possível concluir agora. Sua mensagem foi preservada. Tente novamente.",
+        composerError: {
+          kind: "preview",
+          text: "Falha de demonstração: não foi possível concluir agora. Sua mensagem foi preservada. Tente novamente.",
+        },
       };
   }
 }

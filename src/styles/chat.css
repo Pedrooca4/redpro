@@ -270,6 +270,14 @@ summary:focus-visible {
   padding: 6px;
   font-size: var(--text-xs);
 }
+.custom-version input[aria-invalid="true"] {
+  border-color: var(--color-error);
+}
+.version-error {
+  grid-column: 1 / -1;
+  color: var(--color-error);
+  font-size: var(--text-xs);
+}
 .chat-main {
   display: flex;
   flex-direction: column;
@@ -334,6 +342,9 @@ summary:focus-visible {
   overscroll-behavior: contain;
   scrollbar-width: thin;
   scrollbar-color: var(--color-border) transparent;
+}
+.chat-workspace:has(.custom-version) .chat-scroll {
+  min-height: 44px;
 }
 .chat-content {
   max-width: 860px;
