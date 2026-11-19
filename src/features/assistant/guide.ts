@@ -62,7 +62,7 @@ const versionComparisons = new RegExp(
 );
 const versionValues = new RegExp(versionNumber, "g");
 
-function contextConflict(
+export function contextConflict(
   text: string,
   context: MinecraftContext,
 ): "ambiguous" | "mismatch" | undefined {

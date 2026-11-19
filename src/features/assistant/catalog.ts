@@ -10,6 +10,8 @@ import type {
 
 export const supportedVersions = { JAVA: ["1.21.1"], BEDROCK: ["1.21.0"] } as const;
 
+export const builderBaseDimensions = { length: 21, width: 21, wallHeight: 3 } as const;
+
 type Procedure = {
   mode: Mode;
   topic: string;
@@ -142,9 +144,10 @@ export const catalog: Record<ProcedureId, Procedure> = {
     versions: supportedVersions,
     verification: "CALCULATED",
     build: () => {
-      const square = { length: 21, width: 21 };
+      const { length, width, wallHeight } = builderBaseDimensions;
+      const square = { length, width };
       const platform = estimateBlocks("platform", square);
-      const walls = estimateBlocks("walls", { ...square, height: 3 });
+      const walls = estimateBlocks("walls", { ...square, height: wallHeight });
       return {
         answer: {
           text: "Planeje uma base térrea de 21 × 21. Use a faixa central para a circulação e distribua armazenamento, fabricação e descanso nos lados.",

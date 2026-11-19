@@ -19,7 +19,7 @@ function error(code: AssistantError["code"], text: string, status: number): Resp
   return json({ type: "ERROR", code, text }, status);
 }
 
-async function readBody(request: Request): Promise<string | null> {
+export async function readBody(request: Request): Promise<string | null> {
   if (Number(request.headers.get("content-length")) > MAX_BODY_BYTES) return null;
   if (!request.body) return "";
   const reader = request.body.getReader();
