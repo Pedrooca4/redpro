@@ -5,7 +5,13 @@ import { randomUUID } from "node:crypto";
 export const REQUEST_ID_HEADER = "x-request-id";
 export const UUID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-const routes = ["/", "/status", "/api/health", "/api/assistant"] as const;
+const routes = [
+  "/",
+  "/status",
+  "/api/health",
+  "/api/assistant",
+  "/api/assistant/conversation",
+] as const;
 type Route = (typeof routes)[number] | "unmatched";
 type Method = "GET" | "HEAD" | "POST" | "PUT" | "PATCH" | "DELETE" | "OPTIONS" | "OTHER";
 export type RequestContext = { requestId: string; route: Route; method: Method };
@@ -73,16 +79,20 @@ export function createRequestLogger(write: LogWriter = (line) => console.info(li
 
 export const logRequest = createRequestLogger();
 
+// For App Router handlers behind proxy.ts, which replaces the incoming header.
+export function requestIdFromProxy(request: Request): string {
+  const forwarded = request.headers.get(REQUEST_ID_HEADER);
+  return forwarded && UUID_PATTERN.test(forwarded) ? forwarded : randomUUID();
+}
+
 export function withRequestLogging(
   route: (typeof routes)[number],
   handler: (request: Request) => Response | Promise<Response>,
   log = logRequest,
 ) {
   return async (request: Request): Promise<Response> => {
-    // This header is overwritten by proxy.ts; only a UUID is accepted as fallback.
-    const forwarded = request.headers.get(REQUEST_ID_HEADER);
     const context: RequestContext = {
-      requestId: forwarded && UUID_PATTERN.test(forwarded) ? forwarded : randomUUID(),
+      requestId: requestIdFromProxy(request),
       route,
       method: safeMethod(request.method),
     };
